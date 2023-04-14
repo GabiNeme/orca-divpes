@@ -1,0 +1,5 @@
+# Tests
+pytest==7.2.0
+
+# Formatting
+pre-commit==2.21.0
