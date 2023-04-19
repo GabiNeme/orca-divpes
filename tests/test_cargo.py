@@ -38,3 +38,12 @@ class TestNivel:
     def test_letra(self):
         nivel = Nivel("13.C")
         assert nivel.letra == "C"
+
+    @pytest.mark.parametrize(
+        "letra, numero_progs",
+        [("0", 0), ("A", 1), ("B", 2), ("C", 3), ("D", 4), ("E", 5)],
+    )
+    def test_correspondencia_letra_e_num_prog_horizontal(self, letra, numero_progs):
+        nivel = Nivel("1." + letra)
+
+        assert nivel.numero_progressoes_horizontais == numero_progs
