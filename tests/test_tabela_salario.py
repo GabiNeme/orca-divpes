@@ -20,5 +20,5 @@ class TestTabelaE2:
     )
     def test_valor_do_nivel(self, nivel: str, valor: float):
         tabela = Tabela()
-
-        assert tabela.valor_do(Nivel(nivel), INICIAL_E2) == valor
+        nivel_ = Nivel.from_string(nivel)
+        assert tabela.valor_do(nivel_, INICIAL_E2) == valor

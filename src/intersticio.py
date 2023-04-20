@@ -20,6 +20,6 @@ class Intersticio:
         tempo = 0
         numero = nivel.numero
         for _ in range(num_passos):
-            numero += 1
             tempo += Intersticio._intersticio(numero)
+            numero += 1
         return tempo

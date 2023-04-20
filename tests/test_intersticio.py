@@ -10,9 +10,9 @@ class TestIntersticio:
         [
             (Nivel(1, "0"), 1, 9),
             (Nivel(1, "A"), 2, 18),
-            (Nivel(7, "B"), 2, 21),
+            (Nivel(8, "B"), 2, 21),
             (Nivel(15, "C"), 2, 24),
-            (Nivel(27, "D"), 2, 27),
+            (Nivel(28, "D"), 2, 27),
             (Nivel(30, "E"), 2, 30),
         ],
     )

@@ -36,16 +36,16 @@ class TestCarreira2004:
                 Progressao(date(2022, 3, 25), Nivel(5, "A")),
             ),
             (
-                Progressao(date(2020, 1, 1), Nivel(7, "B")),
-                Progressao(date(2021, 10, 1), Nivel(9, "B")),
+                Progressao(date(2020, 1, 1), Nivel(8, "B")),
+                Progressao(date(2021, 10, 1), Nivel(10, "B")),
             ),
             (
                 Progressao(date(2021, 10, 20), Nivel(16, "C")),
                 Progressao(date(2023, 10, 20), Nivel(18, "C")),
             ),
             (
-                Progressao(date(2021, 1, 1), Nivel(27, "0")),
-                Progressao(date(2023, 4, 1), Nivel(29, "0")),
+                Progressao(date(2021, 1, 1), Nivel(28, "0")),
+                Progressao(date(2023, 4, 1), Nivel(30, "0")),
             ),
             (
                 Progressao(date(2020, 10, 3), Nivel(32, "A")),
