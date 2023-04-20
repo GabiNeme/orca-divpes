@@ -51,3 +51,12 @@ Execute:
 ```
 pytest
 ```
+Para executar os testes e medir sua cobertura, execute:
+````
+coverage run -m pytest
+```
+E para avaliar a cobertura dos testes:
+```
+coverage report -m
+coverage html
+```

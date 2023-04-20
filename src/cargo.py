@@ -1,7 +1,7 @@
 from enum import Enum
 
 NIVEL_MINIMO = 1
-NIVEL_MAXIMO = 47
+NIVEL_MAXIMO = 57
 POSSIVEIS_LETRAS = ["0", "A", "B", "C", "D", "E"]
 
 
@@ -78,10 +78,3 @@ class Nivel:
 
     def __hash__(self) -> int:
         return self.numero * (self.numero_progressoes_horizontais + 1000)
-
-
-class Cargo:
-    def __init__(self, classe: Classe, nivel: Nivel, e_procurador: bool) -> None:
-        self.classe = classe
-        self.nivel = nivel
-        self.e_procurador = e_procurador

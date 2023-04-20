@@ -14,6 +14,7 @@ class TestIntersticio:
             (Nivel(15, "C"), 2, 24),
             (Nivel(28, "D"), 2, 27),
             (Nivel(30, "E"), 2, 30),
+            (Nivel(48, "0"), 2, 48),
         ],
     )
     def test_calcula_tempo_para_progredir(

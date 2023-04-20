@@ -90,5 +90,3 @@ class Desenvolvimento:
                 dt_prog.month == data.month and dt_prog.year == data.year
             ):
                 return progressao.nivel
-
-        return self.progressoes[-1].nivel

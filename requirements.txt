@@ -1,5 +1,6 @@
 # Tests
 pytest==7.2.0
+coverage==7.2.3
 
 # Formatting
 pre-commit==2.21.0

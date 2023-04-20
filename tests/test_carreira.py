@@ -142,6 +142,7 @@ class TestCarreira2004:
             (Nivel(18, "D")),
             (Nivel(24, "E")),
             (Nivel(10, "E")),
+            (Nivel(40, "0")),
         ],
     )
     def test_checa_nivel_valido_lanca_excecao_se_invalido(self, nivel):
