@@ -3,3 +3,6 @@ pytest==7.2.0
 
 # Formatting
 pre-commit==2.21.0
+
+# Fazer contas com datas
+python-dateutil==2.8.2
