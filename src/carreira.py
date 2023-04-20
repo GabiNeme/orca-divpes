@@ -66,6 +66,10 @@ class Carreira2004:
         não, e concede todas as letras permitidas pelo nível final."""
 
         progressao = self.progride_verticalmente(ultima_progressao, especial)
+
+        if not progressao:
+            return None
+
         nivel_com_letras = self.concede_letras_ate_limite(progressao.nivel)
         return Progressao(progressao.data, nivel_com_letras)
 
@@ -110,9 +114,9 @@ class Carreira2004:
     def progressao_vertical_anterior(self, progressao: Progressao):
         """Calcula a progressão que aconteceu imediatamente antes da informada."""
 
-        self.checa_nivel_valido(progressao.nivel)        
+        self.checa_nivel_valido(progressao.nivel)
 
-        dois_niveis_atras = progressao.nivel.anterior(2,0)
+        dois_niveis_atras = progressao.nivel.anterior(2, 0)
         intersticio = Intersticio.tempo_para_progredir(dois_niveis_atras, 2)
         dt_prog_anterior = progressao.data - relativedelta(months=intersticio)
 
