@@ -1,6 +1,6 @@
 # Orça DIVPES
 
-O objetivo desse repositório é criar um sistema de orçamento com gastos de pessoal para a Câmara Municipal de Belo Horizonte, considerando diferentes critérios de aposentadoria, progressão, reajustes e os diversos tipos de servidores: efetivos, vereadores, amplos, à disposição. 
+O objetivo desse repositório é criar um sistema de orçamento com gastos de pessoal para a Câmara Municipal de Belo Horizonte, considerando diferentes critérios de aposentadoria, progressão, reajustes e os diversos tipos de servidores: efetivos, vereadores, amplos, à disposição.
 
 Considerando a especificidade dos termos, seria inviável e pouco prático que esse repositório fosse em inglês, pois causaria mais confusão na tradução dos termos para quem for contribuir.
 
@@ -52,7 +52,7 @@ Execute:
 pytest
 ```
 Para executar os testes e medir sua cobertura, execute:
-````
+```
 coverage run -m pytest
 ```
 E para avaliar a cobertura dos testes:
