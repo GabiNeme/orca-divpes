@@ -7,3 +7,6 @@ pre-commit==2.21.0
 
 # Fazer contas com datas
 python-dateutil==2.8.2
+
+# Congelar datas para testar usando date.today()
+freezegun==1.2.2
