@@ -6,6 +6,7 @@ POSSIVEIS_LETRAS = ["0", "A", "B", "C", "D", "E"]
 
 
 class Classe(Enum):
+    E1 = "E1"
     E2 = "E2"
     E3 = "E3"
 

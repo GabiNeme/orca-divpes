@@ -4,6 +4,10 @@ from src.cargo import Classe, Nivel
 
 
 class TestClasse:
+    def test_classe_E1(self):
+        classe = Classe["E1"]
+        assert classe == Classe.E1
+
     def test_classe_E2(self):
         classe = Classe["E2"]
         assert classe == Classe.E2
@@ -14,7 +18,7 @@ class TestClasse:
 
     def test_classe_nao_aceita_outra_classe(self):
         with pytest.raises(KeyError):
-            _ = Classe["E1"]
+            _ = Classe["E4"]
 
 
 class TestNivel:
