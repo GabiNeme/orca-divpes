@@ -7,6 +7,14 @@ from dateutil.relativedelta import relativedelta
 from src.cargo import Classe, Nivel
 from src.intersticio import Intersticio
 
+TRANSICAO_PARA_LETRA = [
+    (1, "A"),
+    (7, "B"),
+    (13, "C"),
+    (19, "D"),
+    (25, "E"),
+]
+
 
 @dataclass
 class Progressao:
@@ -16,24 +24,12 @@ class Progressao:
 
 class Carreira2004:
     def __init__(self, classe: Classe) -> None:
+        self.transicao_para_letra = TRANSICAO_PARA_LETRA
+
         if classe == Classe.E2:
             self.limite = 37
-            self.transicao_para_letra = [
-                (1, "A"),
-                (7, "B"),
-                (13, "C"),
-                (19, "D"),
-                (27, "E"),
-            ]
         elif classe == Classe.E3:
             self.limite = 36
-            self.transicao_para_letra = [
-                (1, "A"),
-                (7, "B"),
-                (13, "C"),
-                (19, "D"),
-                (25, "E"),
-            ]
 
     def progride_verticalmente(
         self, ultima_progressao: Progressao, especial: bool

@@ -17,12 +17,12 @@ class TestCarreira2004:
             (Nivel(13, "0"), Nivel(13, "C")),
             (Nivel(18, "A"), Nivel(18, "C")),
             (Nivel(19, "C"), Nivel(19, "D")),
-            (Nivel(26, "A"), Nivel(26, "D")),
-            (Nivel(27, "0"), Nivel(27, "E")),
+            (Nivel(24, "A"), Nivel(24, "D")),
+            (Nivel(25, "0"), Nivel(25, "E")),
             (Nivel(36, "B"), Nivel(36, "E")),
         ],
     )
-    def test_concede_letras_ate_limitel(self, nivel_origem, nivel_destino):
+    def test_concede_letras_ate_limite(self, nivel_origem, nivel_destino):
         assert (
             Carreira2004(Classe.E2).concede_letras_ate_limite(nivel_origem)
             == nivel_destino
