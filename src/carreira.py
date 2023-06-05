@@ -123,14 +123,3 @@ class Carreira2004(Carreira):
 
         if numero_invalido(nivel.numero) or letra_invalida(nivel):
             raise (ValueError("O nível " + str(nivel) + " não existe nessa carreira."))
-
-    def progressao_vertical_anterior(self, progressao: Progressao):
-        """Calcula a progressão que aconteceu imediatamente antes da informada."""
-
-        self.checa_nivel_valido(progressao.nivel)
-
-        dois_niveis_atras = progressao.nivel.anterior(2, 0)
-        intersticio = Intersticio.tempo_para_progredir(dois_niveis_atras, 2)
-        dt_prog_anterior = progressao.data - relativedelta(months=intersticio)
-
-        return Progressao(dt_prog_anterior, dois_niveis_atras)

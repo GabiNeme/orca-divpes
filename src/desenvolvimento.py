@@ -10,33 +10,18 @@ class Desenvolvimento:
         carreira: Carreira2004,
         nivel_atual: Nivel,
         dt_ult_prog_vert: date,
-        dt_ult_prog_especial: date,
+        progs_sem_especial: int,
     ) -> None:
         self.carreira = carreira
         self.progressoes = [
             Progressao(dt_ult_prog_vert, nivel_atual),
         ]
-        self.progressoes_sem_especial = self._conta_progressoes_sem_especial(
-            dt_ult_prog_vert, dt_ult_prog_especial
-        )
+        self.progressoes_sem_especial = progs_sem_especial
         self.concede_letras = self._decide_se_concedera_letras()
         if self.concede_letras:
             self.progressoes[0].nivel = self.carreira.concede_letras_ate_limite(
                 self.progressoes[0].nivel
             )
-
-    def _conta_progressoes_sem_especial(
-        self, dt_ult_prog_vert: date, dt_ult_prog_especial: date
-    ) -> int:
-        if dt_ult_prog_vert == dt_ult_prog_especial:
-            return 0
-
-        prog_anterior = self.carreira.progressao_vertical_anterior(self.progressoes[0])
-
-        if prog_anterior.data == dt_ult_prog_especial:
-            return 1
-
-        return 2
 
     def _decide_se_concedera_letras(self):
         """Concede todas as letras se a pessoa tiver a uma letra ou na letra máxima

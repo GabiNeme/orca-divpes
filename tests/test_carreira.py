@@ -56,7 +56,6 @@ class TestCarreira2004:
     def test_progressao_vertical_nao_especial(self, prog_antes, prog_depois):
         carreira = Carreira2004(Classe.E2)
         assert carreira.progride_verticalmente(prog_antes, False) == prog_depois
-        assert carreira.progressao_vertical_anterior(prog_depois) == prog_antes
 
     @pytest.mark.parametrize(
         "prog_antes, prog_depois",
