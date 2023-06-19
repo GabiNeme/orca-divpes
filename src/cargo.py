@@ -39,7 +39,9 @@ class Nivel:
     @numero.setter
     def numero(self, value: int) -> None:
         if value < NIVEL_MINIMO or value > NIVEL_MAXIMO:
-            raise ValueError("O número do nível deve estar entre 1 e 45")
+            raise ValueError(
+                "O número do nível deve estar entre %i e %i", NIVEL_MINIMO, NIVEL_MAXIMO
+            )
         self._numero = value
 
     @property
