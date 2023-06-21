@@ -20,11 +20,11 @@ class Carreira(ABC):
     def __init__(self, classe: Classe) -> None:
         self.classe = classe
 
-    def progride_verticalmente(
-        self, ultima_progressao: Progressao, especial: bool = False
+    def progride_verticalmente_por_quantidade_de_niveis(
+        self, ultima_progressao: Progressao, numero_niveis: int
     ) -> Optional[Progressao]:
-        """Calcula uma progressão vertical (2 interstícios), podendo ser especial
-        ou não."""
+        """Calcula uma progressão vertical (2 interstícios), permitindo definir quantos
+        níveis serão progredidos."""
 
         self.checa_nivel_valido(ultima_progressao.nivel)
         limite = self.limite(ultima_progressao.nivel)
@@ -35,23 +35,35 @@ class Carreira(ABC):
         intersticio = Intersticio.tempo_para_progredir(ultima_progressao.nivel, 2)
         dt_prox_prog = ultima_progressao.data + relativedelta(months=intersticio)
 
-        if especial:
-            num_niveis = 3
-        else:
-            num_niveis = 2
-
-        if num_niveis + ultima_progressao.nivel.numero > limite:
-            num_niveis = limite - ultima_progressao.nivel.numero
-            if num_niveis == 1:
+        if numero_niveis + ultima_progressao.nivel.numero > limite:
+            numero_niveis = limite - ultima_progressao.nivel.numero
+            if numero_niveis == 1:
                 # Se leva só um nível na última progressão, ganha crédito de 15 dias
                 # para a próxima progressão.
                 return Progressao(
                     dt_prox_prog,
-                    ultima_progressao.nivel.proximo(num_niveis, 0),
+                    ultima_progressao.nivel.proximo(numero_niveis, 0),
                     credito_meses_prox_prog=15,
                 )
 
-        return Progressao(dt_prox_prog, ultima_progressao.nivel.proximo(num_niveis, 0))
+        return Progressao(
+            dt_prox_prog, ultima_progressao.nivel.proximo(numero_niveis, 0)
+        )
+
+    def progride_verticalmente(
+        self, ultima_progressao: Progressao, especial: bool = False
+    ) -> Optional[Progressao]:
+        """Calcula uma progressão vertical (2 interstícios), podendo ser especial
+        ou não."""
+
+        if especial:
+            niveis = 3
+        else:
+            niveis = 2
+
+        return self.progride_verticalmente_por_quantidade_de_niveis(
+            ultima_progressao, niveis
+        )
 
     def progride_verticalmente_e_horizontalmente(
         self, ultima_progressao: Progressao, especial: bool

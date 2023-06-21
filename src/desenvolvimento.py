@@ -1,13 +1,13 @@
 from datetime import date
 
 from src.cargo import Nivel
-from src.carreira import Carreira2004, Progressao
+from src.carreira import Carreira, Progressao
 
 
 class Desenvolvimento:
     def __init__(
         self,
-        carreira: Carreira2004,
+        carreira: Carreira,
         nivel_atual: Nivel,
         dt_ult_prog_vert: date,
         progs_sem_especial: int,
