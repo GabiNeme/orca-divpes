@@ -33,72 +33,69 @@ class TestCarreira2004:
         "prog_antes, prog_depois",
         [
             (
-                Progressao(date(2020, 9, 25), Nivel(3, "A")),
-                Progressao(date(2022, 3, 25), Nivel(5, "A")),
+                Progressao(date(2020, 9, 25), Nivel(3, "A"), progs_sem_especial=0),
+                Progressao(date(2022, 3, 25), Nivel(5, "A"), progs_sem_especial=1),
             ),
             (
-                Progressao(date(2020, 1, 1), Nivel(8, "B")),
-                Progressao(date(2021, 10, 1), Nivel(10, "B")),
+                Progressao(date(2020, 1, 1), Nivel(8, "B"), progs_sem_especial=0),
+                Progressao(date(2021, 10, 1), Nivel(10, "B"), progs_sem_especial=1),
             ),
             (
-                Progressao(date(2021, 10, 20), Nivel(16, "C")),
-                Progressao(date(2023, 10, 20), Nivel(18, "C")),
+                Progressao(date(2021, 10, 20), Nivel(16, "C"), progs_sem_especial=0),
+                Progressao(date(2023, 10, 20), Nivel(18, "C"), progs_sem_especial=1),
             ),
             (
-                Progressao(date(2021, 1, 1), Nivel(28, "0")),
-                Progressao(date(2023, 4, 1), Nivel(30, "0")),
+                Progressao(date(2021, 1, 1), Nivel(28, "0"), progs_sem_especial=0),
+                Progressao(date(2023, 4, 1), Nivel(30, "0"), progs_sem_especial=1),
             ),
             (
-                Progressao(date(2020, 10, 3), Nivel(32, "A")),
-                Progressao(date(2023, 4, 3), Nivel(34, "A")),
+                Progressao(date(2020, 10, 3), Nivel(32, "A"), progs_sem_especial=1),
+                Progressao(date(2023, 4, 3), Nivel(34, "A"), progs_sem_especial=2),
             ),
         ],
     )
     def test_progressao_vertical_nao_especial(self, prog_antes, prog_depois):
         carreira = Carreira2004(Classe.E2)
-        assert carreira.progride_verticalmente(prog_antes, False) == prog_depois
+        assert carreira.progride_verticalmente(prog_antes) == prog_depois
 
     @pytest.mark.parametrize(
         "prog_antes, prog_depois",
         [
             (
-                Progressao(date(2021, 7, 13), Nivel(5, "A")),
-                Progressao(date(2023, 1, 13), Nivel(8, "A")),
+                Progressao(date(2021, 7, 13), Nivel(5, "A"), progs_sem_especial=2),
+                Progressao(date(2023, 1, 13), Nivel(8, "A"), progs_sem_especial=0),
             ),
             (
-                Progressao(date(2026, 10, 13), Nivel(12, "B")),
-                Progressao(date(2028, 10, 13), Nivel(15, "B")),
+                Progressao(date(2026, 10, 13), Nivel(12, "B"), progs_sem_especial=2),
+                Progressao(date(2028, 10, 13), Nivel(15, "B"), progs_sem_especial=0),
             ),
             (
-                Progressao(date(2032, 10, 13), Nivel(19, "D")),
-                Progressao(date(2034, 10, 13), Nivel(22, "D")),
+                Progressao(date(2032, 10, 13), Nivel(19, "D"), progs_sem_especial=2),
+                Progressao(date(2034, 10, 13), Nivel(22, "D"), progs_sem_especial=0),
             ),
         ],
     )
     def test_progressao_vertical_com_especial(self, prog_antes, prog_depois):
         carreira = Carreira2004(Classe.E2)
-        assert carreira.progride_verticalmente(prog_antes, True) == prog_depois
+        assert carreira.progride_verticalmente(prog_antes) == prog_depois
 
     @pytest.mark.parametrize(
-        "prog_antes, especial, prog_depois",
+        "prog_antes, prog_depois",
         [
             (
-                Progressao(date(2021, 7, 13), Nivel(5, "A")),
-                True,
-                Progressao(date(2023, 1, 13), Nivel(8, "B")),
+                Progressao(date(2021, 7, 13), Nivel(5, "A"), progs_sem_especial=2),
+                Progressao(date(2023, 1, 13), Nivel(8, "B"), progs_sem_especial=0),
             ),
             (
-                Progressao(date(2026, 10, 13), Nivel(18, "C")),
-                False,
-                Progressao(date(2028, 10, 13), Nivel(20, "D")),
+                Progressao(date(2026, 10, 13), Nivel(18, "C"), progs_sem_especial=0),
+                Progressao(date(2028, 10, 13), Nivel(20, "D"), progs_sem_especial=1),
             ),
         ],
     )
-    def test_progressao_vertical_e_horizontal(self, prog_antes, especial, prog_depois):
+    def test_progressao_vertical_e_horizontal(self, prog_antes, prog_depois):
         carreira = Carreira2004(Classe.E2)
         assert (
-            carreira.progride_verticalmente_e_horizontalmente(prog_antes, especial)
-            == prog_depois
+            carreira.progride_verticalmente_e_horizontalmente(prog_antes) == prog_depois
         )
 
     @pytest.mark.parametrize(
@@ -106,31 +103,30 @@ class TestCarreira2004:
         [
             (
                 Classe.E2,
-                Progressao(date(2020, 1, 1), Nivel(25, "D")),
-                Progressao(date(2022, 1, 1), Nivel(27, "E")),
+                Progressao(date(2020, 1, 1), Nivel(25, "D"), progs_sem_especial=0),
+                Progressao(date(2022, 1, 1), Nivel(27, "E"), progs_sem_especial=1),
             ),
             (
                 Classe.E2,
-                Progressao(date(2020, 1, 1), Nivel(26, "D")),
-                Progressao(date(2022, 1, 1), Nivel(28, "E")),
+                Progressao(date(2020, 1, 1), Nivel(26, "D"), progs_sem_especial=0),
+                Progressao(date(2022, 1, 1), Nivel(28, "E"), progs_sem_especial=1),
             ),
             (
                 Classe.E3,
-                Progressao(date(2020, 1, 1), Nivel(23, "D")),
-                Progressao(date(2022, 1, 1), Nivel(25, "E")),
+                Progressao(date(2020, 1, 1), Nivel(23, "D"), progs_sem_especial=0),
+                Progressao(date(2022, 1, 1), Nivel(25, "E"), progs_sem_especial=1),
             ),
             (
                 Classe.E3,
-                Progressao(date(2020, 1, 1), Nivel(24, "D")),
-                Progressao(date(2022, 1, 1), Nivel(26, "E")),
+                Progressao(date(2020, 1, 1), Nivel(24, "D"), progs_sem_especial=0),
+                Progressao(date(2022, 1, 1), Nivel(26, "E"), progs_sem_especial=1),
             ),
         ],
     )
     def test_limite_letras_D_e_E(self, classe, prog_antes, prog_depois):
         carreira = Carreira2004(classe)
         assert (
-            carreira.progride_verticalmente_e_horizontalmente(prog_antes, False)
-            == prog_depois
+            carreira.progride_verticalmente_e_horizontalmente(prog_antes) == prog_depois
         )
 
     @pytest.mark.parametrize(
@@ -150,15 +146,15 @@ class TestCarreira2004:
             _ = Carreira2004(Classe.E2).checa_nivel_valido(nivel)
 
     def test_progride_verticalmente_verifica_nivel_invalido(self):
-        progressao = Progressao(date.today(), Nivel(2, "E"))
+        progressao = Progressao(date.today(), Nivel(2, "E"), progs_sem_especial=0)
         with pytest.raises(ValueError):
-            _ = Carreira2004(Classe.E2).progride_verticalmente(progressao, False)
+            _ = Carreira2004(Classe.E2).progride_verticalmente(progressao)
 
     def test_progride_verticalmente_e_horizontalmente_verifica_nivel_invalido(self):
-        progressao = Progressao(date.today(), Nivel(2, "E"))
+        progressao = Progressao(date.today(), Nivel(2, "E"), progs_sem_especial=0)
         with pytest.raises(ValueError):
             _ = Carreira2004(Classe.E2).progride_verticalmente_e_horizontalmente(
-                progressao, False
+                progressao
             )
 
     def test_concede_letra_verifica_nivel_invalido(self):
@@ -167,66 +163,80 @@ class TestCarreira2004:
             _ = Carreira2004(Classe.E2).concede_letras_ate_limite(nivel)
 
     @pytest.mark.parametrize(
-        "classe, prog_antes, especial, prog_depois",
+        "classe, prog_antes, prog_depois",
         [
             (
                 Classe.E2,
-                Progressao(date(2020, 1, 1), Nivel(35, "D")),
-                True,
-                Progressao(date(2022, 7, 1), Nivel(37, "D")),
+                Progressao(date(2020, 1, 1), Nivel(35, "D"), progs_sem_especial=2),
+                Progressao(date(2022, 7, 1), Nivel(37, "D"), progs_sem_especial=0),
             ),
             (
                 Classe.E2,
-                Progressao(date(2020, 1, 1), Nivel(36, "D")),
-                True,
-                Progressao(date(2022, 7, 1), Nivel(37, "D"), 15),
+                Progressao(date(2020, 1, 1), Nivel(36, "D"), progs_sem_especial=2),
+                Progressao(
+                    date(2022, 7, 1),
+                    Nivel(37, "D"),
+                    progs_sem_especial=0,
+                    credito_meses_prox_prog=15,
+                ),
             ),
             (
                 Classe.E2,
-                Progressao(date(2020, 1, 1), Nivel(36, "D")),
-                False,
-                Progressao(date(2022, 7, 1), Nivel(37, "D"), 15),
+                Progressao(date(2020, 1, 1), Nivel(36, "D"), progs_sem_especial=0),
+                Progressao(
+                    date(2022, 7, 1),
+                    Nivel(37, "D"),
+                    progs_sem_especial=1,
+                    credito_meses_prox_prog=15,
+                ),
             ),
             (
                 Classe.E3,
-                Progressao(date(2020, 1, 1), Nivel(34, "D")),
-                True,
-                Progressao(date(2022, 7, 1), Nivel(36, "D")),
+                Progressao(date(2020, 1, 1), Nivel(34, "D"), progs_sem_especial=2),
+                Progressao(date(2022, 7, 1), Nivel(36, "D"), progs_sem_especial=0),
             ),
             (
                 Classe.E3,
-                Progressao(date(2020, 1, 1), Nivel(35, "D")),
-                True,
-                Progressao(date(2022, 7, 1), Nivel(36, "D"), 15),
+                Progressao(date(2020, 1, 1), Nivel(35, "D"), progs_sem_especial=2),
+                Progressao(
+                    date(2022, 7, 1),
+                    Nivel(36, "D"),
+                    progs_sem_especial=0,
+                    credito_meses_prox_prog=15,
+                ),
             ),
             (
                 Classe.E3,
-                Progressao(date(2020, 1, 1), Nivel(35, "D")),
-                False,
-                Progressao(date(2022, 7, 1), Nivel(36, "D"), 15),
+                Progressao(date(2020, 1, 1), Nivel(35, "D"), progs_sem_especial=0),
+                Progressao(
+                    date(2022, 7, 1),
+                    Nivel(36, "D"),
+                    progs_sem_especial=1,
+                    credito_meses_prox_prog=15,
+                ),
             ),
         ],
     )
     def test_nao_progride_alem_do_fim_da_carreira(
-        self, classe, prog_antes, especial, prog_depois
+        self, classe, prog_antes, prog_depois
     ):
         carreira = Carreira2004(classe)
-        assert carreira.progride_verticalmente(prog_antes, especial) == prog_depois
+        assert carreira.progride_verticalmente(prog_antes) == prog_depois
 
     @pytest.mark.parametrize(
-        "classe, prog_antes, especial",
+        "classe, prog_antes",
         [
-            (Classe.E2, Progressao(date(2020, 1, 1), Nivel(37, "E")), True),
-            (Classe.E2, Progressao(date(2020, 1, 1), Nivel(37, "B")), False),
-            (Classe.E3, Progressao(date(2020, 1, 1), Nivel(36, "E")), True),
-            (Classe.E3, Progressao(date(2020, 1, 1), Nivel(36, "B")), False),
+            (Classe.E2, Progressao(date(2020, 1, 1), Nivel(37, "E"), progs_sem_especial=2)),
+            (Classe.E2, Progressao(date(2020, 1, 1), Nivel(37, "B"), progs_sem_especial=1)),
+            (Classe.E3, Progressao(date(2020, 1, 1), Nivel(36, "E"), progs_sem_especial=2)),
+            (Classe.E3, Progressao(date(2020, 1, 1), Nivel(36, "B"), progs_sem_especial=1)),
         ],
     )
     def test_progressao_e_none_se_ja_esta_no_fim_da_carreira(
-        self, classe, prog_antes, especial
+        self, classe, prog_antes
     ):
         carreira = Carreira2004(classe)
-        assert carreira.progride_verticalmente(prog_antes, especial) is None
+        assert carreira.progride_verticalmente(prog_antes) is None
 
 
 class TestCarreiraAntes2004:
@@ -296,13 +306,13 @@ class TestCarreiraAntes2004:
         [
             (
                 Classe.E2,
-                Progressao(date(2020, 9, 25), Nivel(36, "A")),
-                Progressao(date(2023, 3, 25), Nivel(38, "A")),
+                Progressao(date(2020, 9, 25), Nivel(36, "A"), progs_sem_especial=0),
+                Progressao(date(2023, 3, 25), Nivel(38, "A"), progs_sem_especial=1),
             ),
             (
                 Classe.E3,
-                Progressao(date(2020, 9, 25), Nivel(36, "D")),
-                Progressao(date(2023, 3, 25), Nivel(38, "D")),
+                Progressao(date(2020, 9, 25), Nivel(36, "D"), progs_sem_especial=0),
+                Progressao(date(2023, 3, 25), Nivel(38, "D"), progs_sem_especial=1),
             ),
         ],
     )
@@ -315,40 +325,37 @@ class TestCarreiraAntes2004:
         [
             (
                 Classe.E2,
-                Progressao(date(2020, 9, 25), Nivel(38, "B")),
-                Progressao(date(2023, 3, 25), Nivel(41, "B")),
+                Progressao(date(2020, 9, 25), Nivel(38, "B"), progs_sem_especial=2),
+                Progressao(date(2023, 3, 25), Nivel(41, "B"), progs_sem_especial=0),
             ),
             (
                 Classe.E3,
-                Progressao(date(2020, 9, 25), Nivel(36, "C")),
-                Progressao(date(2023, 3, 25), Nivel(39, "C")),
+                Progressao(date(2020, 9, 25), Nivel(36, "C"), progs_sem_especial=2),
+                Progressao(date(2023, 3, 25), Nivel(39, "C"), progs_sem_especial=0),
             ),
         ],
     )
     def test_progressao_vertical_com_especial(self, classe, prog_antes, prog_depois):
         carreira = CarreiraAntes2004(classe)
-        assert carreira.progride_verticalmente(prog_antes, True) == prog_depois
+        assert carreira.progride_verticalmente(prog_antes) == prog_depois
 
     @pytest.mark.parametrize(
-        "prog_antes, especial, prog_depois",
+        "prog_antes, prog_depois",
         [
             (
-                Progressao(date(2021, 7, 13), Nivel(37, "A")),
-                True,
-                Progressao(date(2024, 1, 13), Nivel(40, "C")),
+                Progressao(date(2021, 7, 13), Nivel(37, "A"), progs_sem_especial=2),
+                Progressao(date(2024, 1, 13), Nivel(40, "C"), progs_sem_especial=0),
             ),
             (
-                Progressao(date(2026, 10, 13), Nivel(43, "0")),
-                False,
-                Progressao(date(2029, 4, 13), Nivel(45, "A")),
+                Progressao(date(2026, 10, 13), Nivel(43, "0"), progs_sem_especial=1),
+                Progressao(date(2029, 4, 13), Nivel(45, "A"), progs_sem_especial=2),
             ),
         ],
     )
-    def test_progressao_vertical_e_horizontal(self, prog_antes, especial, prog_depois):
+    def test_progressao_vertical_e_horizontal(self, prog_antes, prog_depois):
         carreira = CarreiraAntes2004(Classe.E2)
         assert (
-            carreira.progride_verticalmente_e_horizontalmente(prog_antes, especial)
-            == prog_depois
+            carreira.progride_verticalmente_e_horizontalmente(prog_antes) == prog_depois
         )
 
     @pytest.mark.parametrize(
@@ -368,62 +375,56 @@ class TestCarreiraAntes2004:
             _ = CarreiraAntes2004(Classe.E3).checa_nivel_valido(nivel)
 
     @pytest.mark.parametrize(
-        "classe, prog_antes, especial, prog_depois",
+        "classe, prog_antes, prog_depois",
         [
             (
                 Classe.E2,
-                Progressao(date(2020, 1, 1), Nivel(44, "A")),
-                False,
-                Progressao(date(2022, 7, 1), Nivel(45, "A"), 15),
+                Progressao(date(2020, 1, 1), Nivel(44, "A"), progs_sem_especial=0),
+                Progressao(date(2022, 7, 1), Nivel(45, "A"), progs_sem_especial=1,credito_meses_prox_prog=15),
             ),
             (
                 Classe.E3,
-                Progressao(date(2020, 1, 1), Nivel(39, "C")),
-                False,
-                Progressao(date(2022, 7, 1), Nivel(40, "C"), 15),
+                Progressao(date(2020, 1, 1), Nivel(39, "C"), progs_sem_especial=1),
+                Progressao(date(2022, 7, 1), Nivel(40, "C"), progs_sem_especial=2,credito_meses_prox_prog=15),
             ),
             (
                 Classe.E2,
-                Progressao(date(2020, 1, 1), Nivel(41, "B")),
-                True,
-                Progressao(date(2022, 7, 1), Nivel(43, "B")),
+                Progressao(date(2020, 1, 1), Nivel(41, "B"), progs_sem_especial=2),
+                Progressao(date(2022, 7, 1), Nivel(43, "B"), progs_sem_especial=0),
             ),
             (
                 Classe.E3,
-                Progressao(date(2020, 1, 1), Nivel(44, "0")),
-                True,
-                Progressao(date(2022, 7, 1), Nivel(46, "0")),
+                Progressao(date(2020, 1, 1), Nivel(44, "0"), progs_sem_especial=2),
+                Progressao(date(2022, 7, 1), Nivel(46, "0"), progs_sem_especial=0),
             ),
         ],
     )
     def test_progressao_com_ganho_de_credito(
-        self, classe, prog_antes, especial, prog_depois
+        self, classe, prog_antes, prog_depois
     ):
         carreira = CarreiraAntes2004(classe)
-        assert carreira.progride_verticalmente(prog_antes, especial) == prog_depois
+        assert carreira.progride_verticalmente(prog_antes) == prog_depois
 
     @pytest.mark.parametrize(
-        "classe, prog_antes, especial, prog_depois",
+        "classe, prog_antes, prog_depois",
         [
             (
                 Classe.E2,
-                Progressao(date(2022, 7, 1), Nivel(45, "A"), 15),
-                False,
-                Progressao(date(2025, 4, 1), Nivel(46, "A")),
+                Progressao(date(2022, 7, 1), Nivel(45, "A"), progs_sem_especial=1,credito_meses_prox_prog=15),
+                Progressao(date(2025, 4, 1), Nivel(46, "A"), progs_sem_especial=2),
             ),
             (
                 Classe.E3,
-                Progressao(date(2020, 1, 1), Nivel(40, "C"), 15),
-                False,
-                Progressao(date(2022, 10, 1), Nivel(41, "C")),
+                Progressao(date(2020, 1, 1), Nivel(40, "C"), progs_sem_especial=0,credito_meses_prox_prog=15),
+                Progressao(date(2022, 10, 1), Nivel(41, "C"), progs_sem_especial=1),
             ),
         ],
     )
     def test_progressao_com_gasto_de_credito(
-        self, classe, prog_antes, especial, prog_depois
+        self, classe, prog_antes, prog_depois
     ):
         carreira = CarreiraAntes2004(classe)
-        assert carreira.progride_verticalmente(prog_antes, especial) == prog_depois
+        assert carreira.progride_verticalmente(prog_antes) == prog_depois
 
     @pytest.mark.parametrize(
         "classe, prog_antes, prog_depois",
@@ -431,12 +432,12 @@ class TestCarreiraAntes2004:
             (
                 Classe.E2,
                 Progressao(date(2022, 7, 1), Nivel(50, "0")),
-                Progressao(date(2026, 7, 1), Nivel(51, "0")),
+                Progressao(date(2026, 7, 1), Nivel(51, "0"), progs_sem_especial=1),
             ),
             (
                 Classe.E3,
                 Progressao(date(2020, 1, 1), Nivel(41, "D")),
-                Progressao(date(2024, 1, 1), Nivel(42, "D")),
+                Progressao(date(2024, 1, 1), Nivel(42, "D"), progs_sem_especial=1),
             ),
         ],
     )

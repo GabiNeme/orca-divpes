@@ -14,9 +14,8 @@ class Desenvolvimento:
     ) -> None:
         self.carreira = carreira
         self.progressoes = [
-            Progressao(dt_ult_prog_vert, nivel_atual),
+            Progressao(dt_ult_prog_vert, nivel_atual, progs_sem_especial=progs_sem_especial),
         ]
-        self.progressoes_sem_especial = progs_sem_especial
         self.concede_letras = self._decide_se_concedera_letras()
         if self.concede_letras:
             self.progressoes[0].nivel = self.carreira.concede_letras_ate_limite(
@@ -43,22 +42,15 @@ class Desenvolvimento:
         ultima_progressao = self.progressoes[-1]
 
         while ultima_progressao and data > ultima_progressao.data:
-            if self.progressoes_sem_especial == 2:
-                self.progressoes_sem_especial = 0
-                especial = True
-            else:
-                self.progressoes_sem_especial += 1
-                especial = False
-
             if self.concede_letras:
                 ultima_progressao = (
                     self.carreira.progride_verticalmente_e_horizontalmente(
-                        ultima_progressao, especial
+                        ultima_progressao
                     )
                 )
             else:
                 ultima_progressao = self.carreira.progride_verticalmente(
-                    ultima_progressao, especial
+                    ultima_progressao
                 )
 
             if ultima_progressao:

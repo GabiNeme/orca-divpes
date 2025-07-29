@@ -14,6 +14,7 @@ from src.intersticio import Intersticio
 class Progressao:
     data: date
     nivel: Nivel
+    progs_sem_especial: int = 0
     credito_meses_prox_prog: int = 0
 
 
@@ -44,20 +45,23 @@ class Carreira(ABC):
                 return Progressao(
                     dt_prox_prog,
                     ultima_progressao.nivel.proximo(numero_niveis, 0),
+                    progs_sem_especial=(ultima_progressao.progs_sem_especial + 1) % 3,
                     credito_meses_prox_prog=15,
                 )
 
         return Progressao(
-            dt_prox_prog, ultima_progressao.nivel.proximo(numero_niveis, 0)
+            dt_prox_prog,
+            ultima_progressao.nivel.proximo(numero_niveis, 0),
+            progs_sem_especial=(ultima_progressao.progs_sem_especial + 1) % 3,
         )
 
     def progride_verticalmente(
-        self, ultima_progressao: Progressao, especial: bool = False
+        self, ultima_progressao: Progressao
     ) -> Optional[Progressao]:
         """Calcula uma progressão vertical (2 interstícios), podendo ser especial
         ou não."""
 
-        if especial:
+        if ultima_progressao.progs_sem_especial == 2:
             niveis = 3
         else:
             niveis = 2
@@ -67,18 +71,20 @@ class Carreira(ABC):
         )
 
     def progride_verticalmente_e_horizontalmente(
-        self, ultima_progressao: Progressao, especial: bool
+        self, ultima_progressao: Progressao
     ) -> Optional[Progressao]:
         """Calcula uma progressão vertical (2 interstícios), podendo ser especial ou
         não, e concede todas as letras permitidas pelo nível final."""
 
-        progressao = self.progride_verticalmente(ultima_progressao, especial)
+        progressao = self.progride_verticalmente(ultima_progressao)
 
         if not progressao:
             return None
 
         nivel_com_letras = self.concede_letras_ate_limite(progressao.nivel)
-        return Progressao(progressao.data, nivel_com_letras)
+        return Progressao(
+            progressao.data, nivel_com_letras, progressao.progs_sem_especial
+        )
 
     def concede_letras_ate_limite(self, nivel_origem: Nivel) -> Nivel:
         """Concede progressões veriticais até o máximo permitido por aquele nível
@@ -198,7 +204,7 @@ class CarreiraAntes2004(Carreira):
         """Sobrescreve o método de progressão vertical para calcular a progressão do
         art. 44, ou seja, progredir a cada 48 meses 1 nível até o máximo de 25% a mais
         que o teto da carreira."""
-        progressao = super().progride_verticalmente(ultima_progressao, especial)
+        progressao = super().progride_verticalmente(ultima_progressao)
 
         if progressao:
             return progressao
@@ -211,7 +217,12 @@ class CarreiraAntes2004(Carreira):
         intersticio = 48 - ultima_progressao.credito_meses_prox_prog
         dt_prox_prog = ultima_progressao.data + relativedelta(months=intersticio)
 
-        return Progressao(dt_prox_prog, ultima_progressao.nivel.proximo(1, 0))
+        return Progressao(
+            dt_prox_prog,
+            ultima_progressao.nivel.proximo(1, 0),
+            (ultima_progressao.progs_sem_especial + 1) % 3,
+            0,
+        )
 
     def checa_nivel_valido(self, nivel: Nivel):
         nivel_vertical_maximo = self.limite_absoluto(nivel)
