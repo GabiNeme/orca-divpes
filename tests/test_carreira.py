@@ -2,7 +2,8 @@ from datetime import date
 
 import pytest
 
-from src.cargo import Classe, Nivel
+from src.classe import Classe
+from src.nivel import Nivel
 from src.carreira import Carreira2004, CarreiraAntes2004, Progressao
 
 

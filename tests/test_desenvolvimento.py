@@ -1,6 +1,7 @@
 from datetime import date
 
-from src.cargo import Classe, Nivel
+from src.classe import Classe
+from src.nivel import Nivel
 from src.carreira import Carreira2004
 from src.desenvolvimento import Desenvolvimento
 

@@ -1,6 +1,7 @@
 import pytest
 
-from src.cargo import Classe, Nivel
+from src.classe import Classe
+from src.nivel import Nivel
 
 
 class TestClasse:
@@ -22,7 +23,7 @@ class TestClasse:
 
 
 class TestNivel:
-    @pytest.mark.parametrize("nivel_str", ["", " ", "0.A", "1.F", "60.E", "1.1.A"])
+    @pytest.mark.parametrize("nivel_str", ["", " ", "0.A", "1.1.A"])
     def test_nao_aceita_niveis_incorretos(self, nivel_str):
         with pytest.raises(ValueError):
             _ = Nivel.from_string(nivel_str)

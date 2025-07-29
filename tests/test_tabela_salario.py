@@ -1,6 +1,6 @@
 import pytest
 
-from src.cargo import Nivel
+from src.nivel import Nivel
 from src.tabela_salario import Tabela
 
 INICIAL_E2 = 4759.37

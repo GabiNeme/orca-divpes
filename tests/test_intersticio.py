@@ -1,6 +1,6 @@
 import pytest
 
-from src.cargo import Nivel
+from src.nivel import Nivel
 from src.intersticio import Intersticio
 
 

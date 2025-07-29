@@ -1,15 +1,5 @@
-from enum import Enum
 
-NIVEL_MINIMO = 1
-NIVEL_MAXIMO = 57
-POSSIVEIS_LETRAS = ["0", "A", "B", "C", "D", "E"]
-
-
-class Classe(Enum):
-    E1 = "E1"
-    E2 = "E2"
-    E3 = "E3"
-
+LETRAS = ["0", "A", "B", "C", "D", "E"]
 
 class Nivel:
     def __init__(self, numero: int, letra: str) -> None:
@@ -38,10 +28,8 @@ class Nivel:
 
     @numero.setter
     def numero(self, value: int) -> None:
-        if value < NIVEL_MINIMO or value > NIVEL_MAXIMO:
-            raise ValueError(
-                "O número do nível deve estar entre %i e %i", NIVEL_MINIMO, NIVEL_MAXIMO
-            )
+        if value <= 0:
+            raise ValueError("O número do nível deve ser maior que zero")
         self._numero = value
 
     @property
@@ -50,25 +38,25 @@ class Nivel:
 
     @letra.setter
     def letra(self, value: int) -> None:
-        if value not in POSSIVEIS_LETRAS:
-            raise ValueError("A letra deve ser 0, A, B, C, D ou E")
+        if value not in LETRAS:
+            raise ValueError("As letras devem ser : " + ", ".join(LETRAS))
         self._letra = value
 
     @property
     def numero_progressoes_horizontais(self) -> int:
         """Retorna o número de progressões horizontais que aquela letra representa."""
-        return POSSIVEIS_LETRAS.index(self.letra)
+        return LETRAS.index(self.letra)
 
     def anterior(self, passos_verticais: int, passos_horizontais: int):
         prox_numero = self.numero - passos_verticais
-        prox_letra = POSSIVEIS_LETRAS[
+        prox_letra = LETRAS[
             self.numero_progressoes_horizontais - passos_horizontais
         ]
         return Nivel(prox_numero, prox_letra)
 
     def proximo(self, passos_verticais: int, passos_horizontais: int):
         prox_numero = self.numero + passos_verticais
-        prox_letra = POSSIVEIS_LETRAS[
+        prox_letra = LETRAS[
             self.numero_progressoes_horizontais + passos_horizontais
         ]
         return Nivel(prox_numero, prox_letra)

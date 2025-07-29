@@ -1,6 +1,6 @@
 from functools import lru_cache
 
-from src.cargo import Nivel
+from src.nivel import Nivel
 
 INDICE_PROGRESSAO_VERTICAL = 0.0391
 INDICE_PROGRESSAO_HORIZONTAL = 0.0797

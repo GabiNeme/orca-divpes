@@ -5,7 +5,8 @@ from typing import Optional
 
 from dateutil.relativedelta import relativedelta
 
-from src.cargo import Classe, Nivel
+from src.classe import Classe
+from src.nivel import Nivel
 from src.intersticio import Intersticio
 
 

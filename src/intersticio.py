@@ -1,5 +1,4 @@
-from src.cargo import Nivel
-
+from src.nivel import Nivel
 
 class Intersticio:
     @staticmethod
