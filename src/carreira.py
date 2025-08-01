@@ -22,6 +22,10 @@ class Carreira(ABC):
     def __init__(self, classe: Classe) -> None:
         self.classe = classe
 
+    def incrementa(self, progs_sem_especial: int) -> int:
+        """Incrementa a progressão especial (concede 1 a cada 3 progressões)."""
+        return (progs_sem_especial + 1) % 3
+
     def progride_verticalmente_por_quantidade_de_niveis(
         self, ultima_progressao: Progressao, numero_niveis: int
     ) -> Optional[Progressao]:
@@ -45,14 +49,14 @@ class Carreira(ABC):
                 return Progressao(
                     dt_prox_prog,
                     ultima_progressao.nivel.proximo(numero_niveis, 0),
-                    progs_sem_especial=(ultima_progressao.progs_sem_especial + 1) % 3,
+                    progs_sem_especial=self.incrementa(ultima_progressao.progs_sem_especial),
                     credito_meses_prox_prog=15,
                 )
 
         return Progressao(
             dt_prox_prog,
             ultima_progressao.nivel.proximo(numero_niveis, 0),
-            progs_sem_especial=(ultima_progressao.progs_sem_especial + 1) % 3,
+            progs_sem_especial=self.incrementa(ultima_progressao.progs_sem_especial),
         )
 
     def progride_verticalmente(
@@ -220,7 +224,7 @@ class CarreiraAntes2004(Carreira):
         return Progressao(
             dt_prox_prog,
             ultima_progressao.nivel.proximo(1, 0),
-            (ultima_progressao.progs_sem_especial + 1) % 3,
+            self.incrementa(ultima_progressao.progs_sem_especial),
             0,
         )
 
