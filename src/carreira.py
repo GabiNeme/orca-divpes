@@ -5,7 +5,6 @@ from typing import Optional
 
 from dateutil.relativedelta import relativedelta
 
-from src.classe import Classe
 from src.nivel import Nivel
 from src.intersticio import Intersticio
 
@@ -15,6 +14,7 @@ class Progressao:
     data: date
     nivel: Nivel
     progs_sem_especial: int = 0
+
 
 class Carreira(ABC):
     def __init__(self) -> None:
@@ -122,6 +122,24 @@ class Carreira(ABC):
             (5, "C"),
             (7, "D"),
             (9, "E"),
+        ]
+
+        for i in reversed(range(len(transicao_para_letra))):
+            if transicao_para_letra[i][0] <= numero_nivel:
+                return transicao_para_letra[i][1]
+
+
+class CarreiraAtual(Carreira):
+
+    def _letra_maxima_para_nivel(self, numero_nivel: int) -> str:
+        """Retorna a máxima letra que é possível ter para um determinado nível."""
+
+        transicao_para_letra = [
+            (1, "A"),
+            (7, "B"),
+            (13, "C"),
+            (19, "D"),
+            (25, "E"),
         ]
 
         for i in reversed(range(len(transicao_para_letra))):
