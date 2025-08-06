@@ -1,5 +1,6 @@
 import pytest
 
+from src.classe import Classe
 from src.nivel import Nivel
 from src.tabela_salario import Tabela
 
@@ -19,6 +20,20 @@ class TestTabelaE2:
         ],
     )
     def test_valor_do_nivel(self, nivel: str, valor: float):
-        tabela = Tabela()
+        tabela = Tabela
         nivel_ = Nivel.from_string(nivel)
         assert tabela.valor_do(nivel_, INICIAL_E2) == valor
+
+    def test_valor_do_nivel_E2(self):
+        tabela = Tabela()
+        INICIAL_E2 = 5758.83
+        assert tabela.valor_do_nivel_para_classe(Nivel(1, "0"), Classe.E2) == INICIAL_E2
+        assert tabela.valor_do_nivel_para_classe(Nivel(20, "A"), Classe.E2) == 12886.26
+        assert tabela.valor_do_nivel_para_classe(Nivel(31, "E"), Classe.E2) == 26703.62
+
+    def test_valor_do_nivel_E3(self):
+        tabela = Tabela()
+        INICIAL_E3 = 10047.80
+        assert tabela.valor_do_nivel_para_classe(Nivel(1, "0"), Classe.E3) == INICIAL_E3
+        assert tabela.valor_do_nivel_para_classe(Nivel(16, "B"), Classe.E3) == 20822.72
+        assert tabela.valor_do_nivel_para_classe(Nivel(33, "E"), Classe.E3) == 50306.2
