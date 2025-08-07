@@ -1,19 +1,25 @@
 from dataclasses import dataclass
 from datetime import date
+from enum import Enum
 from typing import Optional
 
 from src.carreira import Progressao, Carreira, CarreiraAtual
 from src.classe import Classe
 from src.nivel import Nivel
 
+class TipoPrevidencia(Enum):
+    Fufin = "Fufin"
+    BHPrev = "BHPrev"
+    BHPrevComplementar = "BHPrevComplementar"
+
 
 @dataclass
-class Registro:
-    cm: int
+class DadosFolha:
     classe: Classe
     data_anuenio: date
     num_ats: int
     procurador: bool
+    tipo_previdencia: TipoPrevidencia
 
 
 @dataclass
@@ -25,12 +31,14 @@ class Aposentadoria:
 class Funcionario:
     def __init__(
         self,
-        registro: Registro,
+        cm: int,
+        dados_folha: DadosFolha,
         aposentadoria: Aposentadoria,
         ultima_progressao: Progressao,
         carreira: Carreira,
     ):
-        self.registro = registro
+        self.cm = cm
+        self.dados_folha = dados_folha
         self.aposentadoria = aposentadoria
         self.progressoes = [ultima_progressao]
         self.carreira = carreira

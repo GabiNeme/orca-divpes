@@ -3,7 +3,7 @@ from datetime import date
 from src.classe import Classe
 from src.nivel import Nivel
 from src.carreira import Carreira, Progressao
-from src.funcionario import Funcionario, Registro, Aposentadoria
+from src.funcionario import Funcionario, DadosFolha, Aposentadoria, TipoPrevidencia
 from dateutil.relativedelta import relativedelta
 
 
@@ -31,12 +31,13 @@ class TesteFuncionario:
 
     def default_funcionario(self, nivel_inicial: Nivel = Nivel(1, "A")) -> Funcionario:
         return Funcionario(
-            registro=Registro(
-                cm=12345,
+            cm=12345,
+            dados_folha=DadosFolha(
                 classe=Classe.E2,
                 data_anuenio=date(2021, 1, 1),
                 num_ats=0,
                 procurador=False,
+                tipo_previdencia=TipoPrevidencia.Fufin,
             ),
             aposentadoria=Aposentadoria(
                 data_aposentadoria=date(2045, 10, 1), num_art_98_data_aposentadoria=0
