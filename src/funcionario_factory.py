@@ -9,6 +9,7 @@ class FuncionarioFactory:
     @staticmethod
     def cria_funcionario(
         cm: int,
+        data_admissao: date,
         classe: Classe,
         data_anuenio: date,
         num_ats: int,
@@ -47,6 +48,7 @@ class FuncionarioFactory:
         )
         return Funcionario(
             cm=cm,
+            data_admissao=data_admissao,
             dados_folha=dados_folha,
             aposentadoria=aposentadoria,
             ultima_progressao=ultima_progressao,

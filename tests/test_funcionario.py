@@ -32,6 +32,7 @@ class TesteFuncionario:
     def default_funcionario(self, nivel_inicial: Nivel = Nivel(1, "A")) -> Funcionario:
         return Funcionario(
             cm=12345,
+            data_admissao=date(2020, 1, 1),
             dados_folha=DadosFolha(
                 classe=Classe.E2,
                 data_anuenio=date(2021, 1, 1),
@@ -76,3 +77,7 @@ class TesteFuncionario:
         funcionario = self.default_funcionario()
 
         assert funcionario.obtem_nivel_para(date(2045, 9, 30)) is not None
+
+    def retorna_none_se_antes_da_admissao(self):
+        funcionario = self.default_funcionario()
+        assert funcionario.obtem_nivel_para(date(2019, 12, 31)) is None

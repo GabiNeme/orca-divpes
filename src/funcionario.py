@@ -7,6 +7,7 @@ from src.carreira import Progressao, Carreira, CarreiraAtual
 from src.classe import Classe
 from src.nivel import Nivel
 
+
 class TipoPrevidencia(Enum):
     Fufin = "Fufin"
     BHPrev = "BHPrev"
@@ -32,12 +33,14 @@ class Funcionario:
     def __init__(
         self,
         cm: int,
+        data_admissao: date,
         dados_folha: DadosFolha,
         aposentadoria: Aposentadoria,
         ultima_progressao: Progressao,
         carreira: Carreira,
     ):
         self.cm = cm
+        self.data_admissao = data_admissao
         self.dados_folha = dados_folha
         self.aposentadoria = aposentadoria
         self.progressoes = [ultima_progressao]
@@ -80,7 +83,9 @@ class Funcionario:
     def obtem_nivel_para(self, data: date) -> Optional[Nivel]:
         """Retorna o nível que o servidor estará em determinada data.
         Se tiver aposentado, retorna None"""
-        if data >= self.aposentadoria.data_aposentadoria:
+        if data <= self.data_admissao:  # Funcionário não admitido
+            return None
+        if data >= self.aposentadoria.data_aposentadoria:  # Funcionário aposentado
             return None
 
         self._calcula_progressoes_ate(data)
