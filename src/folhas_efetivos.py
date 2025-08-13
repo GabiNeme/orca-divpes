@@ -13,11 +13,17 @@ class GastoMensalEfetivos:
     bhprev_complementar_patronal: float
 
 class FolhasEfetivos:
-    def __init__(self, tabela: Tabela, calcula_folha: CalculaFolha = CalculaFolha):
+    def __init__(self, tabela: Tabela = Tabela, calcula_folha: CalculaFolha = CalculaFolha):
         """Inicializa a classe as folhas."""
-        self.folhas = {}  # {competencia: {cm: valor}}
+        self.folhas = {}  # {competencia: {cm: Folha}}
         self.tabela = tabela
         self.calcula_folha = calcula_folha
+
+    def adiciona_folha(self, competencia: date, cm: int, folha: Folha):
+        """Adiciona uma folha de pagamento para um funcionário em uma competência específica."""
+        if competencia not in self.folhas:
+            self.folhas[competencia] = {}
+        self.folhas[competencia][cm] = folha
 
     def _calcula_folhas_funcionario(
         self, funcionario: Funcionario, inicio: date, fim: date
@@ -30,9 +36,8 @@ class FolhasEfetivos:
             nivel = funcionario.obtem_nivel_para(competencia)
             if not nivel: # Funcionário não admitido ou exonerado
                 continue
-            if competencia not in self.folhas:
-                self.folhas[competencia] = {}
-            self.folhas[competencia][cm] = calculadora_folha.calcula(nivel, competencia)
+            folha = calculadora_folha.calcula(nivel, competencia)
+            self.adiciona_folha(competencia, cm, folha)
 
     def _gerar_periodos(self, inicio: date, fim: date) -> list[date]:
         """Gera períodos mensais entre duas datas."""
