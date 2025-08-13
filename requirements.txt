@@ -10,3 +10,9 @@ python-dateutil==2.9.0
 
 # Congelar datas para testar usando date.today()
 freezegun==1.5.3
+
+# Conexão com o banco de dados
+psycopg2==2.9.10
+
+# Pandas
+pandas==2.3.1
