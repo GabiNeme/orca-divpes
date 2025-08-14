@@ -128,6 +128,19 @@ class Carreira(ABC):
             if transicao_para_letra[i][0] <= numero_nivel:
                 return transicao_para_letra[i][1]
 
+class CarreiraConcurso2008(Carreira):
+    """Carreira do concurso de 2008."""
+
+    def _limite(self) -> int:
+        """Limite da carreira enquanto não completar condição de aposentadoria."""
+        return 35
+
+class CarreiraConcurso2004(Carreira):
+    """Carreira do concurso de 2004."""
+
+    def _limite(self) -> int:
+        """Limite da carreira enquanto não completar condição de aposentadoria."""
+        return 37
 
 class CarreiraAtual(Carreira):
 
@@ -145,3 +158,12 @@ class CarreiraAtual(Carreira):
         for i in reversed(range(len(transicao_para_letra))):
             if transicao_para_letra[i][0] <= numero_nivel:
                 return transicao_para_letra[i][1]
+
+
+def atribui_carreira(cm: int) -> Carreira:
+    """Atribui a nova carreira ao funcionário com base no concurso."""
+    if cm <= 336:
+        return CarreiraConcurso2004()
+    elif cm <= 545:
+        return CarreiraConcurso2008()
+    return Carreira()
