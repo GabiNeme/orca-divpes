@@ -1,0 +1,8 @@
+select VW_AFASTAMENTOS.C093_NUMERO as cm, sum(QTDE_DIAS) as qtde_dias_licenca
+FROM VW_AFASTAMENTOS
+    join VW_FUNCIONARIOS_WEB on VW_AFASTAMENTOS.C093_COD = VW_FUNCIONARIOS_WEB.C093_COD
+WHERE 
+	FPC013_COD in (8, 9, 18, 26, 33, 37, 44, 57) -- licenças que interrompem progressao
+	and FPC011_RESCISAO is null
+    and VW_AFASTAMENTOS.FPC104_NUMERO IN (1,3, 13) -- efetivos fufin e bhprev
+GROUP BY VW_AFASTAMENTOS.C093_NUMERO

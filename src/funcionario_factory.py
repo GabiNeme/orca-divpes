@@ -16,9 +16,7 @@ class FuncionarioFactory:
         procurador: bool,
         data_aposentadoria: date,
         num_art_98_data_aposentadoria: int,
-        data_ult_progressao: date,
-        nivel: Nivel,
-        progs_sem_especial: int,
+        ultima_progressao: Progressao,
         carreira: Carreira,
         grupo_de_controle: int,
     ) -> Funcionario:
@@ -40,11 +38,6 @@ class FuncionarioFactory:
         aposentadoria = Aposentadoria(
             data_aposentadoria=data_aposentadoria,
             num_art_98_data_aposentadoria=num_art_98_data_aposentadoria,
-        )
-        ultima_progressao = Progressao(
-            data=data_ult_progressao,
-            nivel=nivel,
-            progs_sem_especial=progs_sem_especial,
         )
         return Funcionario(
             cm=cm,
