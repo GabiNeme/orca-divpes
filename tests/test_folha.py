@@ -20,6 +20,21 @@ class MockTabela(Tabela):
 
 
 class TestCalculoFolha:
+
+    def test_nivel(self):
+        calculadora = CalculaFolha(
+            tabela=MockTabela(),
+            funcionario=DadosFolha(
+                classe=Classe.E2,
+                data_anuenio=None,
+                num_ats=0,
+                procurador=False,
+                tipo_previdencia=TipoPrevidencia.BHPrev,
+            ),
+        )
+        nivel = Nivel(25, "B")
+        assert calculadora.calcula(nivel, date(2023, 10, 1)).nivel == nivel
+
     def test_salario(self):
         calculadora = CalculaFolha(
             tabela=MockTabela(),

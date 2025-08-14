@@ -16,6 +16,8 @@ TETO_INSS = 8157.41
 
 @dataclass
 class Folha:
+    """Representa os dados de folha de pagamento de um funcionário."""
+    nivel: Nivel
     salario: float
     anuenio: float
     ats: float
@@ -109,6 +111,7 @@ class CalculaFolha:
 
     def calcula(self, nivel: Nivel, competencia: date) -> Folha:
         return Folha(
+            nivel=nivel,
             salario=self._calcula_salario(nivel),
             anuenio=self._calcula_anuenio(competencia),
             ats=self._calcula_ats(nivel),
