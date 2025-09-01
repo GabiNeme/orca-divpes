@@ -27,6 +27,7 @@ class DadosFolha:
 class Aposentadoria:
     data_aposentadoria: date
     num_art_98_data_aposentadoria: int
+    aderiu_pia: bool
 
 
 class Funcionario:

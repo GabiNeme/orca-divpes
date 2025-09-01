@@ -37,6 +37,7 @@ class TestImportadorProjecaoExcel:
         # Aposentadoria
         assert funcionario.aposentadoria.data_aposentadoria == date(2049, 3, 31)
         assert funcionario.aposentadoria.num_art_98_data_aposentadoria == 393
+        assert funcionario.aposentadoria.aderiu_pia
 
     def test_progressao_funcionario_com_licenca(self, cmbh_fixture: CMBH):
 
@@ -68,8 +69,12 @@ class TestImportadorProjecaoExcel:
         funcionario = cmbh_fixture.funcionarios.get(1)
         assert isinstance(funcionario.carreira, CarreiraConcurso2004)
 
+    def test_nao_aderiu_pia(self, cmbh_fixture: CMBH):
+        funcionario = cmbh_fixture.funcionarios.get(1)
+        assert not funcionario.aposentadoria.aderiu_pia
+
     def test_folha(self, cmbh_fixture: CMBH):
-        competencia = date(2025,11,1)
+        competencia = date(2025, 11, 1)
         folha = cmbh_fixture.folhas_efetivos.folhas[competencia][1]
 
         assert folha.nivel == Nivel(36, "C")

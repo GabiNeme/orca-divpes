@@ -41,7 +41,9 @@ class TesteFuncionario:
                 tipo_previdencia=TipoPrevidencia.Fufin,
             ),
             aposentadoria=Aposentadoria(
-                data_aposentadoria=date(2045, 10, 1), num_art_98_data_aposentadoria=0
+                data_aposentadoria=date(2045, 10, 1),
+                num_art_98_data_aposentadoria=0,
+                aderiu_pia=True,
             ),
             ultima_progressao=Progressao(
                 data=date(2021, 1, 1), nivel=nivel_inicial, progs_sem_especial=1

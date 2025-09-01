@@ -87,6 +87,7 @@ class ImportadorProjecaoExcel:
         num_art_98_data_aposentadoria = (
             int(linha[1][18]) if not pd.isna(linha[1][18]) else 0
         )
+        aderiu_pia = linha[1][20] == "S"
         ultima_progressao = RegraTransicao.primeira_progressao(
             data_admissao, procurador, self.licencas.get(cm, 0)
         )
@@ -102,6 +103,7 @@ class ImportadorProjecaoExcel:
             procurador=procurador,
             data_aposentadoria=data_aposentadoria,
             num_art_98_data_aposentadoria=num_art_98_data_aposentadoria,
+            aderiu_pia=aderiu_pia,
             ultima_progressao=ultima_progressao,
             carreira=carreira,
             grupo_de_controle=grupo_de_controle,
