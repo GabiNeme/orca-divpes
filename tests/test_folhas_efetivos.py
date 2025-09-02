@@ -1,14 +1,21 @@
-import pytest
 from datetime import date
 from src.folhas_efetivos import FolhasEfetivos, GastoMensalEfetivos
 from src.tabela_salario import Tabela
 
+
 class DummyFolha:
-    def __init__(self, total=100, fufin_patronal=10, bhprev_patronal=5, bhprev_complementar_patronal=2):
+    def __init__(
+        self,
+        total=100,
+        fufin_patronal=10,
+        bhprev_patronal=5,
+        bhprev_complementar_patronal=2,
+    ):
         self.total = total
         self.fufin_patronal = fufin_patronal
         self.bhprev_patronal = bhprev_patronal
         self.bhprev_complementar_patronal = bhprev_complementar_patronal
+
 
 class DummyFuncionario:
     def __init__(self, cm, niveis):
@@ -19,12 +26,14 @@ class DummyFuncionario:
     def obtem_nivel_para(self, competencia):
         return self.niveis.get(competencia, None)
 
+
 class DummyCalculaFolha:
     def __init__(self, dados_folha, tabela):
         pass
 
     def calcula(self, nivel, competencia):
         return DummyFolha()
+
 
 class TestFolhasEfetivos:
 
