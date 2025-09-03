@@ -118,3 +118,15 @@ class TestImportadorProjecaoExcel:
         folha = cmbh_fixture.folhas_efetivos.folhas.get(competencia, {}).get(1)
 
         assert folha is None
+
+    def test_existencia_pia(self, cmbh_fixture: CMBH):
+        competencia = date(2049, 3, 1)
+        pia = cmbh_fixture.folhas_pia.pias[competencia][2]
+
+        assert pia == 446457.03
+
+    def test_nao_existencia_pia(self, cmbh_fixture: CMBH):
+        competencia = date(2049, 2, 1)
+        total_pia = cmbh_fixture.folhas_pia.total_por_competencia(competencia)
+
+        assert total_pia == 0

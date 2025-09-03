@@ -6,6 +6,7 @@ from src.folhas_efetivos import FolhasEfetivos
 import pandas as pd
 
 from src.banco_de_dados import BancoDeDados
+from src.folhas_pia import FolhasPIA
 from src.funcionario import Funcionario
 from src.funcionario_factory import FuncionarioFactory
 from src.nivel import Nivel
@@ -18,6 +19,7 @@ class CMBH:
         """Inicializa a classe CMBH."""
         self.funcionarios = {}  # {cm: Funcionario}
         self.folhas_efetivos = FolhasEfetivos()
+        self.folhas_pia = FolhasPIA()
 
     @classmethod
     def from_excel(cls, caminho_excel: str):
@@ -40,11 +42,11 @@ class ImportadorProjecaoExcel:
     def __init__(self, funcao_obtem_tempos_licencas=obtem_tempos_licencas):
         """Inicializa o importador de projeção Excel."""
         self.licencas = funcao_obtem_tempos_licencas()  # {cm: qtde_dias_licenca}
+        self.cmbh = CMBH()
 
     def importa(self, caminho_excel: str) -> CMBH:
         """Importa os dados de funcionários de um arquivo Excel."""
         xls = pd.ExcelFile(caminho_excel)
-        cmbh = CMBH()
 
         for sheet_name in xls.sheet_names:
             try:
@@ -64,12 +66,12 @@ class ImportadorProjecaoExcel:
                 if pd.isna(linha[4]):  # nível vazio, não tem folha
                     continue
 
-                competencia, folha = self._cria_folha_da_linha(linha)
-                cmbh.folhas_efetivos.adiciona_folha(competencia, cm, folha)
+                self._adiciona_folha_da_linha(funcionario.cm, linha)
+                self._adiciona_pia_da_linha(funcionario.cm, linha)
 
-            cmbh.funcionarios[cm] = funcionario
+            self.cmbh.funcionarios[cm] = funcionario
 
-        return cmbh
+        return self.cmbh
 
     def _cria_funcionario_da_linha(self, linha) -> Funcionario:
 
@@ -109,21 +111,37 @@ class ImportadorProjecaoExcel:
             grupo_de_controle=grupo_de_controle,
         )
 
-    def _cria_folha_da_linha(self, linha) -> tuple[date, Folha]:
+    def _adiciona_folha_da_linha(self, cm: int, linha) -> None:
 
-        def _parse_valores(valor_str):
+        def _parse_float(valor_str):
             return round(float(valor_str), 2) if not pd.isna(valor_str) else 0.0
 
         competencia = date(year=int(linha[0]), month=int(linha[1]), day=1)
         folha = Folha(
             nivel=Nivel.from_string(linha[4]),
-            salario=_parse_valores(linha[5]),
-            anuenio=_parse_valores(linha[9]),
-            ats=_parse_valores(linha[7]),
-            total_antes_limite_prefeito=_parse_valores(linha[13]),
-            total=_parse_valores(linha[14]),
-            fufin_patronal=_parse_valores(linha[15]),
-            bhprev_patronal=_parse_valores(linha[16]),
-            bhprev_complementar_patronal=_parse_valores(linha[17]),
+            salario=_parse_float(linha[5]),
+            anuenio=_parse_float(linha[9]),
+            ats=_parse_float(linha[7]),
+            total_antes_limite_prefeito=_parse_float(linha[13]),
+            total=_parse_float(linha[14]),
+            fufin_patronal=_parse_float(linha[15]),
+            bhprev_patronal=_parse_float(linha[16]),
+            bhprev_complementar_patronal=_parse_float(linha[17]),
         )
-        return competencia, folha
+        return self.cmbh.folhas_efetivos.adiciona_folha(
+            competencia, cm, folha
+        )
+
+    def _adiciona_pia_da_linha(self, cm: int, linha) -> None:
+
+        if pd.isna(linha[19]):
+            return
+        
+        competencia = date(year=int(linha[0]), month=int(linha[1]), day=1)
+        pia = round(float(linha[19]), 2)
+
+        return self.cmbh.folhas_pia.adiciona_pia(
+            competencia, cm, pia
+        )
+
+
