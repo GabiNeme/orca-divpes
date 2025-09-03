@@ -6,7 +6,7 @@ from src.folha import *
 from src.tabela_salario import Tabela
 
 
-class MockTabela(Tabela):
+class DummyTabela(Tabela):
     def valor_do_nivel_para_classe(self, nivel: Nivel, classe: Classe) -> float:
         if nivel == Nivel(1, "0") and classe == Classe.E2:
             return 1000
@@ -23,7 +23,7 @@ class TestCalculoFolha:
 
     def test_nivel(self):
         calculadora = CalculaFolha(
-            tabela=MockTabela(),
+            tabela=DummyTabela(),
             funcionario=DadosFolha(
                 classe=Classe.E2,
                 data_anuenio=None,
@@ -37,7 +37,7 @@ class TestCalculoFolha:
 
     def test_salario(self):
         calculadora = CalculaFolha(
-            tabela=MockTabela(),
+            tabela=DummyTabela(),
             funcionario=DadosFolha(
                 classe=Classe.E2,
                 data_anuenio=None,
@@ -51,7 +51,7 @@ class TestCalculoFolha:
 
     def test_calcula_anuenio(self):
         calculadora = CalculaFolha(
-            tabela=MockTabela(),
+            tabela=DummyTabela(),
             funcionario=DadosFolha(
                 classe=Classe.E2,
                 data_anuenio=date(2000, 1, 1),
@@ -65,7 +65,7 @@ class TestCalculoFolha:
 
     def test_calcula_ats(self):
         calculadora = CalculaFolha(
-            tabela=MockTabela(),
+            tabela=DummyTabela(),
             funcionario=DadosFolha(
                 classe=Classe.E2,
                 data_anuenio=None,
@@ -79,7 +79,7 @@ class TestCalculoFolha:
 
     def test_calcula_total_antes_limite_prefeito(self):
         calculadora = CalculaFolha(
-            tabela=MockTabela(),
+            tabela=DummyTabela(),
             funcionario=DadosFolha(
                 classe=Classe.E2,
                 data_anuenio=date(2000, 1, 1),
@@ -96,7 +96,7 @@ class TestCalculoFolha:
 
     def test_calcula_total_quando_nao_atinge_teto(self):
         calculadora = CalculaFolha(
-            tabela=MockTabela(),
+            tabela=DummyTabela(),
             funcionario=DadosFolha(
                 classe=Classe.E2,
                 data_anuenio=date(2000, 1, 1),
@@ -111,7 +111,7 @@ class TestCalculoFolha:
 
     def test_total_respeita_limite_do_prefeito(self):
         calculadora = CalculaFolha(
-            tabela=MockTabela(),
+            tabela=DummyTabela(),
             funcionario=DadosFolha(
                 classe=Classe.E2,
                 data_anuenio=date(2000, 1, 1),
@@ -128,7 +128,7 @@ class TestCalculoFolha:
 
     def test_total_respeita_limite_do_procurador(self):
         calculadora = CalculaFolha(
-            tabela=MockTabela(),
+            tabela=DummyTabela(),
             funcionario=DadosFolha(
                 classe=Classe.E3,
                 data_anuenio=date(2000, 1, 1),
@@ -145,7 +145,7 @@ class TestCalculoFolha:
 
     def test_fufin_eh_zero_se_bh_prev(self):
         calculadora = CalculaFolha(
-            tabela=MockTabela(),
+            tabela=DummyTabela(),
             funcionario=DadosFolha(
                 classe=Classe.E2,
                 data_anuenio=date(2000, 1, 1),
@@ -158,7 +158,7 @@ class TestCalculoFolha:
 
     def test_fufin_eh_zero_se_bh_prev_complementar(self):
         calculadora = CalculaFolha(
-            tabela=MockTabela(),
+            tabela=DummyTabela(),
             funcionario=DadosFolha(
                 classe=Classe.E2,
                 data_anuenio=date(2000, 1, 1),
@@ -172,7 +172,7 @@ class TestCalculoFolha:
     def test_fufin(self):
         competencia = date(2023, 10, 1)
         calculadora = CalculaFolha(
-            tabela=MockTabela(),
+            tabela=DummyTabela(),
             funcionario=DadosFolha(
                 classe=Classe.E2,
                 data_anuenio=competencia,
@@ -190,7 +190,7 @@ class TestCalculoFolha:
     def test_bhprev_patronal_passa_teto_inss_se_bhprev(self):
         competencia = date(2023, 10, 1)
         calculadora = CalculaFolha(
-            tabela=MockTabela(),
+            tabela=DummyTabela(),
             funcionario=DadosFolha(
                 classe=Classe.E2,
                 data_anuenio=competencia,
@@ -207,7 +207,7 @@ class TestCalculoFolha:
     def test_bhprev_patronal_limitado_ao_inss_se_bhprev_complementar(self):
         competencia = date(2023, 10, 1)
         calculadora = CalculaFolha(
-            tabela=MockTabela(),
+            tabela=DummyTabela(),
             funcionario=DadosFolha(
                 classe=Classe.E2,
                 data_anuenio=competencia,
@@ -224,7 +224,7 @@ class TestCalculoFolha:
     def test_bhprev_complementar_zerada_se_fufin(self):
         competencia = date(2023, 10, 1)
         calculadora = CalculaFolha(
-            tabela=MockTabela(),
+            tabela=DummyTabela(),
             funcionario=DadosFolha(
                 classe=Classe.E2,
                 data_anuenio=competencia,
@@ -239,7 +239,7 @@ class TestCalculoFolha:
     def test_bhprev_complementar_zerada_se_bhprev(self):
         competencia = date(2023, 10, 1)
         calculadora = CalculaFolha(
-            tabela=MockTabela(),
+            tabela=DummyTabela(),
             funcionario=DadosFolha(
                 classe=Classe.E2,
                 data_anuenio=competencia,
@@ -254,7 +254,7 @@ class TestCalculoFolha:
     def test_bhprev_complementar_zerada_se_nao_atinge_teto_inss(self):
         competencia = date(2023, 10, 1)
         calculadora = CalculaFolha(
-            tabela=MockTabela(),
+            tabela=DummyTabela(),
             funcionario=DadosFolha(
                 classe=Classe.E2,
                 data_anuenio=competencia,
@@ -269,7 +269,7 @@ class TestCalculoFolha:
     def test_bhprev_complementar_somente_acima_teto_inss(self):
         competencia = date(2023, 10, 1)
         calculadora = CalculaFolha(
-            tabela=MockTabela(),
+            tabela=DummyTabela(),
             funcionario=DadosFolha(
                 classe=Classe.E2,
                 data_anuenio=competencia,

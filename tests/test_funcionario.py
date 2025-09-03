@@ -7,8 +7,8 @@ from src.funcionario import Funcionario, DadosFolha, Aposentadoria, TipoPreviden
 from dateutil.relativedelta import relativedelta
 
 
-class MockCarreira(Carreira):
-    # Implementação mock para testes
+class DummyCarreira(Carreira):
+    # Implementação para testes
     def progride_verticalmente_e_horizontalmente(self, ultima_progressao):
         progs_horizontais = 1
         if ultima_progressao.nivel.numero >= 5:
@@ -48,7 +48,7 @@ class TesteFuncionario:
             ultima_progressao=Progressao(
                 data=date(2021, 1, 1), nivel=nivel_inicial, progs_sem_especial=1
             ),
-            carreira=MockCarreira(),
+            carreira=DummyCarreira(),
         )
 
     def test_retorna_nivel_correto_se_concede_todas_as_letras(self):
