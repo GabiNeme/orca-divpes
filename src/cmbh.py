@@ -22,10 +22,25 @@ class CMBH:
         self.folhas_pia = FolhasPIA()
 
     @classmethod
-    def from_excel(cls, caminho_excel: str):
+    def from_excel(cls, caminho_excel: str, importa_folhas: bool = True) -> "CMBH":
         """Cria uma instância de CMBH a partir de um arquivo Excel."""
 
-        return ImportadorProjecaoExcel().importa(caminho_excel)
+        return ImportadorProjecaoExcel().importa(
+            caminho_excel, importa_folhas=importa_folhas
+        )
+
+    def exporta_totais_para(self, inicio: date, fim: date, caminho_excel: str) -> None:
+        """Exporta os totais das folhas para uma única planilha do Excel, juntando por competência."""
+        df_efetivos = self.folhas_efetivos.total_no_intervalo_para_dataframe(
+            inicio, fim
+        )
+        df_pia = self.folhas_pia.total_no_intervalo_para_dataframe(inicio, fim)
+
+        # Merge usando a coluna 'competencia'
+        df_total = pd.merge(df_efetivos, df_pia, on="competencia", how="outer")
+
+        with pd.ExcelWriter(caminho_excel, engine="openpyxl") as writer:
+            df_total.to_excel(writer, sheet_name="Totais", index=False)
 
 
 def obtem_tempos_licencas() -> dict[int, int]:
@@ -44,7 +59,7 @@ class ImportadorProjecaoExcel:
         self.licencas = funcao_obtem_tempos_licencas()  # {cm: qtde_dias_licenca}
         self.cmbh = CMBH()
 
-    def importa(self, caminho_excel: str) -> CMBH:
+    def importa(self, caminho_excel: str, importa_folhas: bool = True) -> CMBH:
         """Importa os dados de funcionários de um arquivo Excel."""
         xls = pd.ExcelFile(caminho_excel)
 
@@ -59,6 +74,10 @@ class ImportadorProjecaoExcel:
             # As duas primeiras linhas contêm dados do Funcionario
             funcionario_data = df.iloc[0:2].values
             funcionario = self._cria_funcionario_da_linha(funcionario_data)
+            self.cmbh.funcionarios[cm] = funcionario
+
+            if not importa_folhas:
+                continue
 
             # Linhas 4 em diante são Folhas de pagamento
             folhas_data = df.iloc[3:]
@@ -68,8 +87,6 @@ class ImportadorProjecaoExcel:
 
                 self._adiciona_folha_da_linha(funcionario.cm, linha)
                 self._adiciona_pia_da_linha(funcionario.cm, linha)
-
-            self.cmbh.funcionarios[cm] = funcionario
 
         return self.cmbh
 
@@ -128,20 +145,14 @@ class ImportadorProjecaoExcel:
             bhprev_patronal=_parse_float(linha[16]),
             bhprev_complementar_patronal=_parse_float(linha[17]),
         )
-        return self.cmbh.folhas_efetivos.adiciona_folha(
-            competencia, cm, folha
-        )
+        return self.cmbh.folhas_efetivos.adiciona_folha(competencia, cm, folha)
 
     def _adiciona_pia_da_linha(self, cm: int, linha) -> None:
 
         if pd.isna(linha[19]):
             return
-        
+
         competencia = date(year=int(linha[0]), month=int(linha[1]), day=1)
         pia = round(float(linha[19]), 2)
 
-        return self.cmbh.folhas_pia.adiciona_pia(
-            competencia, cm, pia
-        )
-
-
+        return self.cmbh.folhas_pia.adiciona_pia(competencia, cm, pia)

@@ -1,9 +1,12 @@
+import pandas as pd
+
 from dataclasses import dataclass
 from datetime import date
-from dateutil.relativedelta import relativedelta
 from src.folha import CalculaFolha, Folha
+from src.folhas import Folhas
 from src.funcionario import Funcionario
 from src.tabela_salario import Tabela
+
 
 @dataclass
 class GastoMensalEfetivos:
@@ -12,8 +15,11 @@ class GastoMensalEfetivos:
     bhprev_patronal: float
     bhprev_complementar_patronal: float
 
-class FolhasEfetivos:
-    def __init__(self, tabela: Tabela = Tabela, calcula_folha: CalculaFolha = CalculaFolha):
+
+class FolhasEfetivos(Folhas):
+    def __init__(
+        self, tabela: Tabela = Tabela, calcula_folha: CalculaFolha = CalculaFolha
+    ):
         """Inicializa a classe as folhas."""
         self.folhas = {}  # {competencia: {cm: Folha}}
         self.tabela = tabela
@@ -34,18 +40,10 @@ class FolhasEfetivos:
 
         for competencia in self._gerar_periodos(inicio, fim):
             nivel = funcionario.obtem_nivel_para(competencia)
-            if not nivel: # Funcionário não admitido ou exonerado
+            if not nivel:  # Funcionário não admitido ou exonerado
                 continue
             folha = calculadora_folha.calcula(nivel, competencia)
             self.adiciona_folha(competencia, cm, folha)
-
-    def _gerar_periodos(self, inicio: date, fim: date) -> list[date]:
-        """Gera períodos mensais entre duas datas."""
-        periodos = [inicio]
-        while inicio <= fim:
-            inicio += relativedelta(months=1)
-            periodos.append(inicio)
-        return periodos
 
     def calcula_folhas(self, funcionarios: list[Funcionario], inicio: date, fim: date):
         """Calcula as folhas de pagamento para uma lista de funcionários."""
@@ -68,5 +66,26 @@ class FolhasEfetivos:
             gasto.fufin_patronal += folha.fufin_patronal
             gasto.bhprev_patronal += folha.bhprev_patronal
             gasto.bhprev_complementar_patronal += folha.bhprev_complementar_patronal
-        
+
         return gasto
+
+    def total_no_intervalo_para_dataframe(self, inicio: date, fim: date):
+        """Gera um DataFrame com os totais das folhas entre duas competências."""
+
+        periodos = self._gerar_periodos(inicio, fim)
+
+        dados = []
+        for competencia in periodos:
+            gasto = self.total_por_competencia(competencia)
+            dados.append(
+                {
+                    "competencia": competencia,
+                    "Total Efetivos": gasto.total_efetivos,
+                    "Fufin Patronal": gasto.fufin_patronal,
+                    "BHPrev Patronal": gasto.bhprev_patronal,
+                    "BHPrev Complementar Patronal": gasto.bhprev_complementar_patronal,
+                }
+            )
+
+        df = pd.DataFrame(dados)
+        return df

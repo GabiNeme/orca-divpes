@@ -130,3 +130,11 @@ class TestImportadorProjecaoExcel:
         total_pia = cmbh_fixture.folhas_pia.total_por_competencia(competencia)
 
         assert total_pia == 0
+
+    def test_folhas_vazias_se_importa_folhas_falso(self):
+        cmbh = ImportadorProjecaoExcel().importa(
+            "tests/exemplo_projecao_atual.xlsx", importa_folhas=False
+        )
+
+        assert not cmbh.folhas_efetivos.folhas
+        assert not cmbh.folhas_pia.pias

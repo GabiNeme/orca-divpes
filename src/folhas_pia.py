@@ -1,11 +1,13 @@
+import pandas as pd
 from datetime import date
 
+from src.folhas import Folhas
 from src.funcionario import Funcionario
 from src.pia import CalculaPIA
 from src.tabela_salario import Tabela
 
 
-class FolhasPIA:
+class FolhasPIA(Folhas):
     """Representa as folhas do PIA de todos os funcionários."""
 
     def __init__(self, tabela: Tabela = Tabela, calcula_pia: CalculaPIA = CalculaPIA):
@@ -44,3 +46,21 @@ class FolhasPIA:
             return 0.0
 
         return sum(self.pias[competencia].values())
+
+    def total_no_intervalo_para_dataframe(
+        self, inicio: date, fim: date
+    ) -> pd.DataFrame:
+        """Gera um DataFrame com os totais dos PIAs entre duas competências."""
+        periodos = self._gerar_periodos(inicio, fim)
+
+        dados = []
+        for competencia in periodos:
+            total = self.total_por_competencia(competencia)
+            dados.append(
+                {
+                    "competencia": competencia,
+                    "total_pia": total,
+                }
+            )
+
+        return pd.DataFrame(dados)

@@ -1,3 +1,4 @@
+import pandas as pd
 from datetime import date
 from src.folhas_efetivos import FolhasEfetivos, GastoMensalEfetivos
 from src.tabela_salario import Tabela
@@ -72,3 +73,44 @@ class TestFolhasEfetivos:
         assert gasto.fufin_patronal == 0
         assert gasto.bhprev_patronal == 0
         assert gasto.bhprev_complementar_patronal == 0
+
+    def test_total_no_intervalo_para_dataframe(self):
+        folhas = FolhasEfetivos(Tabela(), DummyCalculaFolha)
+        inicio = date(2024, 1, 1)
+        fim = date(2024, 2, 1)
+        competencia1 = inicio
+        competencia2 = fim
+
+        funcionario1 = DummyFuncionario("001", {competencia1: "nivel1", competencia2: "nivel1"})
+        funcionario2 = DummyFuncionario("002", {competencia1: "nivel2", competencia2: "nivel2"})
+        funcionarios = [funcionario1, funcionario2]
+
+        folhas.calcula_folhas(funcionarios, inicio, fim)
+        df = folhas.total_no_intervalo_para_dataframe(inicio, fim)
+
+        assert isinstance(df, pd.DataFrame)
+        assert set(df.columns) == {
+            "competencia",
+            "Total Efetivos",
+            "Fufin Patronal",
+            "BHPrev Patronal",
+            "BHPrev Complementar Patronal",
+        }
+        # Cada competência deve ter o total para 2 funcionários
+        assert df.shape[0] == 2 # duas competências
+        assert all(df["Total Efetivos"] == 200)
+        assert all(df["Fufin Patronal"] == 20)
+        assert all(df["BHPrev Patronal"] == 10)
+        assert all(df["BHPrev Complementar Patronal"] == 4)
+
+    def test_total_no_intervalo_para_dataframe_sem_folhas(self):
+        folhas = FolhasEfetivos(Tabela(), DummyCalculaFolha)
+        inicio = date(2024, 1, 1)
+        fim = date(2024, 1, 1)
+        df = folhas.total_no_intervalo_para_dataframe(inicio, fim)
+        assert isinstance(df, pd.DataFrame)
+        assert df.shape[0] == 1 # Apenas uma competência
+        assert all(df["Total Efetivos"] == 0)
+        assert all(df["Fufin Patronal"] == 0)
+        assert all(df["BHPrev Patronal"] == 0)
+        assert all(df["BHPrev Complementar Patronal"] == 0)
