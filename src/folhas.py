@@ -37,8 +37,20 @@ class Folhas(ABC):
     def total_por_competencia(self, competencia: date):
         """Calcula o total gasto em uma determinada competência."""
         return NotImplementedError
-    
+
     @abstractmethod
     def total_anual(self, ano: int) -> pd.DataFrame:
         """Gera um DataFrame com os totais de um ano."""
         return NotImplementedError
+
+    def total_no_intervalo(self, ano_inicio: int, ano_fim: date) -> pd.DataFrame:
+        """Calcula o total gasto em um intervalo de datas."""
+
+        df_total = pd.DataFrame()
+        for ano in range(ano_inicio, ano_fim + 1):
+            df_ano = self.total_anual(ano)
+            if ano == ano_inicio:
+                df_total = df_ano
+            else:
+                df_total = pd.concat([df_total, df_ano], ignore_index=True)
+        return df_total
