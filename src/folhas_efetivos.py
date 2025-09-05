@@ -38,7 +38,7 @@ class FolhasEfetivos(Folhas):
         cm = funcionario.cm
         calculadora_folha = self.calcula_folha(funcionario.dados_folha, self.tabela)
 
-        for competencia in self._gerar_periodos(inicio, fim):
+        for competencia in self.gerar_periodos(inicio, fim):
             nivel = funcionario.obtem_nivel_para(competencia)
             if not nivel:  # Funcionário não admitido ou exonerado
                 continue
@@ -69,17 +69,13 @@ class FolhasEfetivos(Folhas):
 
         return gasto
 
-    def total_no_intervalo_para_dataframe(self, inicio: date, fim: date):
-        """Gera um DataFrame com os totais das folhas entre duas competências."""
+    def total_anual(self, ano: int) -> pd.DataFrame:
+        """Gera um DataFrame com os totais de um ano, incluindo 13º e 1/3 férias."""
 
-        periodos = self._gerar_periodos(inicio, fim)
-
-        dados = []
-        for competencia in periodos:
-            gasto = self.total_por_competencia(competencia)
+        def append_gasto(competencia_label, gasto: GastoMensalEfetivos):
             dados.append(
                 {
-                    "competencia": competencia,
+                    "competencia": competencia_label,
                     "Total Efetivos": gasto.total_efetivos,
                     "Fufin Patronal": gasto.fufin_patronal,
                     "BHPrev Patronal": gasto.bhprev_patronal,
@@ -87,5 +83,39 @@ class FolhasEfetivos(Folhas):
                 }
             )
 
+        periodos = self.gerar_periodos(date(ano, 1, 1), date(ano, 12, 1))
+        dados = []
+        for competencia in periodos:
+            gasto = self.total_por_competencia(competencia)
+            append_gasto(Folhas.formata_data(competencia), gasto)
+
+        # Adiciona o 13º salário
+        append_gasto(Folhas.formata_13o(ano), self._calcula_13o(ano))
+
+        # Adiciona o 1/3 de férias
+        append_gasto(Folhas.formata_terco_ferias(ano), self._calcula_terco_ferias(ano))
+
         df = pd.DataFrame(dados)
         return df
+
+    def _calcula_13o(self, ano: int) -> GastoMensalEfetivos:
+        """Calcula o total do 13º salário para o ano especificado - igual ao valor de dezembro."""
+
+        competencia = date(ano, 12, 1)
+
+        return self.total_por_competencia(competencia)
+
+    def _calcula_terco_ferias(self, ano: int) -> GastoMensalEfetivos:
+        """Calcula o total do 1/3 de férias para o ano especificado - 1/3 do valor de dezembro."""
+
+        competencia = date(ano, 12, 1)
+        tot_dez = self.total_por_competencia(competencia)
+
+        return GastoMensalEfetivos(
+            total_efetivos=round(tot_dez.total_efetivos / 3, 2),
+            fufin_patronal=round(tot_dez.fufin_patronal / 3, 2),
+            bhprev_patronal=round(tot_dez.bhprev_patronal / 3, 2),
+            bhprev_complementar_patronal=round(
+                tot_dez.bhprev_complementar_patronal / 3, 2
+            ),
+        )

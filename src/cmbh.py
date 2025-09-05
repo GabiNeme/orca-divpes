@@ -31,10 +31,10 @@ class CMBH:
 
     def exporta_totais_para(self, inicio: date, fim: date, caminho_excel: str) -> None:
         """Exporta os totais das folhas para uma única planilha do Excel, juntando por competência."""
-        df_efetivos = self.folhas_efetivos.total_no_intervalo_para_dataframe(
+        df_efetivos = self.folhas_efetivos.total_anual(
             inicio, fim
         )
-        df_pia = self.folhas_pia.total_no_intervalo_para_dataframe(inicio, fim)
+        df_pia = self.folhas_pia.total_anual(inicio, fim)
 
         # Merge usando a coluna 'competencia'
         df_total = pd.merge(df_efetivos, df_pia, on="competencia", how="outer")

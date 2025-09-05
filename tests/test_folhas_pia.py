@@ -1,7 +1,7 @@
 from datetime import date
+from src.folhas import Folhas
 from src.funcionario import Aposentadoria
 from src.folhas_pia import FolhasPIA
-import pandas as pd
 
 
 class DummyFuncionario:
@@ -49,38 +49,53 @@ class TestFolhasPIA:
         total = folhas_pia.total_por_competencia(competencia)
         assert total == 0.0
 
-    def test_total_no_intervalo_para_dataframe(self):
-        inicio = date(2030, 1, 1)
-        fim = date(2030, 4, 1)
-        competencia1 = inicio
-        competencia2 = date(2030, 2, 1)
-        competencia3 = date(2030, 3, 1)
+    def test_total_anual(self):
+        ano = 2030
+        competencia1 = date(ano, 12, 1)
+        competencia2 = date(ano, 2, 1)
+        competencia3 = date(ano, 3, 1)
 
-        funcionario1 = DummyFuncionario(cm=1, data_aposentadoria=competencia1, valor_pia=1000)
-        funcionario2 = DummyFuncionario(cm=2, data_aposentadoria=competencia2, valor_pia=2000)
-        funcionario3 = DummyFuncionario(cm=3, data_aposentadoria=competencia3, valor_pia=3000)
+        funcionario1 = DummyFuncionario(
+            cm=1, data_aposentadoria=competencia1, valor_pia=1000
+        )
+        funcionario2 = DummyFuncionario(
+            cm=2, data_aposentadoria=competencia2, valor_pia=2000
+        )
+        funcionario3 = DummyFuncionario(
+            cm=3, data_aposentadoria=competencia3, valor_pia=3000
+        )
         funcionarios = [funcionario1, funcionario2, funcionario3]
 
         folhas_pia = FolhasPIA(calcula_pia=DummyCalculaPIA)
         folhas_pia.calcula_pias(funcionarios)
 
-        df = folhas_pia.total_no_intervalo_para_dataframe(inicio, fim)
-        assert isinstance(df, pd.DataFrame)
+        df = folhas_pia.total_anual(ano)
+        print(df)
+        # Deve ter 12 meses + 13o + 1/3 férias = 14 linhas
+        assert df.shape[0] == 14
         assert set(df.columns) == {"competencia", "total_pia"}
-        expected = {
-            competencia1: 1000,
-            competencia2: 2000,
-            competencia3: 3000,
-            fim: 0,
-        }
-        for _, row in df.iterrows():
-            assert row["total_pia"] == expected[row["competencia"]]
 
-    def test_total_no_intervalo_para_dataframe_sem_pias(self):
-        inicio = date(2030, 1, 1)
-        fim = date(2030, 1, 1)
+        expected = {
+            Folhas.formata_data(competencia1): 1000,
+            Folhas.formata_data(competencia2): 2000,
+            Folhas.formata_data(competencia3): 3000,
+            Folhas.formata_13o(ano): 0,
+            Folhas.formata_terco_ferias(ano): 0,
+        }
+        for mes in range(1, 13):
+            competencia_str = Folhas.formata_data(date(ano, mes, 1))
+            if competencia_str not in expected:
+                expected[competencia_str] = 0
+
+        for competencia_str, valor_esperado in expected.items():
+            assert (
+                df.loc[df["competencia"] == competencia_str, "total_pia"].iloc[0]
+                == valor_esperado
+            )
+
+    def test_total_anual_sem_pias(self):
         folhas_pia = FolhasPIA()
-        df = folhas_pia.total_no_intervalo_para_dataframe(inicio, fim)
-        assert isinstance(df, pd.DataFrame)
-        assert df.shape[0] == 1
+        df = folhas_pia.total_anual(2030)
+        # Deve ter 12 meses + 13o + 1/3 férias = 14 linhas
+        assert df.shape[0] == 14
         assert all(df["total_pia"] == 0)

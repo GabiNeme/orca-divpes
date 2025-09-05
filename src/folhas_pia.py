@@ -47,20 +47,26 @@ class FolhasPIA(Folhas):
 
         return sum(self.pias[competencia].values())
 
-    def total_no_intervalo_para_dataframe(
-        self, inicio: date, fim: date
-    ) -> pd.DataFrame:
-        """Gera um DataFrame com os totais dos PIAs entre duas competências."""
-        periodos = self._gerar_periodos(inicio, fim)
+    def total_anual(self, ano: int) -> pd.DataFrame:
+        """Gera um DataFrame com os totais dos PIAs em um ano."""
+
+        def append_gasto(competencia_label, gasto: int):
+            dados.append(
+                {
+                    "competencia": competencia_label,
+                    "total_pia": gasto,
+                }
+            )
+
+        periodos = self.gerar_periodos(date(ano, 1, 1), date(ano, 12, 1))
 
         dados = []
         for competencia in periodos:
             total = self.total_por_competencia(competencia)
-            dados.append(
-                {
-                    "competencia": competencia,
-                    "total_pia": total,
-                }
-            )
+            append_gasto(Folhas.formata_data(competencia), total)
+
+        # 13o e férias são zero para PIA
+        append_gasto(Folhas.formata_13o(ano), 0.0)
+        append_gasto(Folhas.formata_terco_ferias(ano), 0.0)
 
         return pd.DataFrame(dados)

@@ -1,13 +1,30 @@
 from abc import ABC, abstractmethod
 from datetime import date
 from dateutil.relativedelta import relativedelta
+import pandas as pd
 
 
 class Folhas(ABC):
     def __init__(self) -> None:
         return
 
-    def _gerar_periodos(self, inicio: date, fim: date) -> list[date]:
+    @staticmethod
+    def formata_data(dt: date) -> str:
+        """Formata a competência como 'YYYY-MM'."""
+        return dt.strftime("%Y-%m")
+
+    @staticmethod
+    def formata_13o(ano: int) -> str:
+        """Formata a competência do 13º salário."""
+        return f"13o {ano}"
+
+    @staticmethod
+    def formata_terco_ferias(ano: int) -> str:
+        """Formata a competência do 1/3 de férias."""
+        return f"1/3 férias {ano}"
+
+    @staticmethod
+    def gerar_periodos(inicio: date, fim: date) -> list[date]:
         """Gera períodos mensais entre duas datas, incluindo apenas até 'fim'."""
         periodos = []
         atual = inicio
@@ -22,6 +39,6 @@ class Folhas(ABC):
         return NotImplementedError
     
     @abstractmethod
-    def total_no_intervalo_para_dataframe(self, inicio: date, fim: date):
-        """Gera um DataFrame com os totais entre duas competências."""
+    def total_anual(self, ano: int) -> pd.DataFrame:
+        """Gera um DataFrame com os totais de um ano."""
         return NotImplementedError
