@@ -72,9 +72,10 @@ class FolhasEfetivos(Folhas):
     def total_anual(self, ano: int) -> pd.DataFrame:
         """Gera um DataFrame com os totais de um ano, incluindo 13º e 1/3 férias."""
 
-        def append_gasto(competencia_label, gasto: GastoMensalEfetivos):
+        def append_gasto(ano, competencia_label, gasto: GastoMensalEfetivos):
             dados.append(
                 {
+                    "ano": ano,
                     "competencia": competencia_label,
                     "Total Efetivos": gasto.total_efetivos,
                     "Fufin Patronal": gasto.fufin_patronal,
@@ -87,13 +88,13 @@ class FolhasEfetivos(Folhas):
         dados = []
         for competencia in periodos:
             gasto = self.total_por_competencia(competencia)
-            append_gasto(Folhas.formata_data(competencia), gasto)
+            append_gasto(ano, Folhas.formata_data(competencia), gasto)
 
         # Adiciona o 13º salário
-        append_gasto(Folhas.formata_13o(ano), self._calcula_13o(ano))
+        append_gasto(ano, Folhas.formata_13o(ano), self._calcula_13o(ano))
 
         # Adiciona o 1/3 de férias
-        append_gasto(Folhas.formata_terco_ferias(ano), self._calcula_terco_ferias(ano))
+        append_gasto(ano, Folhas.formata_terco_ferias(ano), self._calcula_terco_ferias(ano))
 
         df = pd.DataFrame(dados)
         return df

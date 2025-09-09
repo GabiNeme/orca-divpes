@@ -16,12 +16,12 @@ class Folhas(ABC):
     @staticmethod
     def formata_13o(ano: int) -> str:
         """Formata a competência do 13º salário."""
-        return f"13o {ano}"
+        return f"{ano}-13o"
 
     @staticmethod
     def formata_terco_ferias(ano: int) -> str:
         """Formata a competência do 1/3 de férias."""
-        return f"1/3 férias {ano}"
+        return f"{ano}-férias"
 
     @staticmethod
     def gerar_periodos(inicio: date, fim: date) -> list[date]:
@@ -43,8 +43,8 @@ class Folhas(ABC):
         """Gera um DataFrame com os totais de um ano."""
         return NotImplementedError
 
-    def total_no_intervalo(self, ano_inicio: int, ano_fim: date) -> pd.DataFrame:
-        """Calcula o total gasto em um intervalo de datas."""
+    def total_mensal_no_intervalo(self, ano_inicio: int, ano_fim: int) -> pd.DataFrame:
+        """Calcula o total mensal gasto em um intervalo de anos."""
 
         df_total = pd.DataFrame()
         for ano in range(ano_inicio, ano_fim + 1):
@@ -54,3 +54,15 @@ class Folhas(ABC):
             else:
                 df_total = pd.concat([df_total, df_ano], ignore_index=True)
         return df_total
+
+    def total_anual_no_intervalo(self, ano_inicio: int, ano_fim: int) -> pd.DataFrame:
+        """Calcula o total anual gasto em um intervalo de anos, agrupando por ano."""
+
+        df_total = self.total_mensal_no_intervalo(ano_inicio, ano_fim)
+        # Faz o group by pelo ano e soma as colunas numéricas, ignorando 'competencia'
+        df_grouped = (
+            df_total.drop(columns=["competencia"])
+            .groupby("ano", as_index=True)
+            .sum(numeric_only=True)
+        )
+        return df_grouped

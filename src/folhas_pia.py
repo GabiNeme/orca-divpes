@@ -50,9 +50,10 @@ class FolhasPIA(Folhas):
     def total_anual(self, ano: int) -> pd.DataFrame:
         """Gera um DataFrame com os totais dos PIAs em um ano."""
 
-        def append_gasto(competencia_label, gasto: int):
+        def append_gasto(ano, competencia_label, gasto: int):
             dados.append(
                 {
+                    "ano": ano,
                     "competencia": competencia_label,
                     "total_pia": gasto,
                 }
@@ -63,10 +64,10 @@ class FolhasPIA(Folhas):
         dados = []
         for competencia in periodos:
             total = self.total_por_competencia(competencia)
-            append_gasto(Folhas.formata_data(competencia), total)
+            append_gasto(ano, Folhas.formata_data(competencia), total)
 
         # 13o e férias são zero para PIA
-        append_gasto(Folhas.formata_13o(ano), 0.0)
-        append_gasto(Folhas.formata_terco_ferias(ano), 0.0)
+        append_gasto(ano, Folhas.formata_13o(ano), 0.0)
+        append_gasto(ano, Folhas.formata_terco_ferias(ano), 0.0)
 
         return pd.DataFrame(dados)

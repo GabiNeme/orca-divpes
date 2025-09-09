@@ -18,22 +18,38 @@ class DummyFolhas(Folhas):
         return pd.DataFrame(dados)
 
 
-def test_total_no_intervalo():
-    folhas = DummyFolhas()
-    df = folhas.total_no_intervalo(2020, 2021)
-    # Deve ter 8 linhas (4 por ano)
-    assert df.shape[0] == 8
-    # Checa se as competências estão corretas
-    expected = [
-        "2020-01",
-        "2020-02",
-        "13o 2020",
-        "1/3 férias 2020",
-        "2021-01",
-        "2021-02",
-        "13o 2021",
-        "1/3 férias 2021",
-    ]
-    assert list(df["competencia"]) == expected
-    # Checa valores
-    assert list(df["valor"]) == [100, 200, 300, 400, 100, 200, 300, 400]
+class TestFolhas:
+    def test_total_mensal_no_intervalo(self):
+        folhas = DummyFolhas()
+        df = folhas.total_mensal_no_intervalo(2020, 2021)
+        # Deve ter 8 linhas (4 por ano)
+        assert df.shape[0] == 8
+        # Checa se as competências estão corretas
+        expected = [
+            "2020-01",
+            "2020-02",
+            "2020-13o",
+            "2020-férias",
+            "2021-01",
+            "2021-02",
+            "2021-13o",
+            "2021-férias",
+        ]
+        assert list(df["competencia"]) == expected
+        # Checa valores
+        assert list(df["valor"]) == [100, 200, 300, 400, 100, 200, 300, 400]
+
+    def total_anual_no_intervalo(self):
+        folhas = DummyFolhas()
+        df = folhas.total_anual_no_intervalo(2020, 2021)
+        # Deve ter 2 linhas (dois anos)
+        assert df.shape[0] == 2
+        # Checa se as competências estão corretas
+        expected = [
+            "2020",
+            "2021",
+        ]
+        assert list(df["ano"]) == expected
+        # Checa valores anuais (soma dos meses + extras)
+        assert list(df["valor"]) == [1000, 1000]
+

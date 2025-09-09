@@ -70,10 +70,11 @@ class TestFolhasPIA:
         folhas_pia.calcula_pias(funcionarios)
 
         df = folhas_pia.total_anual(ano)
-        print(df)
+
         # Deve ter 12 meses + 13o + 1/3 férias = 14 linhas
         assert df.shape[0] == 14
-        assert set(df.columns) == {"competencia", "total_pia"}
+        assert set(df.columns) == {"ano", "competencia", "total_pia"}
+        assert all(df["ano"] == ano)
 
         expected = {
             Folhas.formata_data(competencia1): 1000,
