@@ -130,3 +130,6 @@ dmypy.json
 
 # Database credentials
 db_config.json
+
+#VsCode
+.vscode/
