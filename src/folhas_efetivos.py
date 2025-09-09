@@ -94,7 +94,9 @@ class FolhasEfetivos(Folhas):
         append_gasto(ano, Folhas.formata_13o(ano), self._calcula_13o(ano))
 
         # Adiciona o 1/3 de férias
-        append_gasto(ano, Folhas.formata_terco_ferias(ano), self._calcula_terco_ferias(ano))
+        append_gasto(
+            ano, Folhas.formata_terco_ferias(ano), self._calcula_terco_ferias(ano)
+        )
 
         df = pd.DataFrame(dados)
         return df
@@ -120,3 +122,26 @@ class FolhasEfetivos(Folhas):
                 tot_dez.bhprev_complementar_patronal / 3, 2
             ),
         )
+
+    def exporta_folhas_do_funcionario(
+        self, cm: int, inicio: date, fim: date
+    ) -> pd.DataFrame:
+        """Exporta as folhas de um funcionário específico para um arquivo Excel."""
+
+        dados = []
+        for competencia in self.gerar_periodos(inicio, fim):
+            if competencia in self.folhas and cm in self.folhas[competencia]:
+                folha = self.folhas[competencia][cm]
+                dados.append(
+                    {"Competência": Folhas.formata_data(competencia), **folha.to_dict()}
+                )
+            else:
+                # Folha em branco para meses sem dados
+                dados.append(
+                    {
+                        "Competência": Folhas.formata_data(competencia),
+                        **Folha().to_dict(),
+                    }
+                )
+
+        return pd.DataFrame(dados)

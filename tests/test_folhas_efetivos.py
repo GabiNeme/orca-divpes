@@ -1,10 +1,13 @@
 import pandas as pd
 from datetime import date
+from src.folha import Folha
 from src.folhas_efetivos import FolhasEfetivos, GastoMensalEfetivos
+from src.nivel import Nivel
 from src.tabela_salario import Tabela
+from datetime import date
 
 
-class DummyFolha:
+class DummyFolha(Folha):
     def __init__(
         self,
         total=100,
@@ -130,3 +133,45 @@ class TestFolhasEfetivos:
         assert all(df["Fufin Patronal"] == 0)
         assert all(df["BHPrev Patronal"] == 0)
         assert all(df["BHPrev Complementar Patronal"] == 0)
+
+    def test_exporta_folhas_do_funcionario(self):
+
+        folhas = FolhasEfetivos(Tabela(), DummyCalculaFolha)
+        competencia1 = date(2024, 1, 1)
+        competencia2 = date(2024, 2, 1)
+        cm = "001"
+        # Adiciona folhas manualmente
+        folhas.adiciona_folha(
+            competencia1,
+            cm,
+            Folha(nivel=Nivel(1, "A"), salario=1000, total=100)
+        )
+        folhas.adiciona_folha(
+            competencia2,
+            cm,
+            Folha(nivel=Nivel(3, "B"), salario=200, total=300)
+        )
+        # Exporta para DataFrame
+        df = folhas.exporta_folhas_do_funcionario(cm, competencia1, competencia2)
+        assert isinstance(df, pd.DataFrame)
+        assert df.shape[0] == 2
+        assert df.iloc[0]["Competência"] == "2024-01"
+        assert df.iloc[0]["Nível"] == "1.A"
+        assert df.iloc[0]["Salário"] == 1000
+        assert df.iloc[0]["Total"] == 100
+        assert df.iloc[1]["Competência"] == "2024-02"
+        assert df.iloc[1]["Nível"] == "3.B"
+        assert df.iloc[1]["Salário"] == 200
+        assert df.iloc[1]["Total"] == 300
+
+    def test_exporta_folhas_do_funcionario_com_meses_sem_folha(self):
+
+        folhas = FolhasEfetivos(Tabela(), DummyCalculaFolha)
+        competencia1 = date(2024, 1, 1)
+        competencia2 = date(2024, 3, 1)
+        cm = "001"
+        df = folhas.exporta_folhas_do_funcionario(cm, competencia1, competencia2)
+        assert isinstance(df, pd.DataFrame)
+        assert df.shape[0] == 3
+        assert df.iloc[2]["Competência"] == "2024-03"
+        assert df.iloc[2]["Total"] == 0

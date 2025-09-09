@@ -17,15 +17,28 @@ TETO_INSS = 8157.41
 @dataclass
 class Folha:
     """Representa os dados de folha de pagamento de um funcionário."""
-    nivel: Nivel
-    salario: float
-    anuenio: float
-    ats: float
-    total_antes_limite_prefeito: float
-    total: float
-    fufin_patronal: float
-    bhprev_patronal: float
-    bhprev_complementar_patronal: float
+    nivel: Nivel = None
+    salario: float = 0.0
+    anuenio: float = 0.0
+    ats: float = 0.0
+    total_antes_limite_prefeito: float = 0.0
+    total: float = 0.0
+    fufin_patronal: float = 0.0
+    bhprev_patronal: float = 0.0
+    bhprev_complementar_patronal: float = 0.0
+
+    def to_dict(self) -> dict:
+        return {
+            "Nível": str(self.nivel),
+            "Salário": self.salario,
+            "Anuênio": self.anuenio,
+            "ATS": self.ats,
+            "Total Antes Limite Prefeito": self.total_antes_limite_prefeito,
+            "Total": self.total,
+            "Fufin Patronal": self.fufin_patronal,
+            "BHPrev Patronal": self.bhprev_patronal,
+            "BHPrev Complementar Patronal": self.bhprev_complementar_patronal,
+        }
 
 
 class CalculaFolha:
