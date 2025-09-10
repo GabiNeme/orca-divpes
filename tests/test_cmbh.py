@@ -40,23 +40,25 @@ class DummyFuncionario:
 
 
 class TestCMBH:
-    def test_exporta_totais_mensais_para(self, tmp_path):
+    def test_exporta_totais_mensais(self, tmp_path):
         cmbh = CMBH(folhas_efetivos=DummyFolhasEfetivos, folhas_pia=DummyFolhasPIA)
         output_file = tmp_path / "totais_mensais.xlsx"
-        cmbh.exporta_totais_mensais_para(2023, 2023, str(output_file))
+        with pd.ExcelWriter(output_file, engine="openpyxl") as writer:
+            cmbh.exporta_totais_mensais(2023, 2023, writer=writer)
         df = pd.read_excel(output_file, sheet_name="Totais Mensais")
         assert df.iloc[0]["valor_efetivos"] == 100
         assert df.iloc[0]["valor_pia"] == 200
 
-    def test_exporta_totais_anuais_para(self, tmp_path):
+    def test_exporta_totais_anuais(self, tmp_path):
         cmbh = CMBH(folhas_efetivos=DummyFolhasEfetivos, folhas_pia=DummyFolhasPIA)
         output_file = tmp_path / "totais_anuais.xlsx"
-        cmbh.exporta_totais_anuais_para(2023, 2023, str(output_file))
+        with pd.ExcelWriter(output_file, engine="openpyxl") as writer:
+            cmbh.exporta_totais_anuais(2023, 2023, writer=writer)
         df = pd.read_excel(output_file, sheet_name="Totais Anuais")
         assert df.iloc[0]["total_efetivos"] == 1200
         assert df.iloc[0]["total_pia"] == 2400
 
-    def test_exporta_folhas_servidores_efetivos_para(self, tmp_path):
+    def test_exporta_folhas_servidores_efetivos(self, tmp_path):
         cmbh = CMBH(folhas_efetivos=DummyFolhasEfetivos, folhas_pia=DummyFolhasPIA)
         # Adiciona dois funcionários fictícios
         cmbh.funcionarios = {
@@ -64,7 +66,8 @@ class TestCMBH:
             2: DummyFuncionario(2, "Bob"),
         }
         output_file = tmp_path / "folhas_servidores.xlsx"
-        cmbh.exporta_folhas_servidores_efetivos_para(2023, 2023, str(output_file))
+        with pd.ExcelWriter(output_file, engine="openpyxl") as writer:
+            cmbh.exporta_folhas_servidores_efetivos(2023, 2023, writer=writer)
 
         # Verifica se as abas dos funcionários existem e os dados estão corretos
         xls = pd.ExcelFile(output_file)
@@ -84,7 +87,7 @@ class TestCMBH:
         assert list(df2["Salário"]) == [1000, 1100]
         assert list(df2["PIA"]) == [200, 0]
 
-    def test_exporta_servidores_para(self, tmp_path):
+    def test_exporta_servidores(self, tmp_path):
         cmbh = CMBH()
         # Adiciona dois funcionários fictícios
         cmbh.funcionarios = {
@@ -92,7 +95,8 @@ class TestCMBH:
             2: DummyFuncionario(2, "Bob"),
         }
         output_file = tmp_path / "servidores.xlsx"
-        cmbh.exporta_servidores_para(str(output_file))
+        with pd.ExcelWriter(output_file, engine="openpyxl") as writer:
+            cmbh.exporta_servidores(writer=writer)
 
         # Verifica se os dados exportados estão corretos
         df = pd.read_excel(output_file, sheet_name="Efetivos")

@@ -22,8 +22,8 @@ class CMBH:
             caminho_excel, importa_folhas=importa_folhas
         )
 
-    def exporta_totais_mensais_para(
-        self, ano_inicio: int, ano_fim: int, caminho_excel: str
+    def exporta_totais_mensais(
+        self, ano_inicio: int, ano_fim: int, writer: pd.ExcelWriter
     ) -> None:
         """Exporta os totais das folhas para uma única planilha do Excel, juntando por competência."""
         df_efetivos = self.folhas_efetivos.total_mensal_no_intervalo(
@@ -33,12 +33,11 @@ class CMBH:
 
         # Merge usando a coluna 'competencia'
         df_total = pd.merge(df_efetivos, df_pia, on=["ano", "competencia"], how="outer")
+        
+        df_total.to_excel(writer, sheet_name="Totais Mensais", index=False)
 
-        with pd.ExcelWriter(caminho_excel, engine="openpyxl") as writer:
-            df_total.to_excel(writer, sheet_name="Totais Mensais", index=False)
-
-    def exporta_totais_anuais_para(
-        self, ano_inicio: int, ano_fim: int, caminho_excel: str
+    def exporta_totais_anuais(
+        self, ano_inicio: int, ano_fim: int, writer: pd.ExcelWriter
     ) -> None:
         """Exporta os totais anuais das folhas para uma única planilha do Excel, juntando por ano."""
         df_efetivos = self.folhas_efetivos.total_anual_no_intervalo(ano_inicio, ano_fim)
@@ -47,35 +46,58 @@ class CMBH:
         # Merge usando a coluna 'competencia'
         df_total = pd.merge(df_efetivos, df_pia, on=["ano"], how="outer")
 
-        with pd.ExcelWriter(caminho_excel, engine="openpyxl") as writer:
-            df_total.to_excel(writer, sheet_name="Totais Anuais", index=False)
+        df_total.to_excel(writer, sheet_name="Totais Anuais", index=False)
 
-    def exporta_folhas_servidores_efetivos_para(
-        self, ano_inicio: int, ano_fim: int, caminho_excel: str
+    def exporta_folhas_servidores_efetivos(
+        self, ano_inicio: int, ano_fim: int, writer: pd.ExcelWriter
     ) -> None:
         """Exporta cada funcionário para uma planilha do Excel, contendo folhas do PIA e mensal."""
 
         comp_inicio = date(ano_inicio, 1, 1)
         comp_fim = date(ano_fim, 12, 1)
+  
+        for funcionario in self.funcionarios.values():
+            cm = funcionario.cm
+            df_folhas = self.folhas_efetivos.exporta_folhas_do_funcionario(
+                cm, comp_inicio, comp_fim
+            )
+            df_pia = self.folhas_pia.exporta_pia_do_funcionario(
+                cm, comp_inicio, comp_fim
+            )
 
-        with pd.ExcelWriter(caminho_excel, engine="openpyxl") as writer:
-            for funcionario in self.funcionarios.values():
-                cm = funcionario.cm
-                df_folhas = self.folhas_efetivos.exporta_folhas_do_funcionario(
-                    cm, comp_inicio, comp_fim
-                )
-                df_pia = self.folhas_pia.exporta_pia_do_funcionario(
-                    cm, comp_inicio, comp_fim
-                )
+            df_total = pd.merge(df_folhas, df_pia, on=["Competência"], how="outer")
+            df_total.to_excel(writer, sheet_name=str(cm), index=False)
 
-                df_total = pd.merge(df_folhas, df_pia, on=["Competência"], how="outer")
-                df_total.to_excel(writer, sheet_name=str(cm), index=False)
-
-    def exporta_servidores_para(self, caminho_excel: str) -> None:
+    def exporta_servidores(self, writer: pd.ExcelWriter) -> None:
         """Exporta os dados dos servidores para uma planilha do Excel."""
         dados = []
         for funcionario in self.funcionarios.values():
             dados.append(funcionario.to_dict())
 
         df = pd.DataFrame(dados)
-        df.to_excel(caminho_excel, sheet_name="Efetivos", index=False)
+        df.to_excel(writer, sheet_name="Efetivos", index=False)
+
+    def exporta(
+        self,
+        caminho_excel: str,
+        ano_inicio: int,
+        ano_fim: int,
+        dados_individuais: bool = True,
+        totalizadores: bool = True,
+    ):
+        if not dados_individuais and not totalizadores:
+            print("Nenhum dado selecionado para exportação.")
+            return
+        with pd.ExcelWriter(caminho_excel, engine="openpyxl") as writer:
+            if dados_individuais:
+                self.exporta_servidores(writer=writer)
+                self.exporta_folhas_servidores_efetivos(
+                    ano_inicio=ano_inicio, ano_fim=ano_fim, writer=writer
+                )
+            if totalizadores:
+                self.exporta_totais_mensais(
+                    ano_inicio=ano_inicio, ano_fim=ano_fim, writer=writer
+                )
+                self.exporta_totais_anuais(
+                    ano_inicio=ano_inicio, ano_fim=ano_fim, writer=writer
+                )
