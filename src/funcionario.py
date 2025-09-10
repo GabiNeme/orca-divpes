@@ -97,3 +97,17 @@ class Funcionario:
                 dt_prog.month == data.month and dt_prog.year == data.year
             ):
                 return progressao.nivel
+
+    def to_dict(self):
+        return {
+            "CM": self.cm,
+            "Data admissão": self.data_admissao,
+            "Classe": self.dados_folha.classe.value,
+            "Data anuênio": self.dados_folha.data_anuenio,
+            "Num ATS": self.dados_folha.num_ats,
+            "Procurador": self.dados_folha.procurador,
+            "Tipo Previdência": self.dados_folha.tipo_previdencia.value,
+            "Data Aposentadoria": self.aposentadoria.data_aposentadoria,
+            "Num Art 98 Data Aposentadoria": self.aposentadoria.num_art_98_data_aposentadoria,
+            "Aderiu PIA": self.aposentadoria.aderiu_pia,
+        }

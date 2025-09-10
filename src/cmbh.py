@@ -70,3 +70,12 @@ class CMBH:
 
                 df_total = pd.merge(df_folhas, df_pia, on=["Competência"], how="outer")
                 df_total.to_excel(writer, sheet_name=str(cm), index=False)
+
+    def exporta_servidores_para(self, caminho_excel: str) -> None:
+        """Exporta os dados dos servidores para uma planilha do Excel."""
+        dados = []
+        for funcionario in self.funcionarios.values():
+            dados.append(funcionario.to_dict())
+
+        df = pd.DataFrame(dados)
+        df.to_excel(caminho_excel, sheet_name="Efetivos", index=False)
