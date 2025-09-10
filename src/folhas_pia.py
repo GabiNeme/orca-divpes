@@ -71,3 +71,25 @@ class FolhasPIA(Folhas):
         append_gasto(ano, Folhas.formata_terco_ferias(ano), 0.0)
 
         return pd.DataFrame(dados)
+
+    def exporta_pia_do_funcionario(
+        self, cm: int, inicio: date, fim: date
+    ) -> pd.DataFrame:
+        """Exporta o PIA de um funcionário específico para um DataFrame."""
+        dados = []
+        for competencia in self.gerar_periodos(inicio, fim):
+            if competencia in self.pias and cm in self.pias[competencia]:
+                valor_pia = self.pias[competencia][cm]
+                dados.append(
+                    {"Competência": Folhas.formata_data(competencia), "PIA": valor_pia}
+                )
+            else:
+                # Folha em branco para meses sem dados
+                dados.append(
+                    {
+                        "Competência": Folhas.formata_data(competencia),
+                        "PIA": 0.0,
+                    }
+                )
+
+        return pd.DataFrame(dados)

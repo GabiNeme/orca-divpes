@@ -1,4 +1,6 @@
 from datetime import date
+
+import pandas as pd
 from src.folhas import Folhas
 from src.funcionario import Aposentadoria
 from src.folhas_pia import FolhasPIA
@@ -100,3 +102,53 @@ class TestFolhasPIA:
         # Deve ter 12 meses + 13o + 1/3 férias = 14 linhas
         assert df.shape[0] == 14
         assert all(df["total_pia"] == 0)
+
+    def test_exporta_pia_do_funcionario(self):
+        ano = 2030
+        competencia1 = date(ano, 1, 1)
+        competencia2 = date(ano, 2, 1)
+        competencia3 = date(ano, 3, 1)
+        funcionario = DummyFuncionario(
+            cm=1, data_aposentadoria=competencia1, valor_pia=1000
+        )
+
+        folhas_pia = FolhasPIA(calcula_pia=DummyCalculaPIA)
+        folhas_pia.calcula_pias([funcionario])
+
+        # Exporta de janeiro a março
+        df = folhas_pia.exporta_pia_do_funcionario(1, competencia1, competencia3)
+        assert isinstance(df, pd.DataFrame)
+        assert list(df.columns) == ["Competência", "PIA"]
+        # Deve ter 3 linhas (jan, fev, mar)
+        assert df.shape[0] == 3
+        # Janeiro tem valor, os outros meses são zero
+        assert (
+            df.loc[df["Competência"] == Folhas.formata_data(competencia1), "PIA"].iloc[
+                0
+            ]
+            == 1000
+        )
+        assert (
+            df.loc[df["Competência"] == Folhas.formata_data(competencia2), "PIA"].iloc[
+                0
+            ]
+            == 0.0
+        )
+        assert (
+            df.loc[df["Competência"] == Folhas.formata_data(competencia3), "PIA"].iloc[
+                0
+            ]
+            == 0.0
+        )
+
+    def test_exporta_pia_do_funcionario_sem_pia(self):
+        ano = 2030
+        competencia1 = date(ano, 1, 1)
+        competencia2 = date(ano, 2, 1)
+        folhas_pia = FolhasPIA()
+        # Exporta para funcionário sem PIA
+        df = folhas_pia.exporta_pia_do_funcionario(99, competencia1, competencia2)
+        assert isinstance(df, pd.DataFrame)
+        assert list(df.columns) == ["Competência", "PIA"]
+        assert df.shape[0] == 2
+        assert df["PIA"].sum() == 0
