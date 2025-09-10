@@ -6,13 +6,28 @@ class DummyFolhasEfetivos:
         return pd.DataFrame({"ano": [2023], "competencia": ["01"], "valor_efetivos": [100]})
     def total_anual_no_intervalo(self, ano_inicio, ano_fim):
         return pd.DataFrame({"ano": [2023], "total_efetivos": [1200]})
+    def exporta_folhas_do_funcionario(self, cm, inicio, fim):
+        # Simula um DataFrame de folhas para o funcionário
+        return pd.DataFrame({
+            "Competência": ["2023-01", "2023-02"],
+            "Salário": [1000, 1100]
+        })
 
 class DummyFolhasPIA:
     def total_mensal_no_intervalo(self, ano_inicio, ano_fim):
         return pd.DataFrame({"ano": [2023], "competencia": ["01"], "valor_pia": [200]})
     def total_anual_no_intervalo(self, ano_inicio, ano_fim):
         return pd.DataFrame({"ano": [2023], "total_pia": [2400]})
+    def exporta_pia_do_funcionario(self, cm, inicio, fim):
+        # Simula um DataFrame de PIA para o funcionário
+        return pd.DataFrame({
+            "Competência": ["2023-01", "2023-02"],
+            "PIA": [200, 0]
+        })
 
+class DummyFuncionario:
+    def __init__(self, cm):
+        self.cm = cm
 
 class TestCMBH:
     def test_exporta_totais_mensais_para(self, tmp_path):
@@ -30,3 +45,31 @@ class TestCMBH:
         df = pd.read_excel(output_file, sheet_name="Totais Anuais")
         assert df.iloc[0]["total_efetivos"] == 1200
         assert df.iloc[0]["total_pia"] == 2400
+
+    def test_exporta_folhas_servidores_efetivos_para(self, tmp_path):
+        cmbh = CMBH(folhas_efetivos=DummyFolhasEfetivos, folhas_pia=DummyFolhasPIA)
+        # Adiciona dois funcionários fictícios
+        cmbh.funcionarios = {
+            1: DummyFuncionario(1),
+            2: DummyFuncionario(2)
+        }
+        output_file = tmp_path / "folhas_servidores.xlsx"
+        cmbh.exporta_folhas_servidores_efetivos_para(2023, 2023, str(output_file))
+
+        # Verifica se as abas dos funcionários existem e os dados estão corretos
+        xls = pd.ExcelFile(output_file)
+        assert "1" in xls.sheet_names
+        assert "2" in xls.sheet_names
+
+        df1 = pd.read_excel(output_file, sheet_name="1")
+        df2 = pd.read_excel(output_file, sheet_name="2")
+
+        # Verifica dados do funcionário 1
+        assert list(df1["Competência"]) == ["2023-01", "2023-02"]
+        assert list(df1["Salário"]) == [1000, 1100]
+        assert list(df1["PIA"]) == [200, 0]
+
+        # Verifica dados do funcionário 2
+        assert list(df2["Competência"]) == ["2023-01", "2023-02"]
+        assert list(df2["Salário"]) == [1000, 1100]
+        assert list(df2["PIA"]) == [200, 0]

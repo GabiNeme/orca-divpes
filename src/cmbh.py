@@ -1,3 +1,4 @@
+from datetime import date
 from src.folhas_efetivos import FolhasEfetivos
 import pandas as pd
 
@@ -48,3 +49,24 @@ class CMBH:
 
         with pd.ExcelWriter(caminho_excel, engine="openpyxl") as writer:
             df_total.to_excel(writer, sheet_name="Totais Anuais", index=False)
+
+    def exporta_folhas_servidores_efetivos_para(
+        self, ano_inicio: int, ano_fim: int, caminho_excel: str
+    ) -> None:
+        """Exporta cada funcionário para uma planilha do Excel, contendo folhas do PIA e mensal."""
+
+        comp_inicio = date(ano_inicio, 1, 1)
+        comp_fim = date(ano_fim, 12, 1)
+
+        with pd.ExcelWriter(caminho_excel, engine="openpyxl") as writer:
+            for funcionario in self.funcionarios.values():
+                cm = funcionario.cm
+                df_folhas = self.folhas_efetivos.exporta_folhas_do_funcionario(
+                    cm, comp_inicio, comp_fim
+                )
+                df_pia = self.folhas_pia.exporta_pia_do_funcionario(
+                    cm, comp_inicio, comp_fim
+                )
+
+                df_total = pd.merge(df_folhas, df_pia, on=["Competência"], how="outer")
+                df_total.to_excel(writer, sheet_name=str(cm), index=False)
