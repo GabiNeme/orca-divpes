@@ -21,6 +21,15 @@ class CMBH:
         return ImportadorProjecaoExcel().importa(
             caminho_excel, importa_folhas=importa_folhas
         )
+    
+    def calcula_projecao(self, ano_inicio: int, ano_fim: int):
+        """Calcula as folhas de pagamento e PIAs para o intervalo de anos especificado."""
+        comp_inicio = date(ano_inicio, 1, 1)
+        comp_fim = date(ano_fim, 12, 1)
+
+        funcionarios = list(self.funcionarios.values())
+        self.folhas_efetivos.calcula_folhas(funcionarios, comp_inicio, comp_fim)
+        self.folhas_pia.calcula_pias(funcionarios)
 
     def exporta_totais_mensais(
         self, ano_inicio: int, ano_fim: int, writer: pd.ExcelWriter
