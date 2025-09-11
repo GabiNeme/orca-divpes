@@ -74,7 +74,7 @@ class ImportadorProjecaoExcel:
         num_art_98_data_aposentadoria = (
             int(linha[1][18]) if not pd.isna(linha[1][18]) else 0
         )
-        aderiu_pia = linha[1][20] == "S"
+        aderiu_pia = not (linha[1][20] == "N")  # Qualquer coisa diferente de "N" aderiu
         ultima_progressao = RegraTransicao.primeira_progressao(
             data_admissao, procurador, self.licencas.get(cm, 0)
         )
