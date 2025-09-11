@@ -110,3 +110,20 @@ class CMBH:
                 self.exporta_totais_anuais(
                     ano_inicio=ano_inicio, ano_fim=ano_fim, writer=writer
                 )
+
+    def exporta_progressoes(self, caminho_excel: str) -> None:
+        """Exporta as progressões dos funcionários para um arquivo Excel."""
+        with pd.ExcelWriter(caminho_excel, engine="openpyxl") as writer:
+            for funcionario in self.funcionarios.values():
+                dados = []
+                for prog in funcionario.progressoes:
+                    dados.append(
+                        {
+                            "Data Progressão": prog.data,
+                            "Novo Nível": str(prog.nivel),
+                            "No progressões sem especial": prog.progs_sem_especial,
+                        }
+                    )
+
+                df = pd.DataFrame(dados)
+                df.to_excel(writer, sheet_name=str(funcionario.cm), index=False)
