@@ -55,7 +55,7 @@ class CMBH:
         # Merge usando a coluna 'competencia'
         df_total = pd.merge(df_efetivos, df_pia, on=["ano"], how="outer")
 
-        df_total.to_excel(writer, sheet_name="Totais Anuais", index=False)
+        df_total.to_excel(writer, sheet_name="Totais Anuais", index=True)
 
     def exporta_folhas_servidores_efetivos(
         self, ano_inicio: int, ano_fim: int, writer: pd.ExcelWriter

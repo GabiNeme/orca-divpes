@@ -55,6 +55,7 @@ class TestCMBH:
         with pd.ExcelWriter(output_file, engine="openpyxl") as writer:
             cmbh.exporta_totais_anuais(2023, 2023, writer=writer)
         df = pd.read_excel(output_file, sheet_name="Totais Anuais")
+        assert df.iloc[0]["ano"] == 2023
         assert df.iloc[0]["total_efetivos"] == 1200
         assert df.iloc[0]["total_pia"] == 2400
 
