@@ -84,9 +84,13 @@ class Funcionario:
     def obtem_nivel_para(self, data: date) -> Optional[Nivel]:
         """Retorna o nível que o servidor estará em determinada data.
         Se tiver aposentado, retorna None"""
+
+        # Se a data for após o dia 1o, muda para o dia 1o
+        if data.day > 1:
+            data = date(data.year, data.month, 1)
         if data <= self.data_admissao:  # Funcionário não admitido
             return None
-        if data >= self.aposentadoria.data_aposentadoria:  # Funcionário aposentado
+        if data > self.aposentadoria.data_aposentadoria:  # Funcionário aposentado
             return None
 
         self._calcula_progressoes_ate(data)

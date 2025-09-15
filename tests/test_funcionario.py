@@ -41,7 +41,7 @@ class TesteFuncionario:
                 tipo_previdencia=TipoPrevidencia.Fufin,
             ),
             aposentadoria=Aposentadoria(
-                data_aposentadoria=date(2045, 10, 1),
+                data_aposentadoria=date(2045, 10, 20),
                 num_art_98_data_aposentadoria=0,
                 aderiu_pia=True,
             ),
@@ -79,6 +79,11 @@ class TesteFuncionario:
         funcionario = self.default_funcionario()
 
         assert funcionario.obtem_nivel_para(date(2045, 9, 30)) is not None
+    
+    def retorna_nivel_correto_no_dia_da_aposentadoria(self):
+        funcionario = self.default_funcionario()
+
+        assert funcionario.obtem_nivel_para(date(2045, 10, 31)) is not None
 
     def retorna_none_se_antes_da_admissao(self):
         funcionario = self.default_funcionario()
