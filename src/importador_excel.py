@@ -61,8 +61,13 @@ class ImportadorProjecaoExcel:
 
     def _cria_funcionario_da_linha(self, linha) -> Funcionario:
         def _parse_data(data):
-            """Converte datetime to date."""
-            return data.date()
+            """Converte datetime ou inteiro (Excel) para date."""
+            if isinstance(data, int):
+                # Excel date serial to datetime
+                return pd.to_datetime(data, unit="D", origin="1899-12-30").date()
+            elif hasattr(data, "date"):
+                return data.date()
+            return data  # Assume already date or None
 
         cm = int(linha[1][0])
         data_admissao = _parse_data(linha[1][1])
@@ -74,7 +79,7 @@ class ImportadorProjecaoExcel:
         num_art_98_data_aposentadoria = (
             int(linha[1][18]) if not pd.isna(linha[1][18]) else 0
         )
-        aderiu_pia = not (linha[1][20] == "N")  # Qualquer coisa diferente de "N" aderiu
+        aderiu_pia = linha[1][20] != "N"  # Qualquer coisa diferente de "N" aderiu
         ultima_progressao = RegraTransicao.primeira_progressao(
             data_admissao, procurador, self.licencas.get(cm, 0)
         )
