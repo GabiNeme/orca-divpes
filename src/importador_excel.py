@@ -16,7 +16,7 @@ def obtem_tempos_licencas() -> dict[int, int]:
         sql_query = f.read()
     df_licencas = BancoDeDados().realiza_consulta(sql_query)
     # Cria o dicionário indexado por cm
-    return dict(zip(df_licencas["cm"], df_licencas["qtde_dias_licenca"]))
+    return dict(zip(df_licencas["cm"].astype(int), df_licencas["qtde_dias_licenca"]))
 
 
 class ImportadorProjecaoExcel:
