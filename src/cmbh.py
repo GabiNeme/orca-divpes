@@ -1,4 +1,5 @@
 from datetime import date
+import os
 from src.folhas_efetivos import FolhasEfetivos
 import pandas as pd
 
@@ -88,22 +89,25 @@ class CMBH:
 
     def exporta(
         self,
-        caminho_excel: str,
+        diretorio_resultado: str,
         ano_inicio: int,
         ano_fim: int,
-        dados_individuais: bool = True,
+        dados_servidores: bool = True,
         totalizadores: bool = True,
     ):
-        if not dados_individuais and not totalizadores:
+        if not dados_servidores and not totalizadores:
             print("Nenhum dado selecionado para exportação.")
             return
-        with pd.ExcelWriter(caminho_excel, engine="openpyxl") as writer:
-            if dados_individuais:
+        if dados_servidores:
+            arquivo_servidores = os.path.join(diretorio_resultado, "servidores.xlsx")
+            with pd.ExcelWriter(arquivo_servidores, engine="openpyxl") as writer:
                 self.exporta_servidores(writer=writer)
                 self.exporta_folhas_servidores_efetivos(
                     ano_inicio=ano_inicio, ano_fim=ano_fim, writer=writer
                 )
-            if totalizadores:
+        if totalizadores:
+            arquivo_totalizadores = os.path.join(diretorio_resultado, "totalizadores.xlsx")
+            with pd.ExcelWriter(arquivo_totalizadores, engine="openpyxl") as writer:
                 self.exporta_totais_mensais(
                     ano_inicio=ano_inicio, ano_fim=ano_fim, writer=writer
                 )
