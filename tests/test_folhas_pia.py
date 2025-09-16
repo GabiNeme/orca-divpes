@@ -51,6 +51,18 @@ class TestFolhasPIA:
         total = folhas_pia.total_por_competencia(competencia)
         assert total == 0.0
 
+    def test_competencia_mantida_se_dia_diferente_de_1(self):
+        competencia = date(2030, 1, 15)  # dia diferente de 1
+        funcionario = DummyFuncionario(
+            cm=1, data_aposentadoria=competencia, valor_pia=1000
+        )
+        folhas_pia = FolhasPIA(calcula_pia=DummyCalculaPIA)
+        folhas_pia.calcula_pias([funcionario])
+        # A competência deve ser armazenada como o primeiro dia do mês
+        assert date(2030, 1, 1) in folhas_pia.pias
+        assert folhas_pia.pias[date(2030, 1, 1)][1] == 1000
+
+
     def test_total_anual(self):
         ano = 2030
         competencia1 = date(ano, 12, 1)

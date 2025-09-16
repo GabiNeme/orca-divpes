@@ -20,6 +20,8 @@ class FolhasPIA(Folhas):
         """Adiciona um PIA para um funcionário em uma competência específica."""
         if pia is None:
             return
+        if competencia.day != 1:
+            competencia = competencia.replace(day=1)
         if competencia not in self.pias:
             self.pias[competencia] = {}
         self.pias[competencia][cm] = pia
