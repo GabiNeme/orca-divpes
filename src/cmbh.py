@@ -22,7 +22,7 @@ class CMBH:
         return ImportadorProjecaoExcel().importa(
             caminho_excel, importa_folhas=importa_folhas
         )
-    
+
     def calcula_projecao(self, ano_inicio: int, ano_fim: int):
         """Calcula as folhas de pagamento e PIAs para o intervalo de anos especificado."""
         comp_inicio = date(ano_inicio, 1, 1)
@@ -43,7 +43,7 @@ class CMBH:
 
         # Merge usando a coluna 'competencia'
         df_total = pd.merge(df_efetivos, df_pia, on=["ano", "competencia"], how="outer")
-        
+
         df_total.to_excel(writer, sheet_name="Totais Mensais", index=False)
 
     def exporta_totais_anuais(
@@ -65,7 +65,7 @@ class CMBH:
 
         comp_inicio = date(ano_inicio, 1, 1)
         comp_fim = date(ano_fim, 12, 1)
-  
+
         for funcionario in self.funcionarios.values():
             cm = funcionario.cm
             df_folhas = self.folhas_efetivos.exporta_folhas_do_funcionario(
@@ -106,7 +106,9 @@ class CMBH:
                     ano_inicio=ano_inicio, ano_fim=ano_fim, writer=writer
                 )
         if totalizadores:
-            arquivo_totalizadores = os.path.join(diretorio_resultado, "totalizadores.xlsx")
+            arquivo_totalizadores = os.path.join(
+                diretorio_resultado, "totalizadores.xlsx"
+            )
             with pd.ExcelWriter(arquivo_totalizadores, engine="openpyxl") as writer:
                 self.exporta_totais_mensais(
                     ano_inicio=ano_inicio, ano_fim=ano_fim, writer=writer
@@ -115,9 +117,10 @@ class CMBH:
                     ano_inicio=ano_inicio, ano_fim=ano_fim, writer=writer
                 )
 
-    def exporta_progressoes(self, caminho_excel: str) -> None:
+    def exporta_progressoes(self, diretorio_resultado: str) -> None:
         """Exporta as progressões dos funcionários para um arquivo Excel."""
-        with pd.ExcelWriter(caminho_excel, engine="openpyxl") as writer:
+        arquivo_progressoes = os.path.join(diretorio_resultado, "progressoes.xlsx")
+        with pd.ExcelWriter(arquivo_progressoes, engine="openpyxl") as writer:
             for funcionario in self.funcionarios.values():
                 dados = []
                 for prog in funcionario.progressoes:

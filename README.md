@@ -46,6 +46,30 @@ Em Linux e Mac:
 source venv/bin/activate
 ```
 
+
+# Como executar a projeção
+
+Para gerar a projeção, utilize o comando abaixo no terminal, estando no diretório do projeto e com o ambiente virtual ativado:
+
+```
+python main.py <caminho_projecao_excel> <ano_inicio> <ano_fim> <diretorio_resultado> [--recalcula-projecao] [--exporta-progressoes]
+```
+
+**Exemplo:**
+```
+python main.py dados/projecao.xlsx 2023 2025 resultados
+```
+
+- `<caminho_projecao_excel>`: Caminho para o arquivo Excel de projeção.
+- `<ano_inicio>`: Ano inicial da projeção (ex: 2023).
+- `<ano_fim>`: Ano final da projeção (ex: 2025).
+- `<diretorio_resultado>`: Pasta onde os arquivos de resultado serão salvos.
+- `--recalcula-projecao` (opcional): Recalcula as projeções antes de exportar.
+- `--exporta-progressoes` (opcional): Exporta as progressões dos servidores.
+
+Certifique-se de que o diretório de resultado existe e que você tem permissão de escrita nele.
+
+
 ## Rodar os testes
 Execute:
 ```
