@@ -91,3 +91,11 @@ class Aposentadoria:
 
     def _data_compulsoria(self) -> date:
         return self.servidor.data_nascimento + relativedelta(years=IDADE_COMPULSORIA)
+
+class AposentadoriaAtual(Aposentadoria):
+    def __init__(self, servidor: DadosPrevidenciarios) -> None:
+        super().__init__(servidor, t_min_serv_pub=10, t_min_camara=5)
+
+class AposentadoriaIntegral(Aposentadoria):
+    def __init__(self, servidor: DadosPrevidenciarios) -> None:
+        super().__init__(servidor, t_min_serv_pub=20, t_min_camara=10)
