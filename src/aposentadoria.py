@@ -92,10 +92,77 @@ class Aposentadoria:
     def _data_compulsoria(self) -> date:
         return self.servidor.data_nascimento + relativedelta(years=IDADE_COMPULSORIA)
 
+
 class AposentadoriaAtual(Aposentadoria):
     def __init__(self, servidor: DadosPrevidenciarios) -> None:
         super().__init__(servidor, t_min_serv_pub=10, t_min_camara=5)
 
+
 class AposentadoriaIntegral(Aposentadoria):
     def __init__(self, servidor: DadosPrevidenciarios) -> None:
         super().__init__(servidor, t_min_serv_pub=20, t_min_camara=10)
+
+
+class AposentadoriaAntes98(Aposentadoria):
+    def __init__(self, servidor: DadosPrevidenciarios) -> None:
+        super().__init__(servidor, t_min_serv_pub=25, t_min_camara=15)
+        if servidor.sexo == Sexo.MASCULINO:
+            self.PONTOS = 95
+        else:
+            self.PONTOS = 85
+
+    def _calcula_aposentadoria(self):
+        data_completa_cond_aposentadoria = max(
+            self._data_por_regra_transicao(),
+            self._data_por_tempo_minimo_servico_publico(),
+            self._data_por_tempo_minimo_de_camara(),
+        )
+
+        data_completa_cond_aposentadoria = min(
+            data_completa_cond_aposentadoria,
+            # Pode ser que a regra de transição dê uma data maior que a integral
+            # (se o servidor tiver muito tempo averbado no serviço público).
+            AposentadoriaIntegral(self.servidor).data_aposentadoria,
+        )
+
+        compulsoria = self._data_compulsoria()
+
+        if data_completa_cond_aposentadoria > compulsoria:
+            self._compulsoria = True
+            self._data_aposentadoria = compulsoria
+            return
+
+        self._compulsoria = False
+        self._data_aposentadoria = data_completa_cond_aposentadoria
+
+    def _data_por_regra_transicao(self):
+        dtAdm = self.servidor.data_admissao
+        dtNascimento = self.servidor.data_nascimento
+        tempo_contrib_averbado = (
+            self.servidor.tempo_INSS + self.servidor.tempo_sevico_publico
+        )
+
+        # Início: data que completa o tempo mínimo de contribuição
+        data_contrib = (
+            dtAdm
+            + relativedelta(years=self.ANOS_CONTRIB)
+            - relativedelta(days=tempo_contrib_averbado)
+        )
+        data_aniversario = date(data_contrib.year, dtNascimento.month, dtNascimento.day)
+
+        data = data_contrib
+        while True:
+            idade = relativedelta(data, dtNascimento).years
+            tempo_contrib = ((data - dtAdm).days + tempo_contrib_averbado) // 365
+            if idade + tempo_contrib >= self.PONTOS:
+                return data
+
+            # Escolhe a próxima data mais próxima (aniversário ou data de contribuição)
+            prox_data_contrib = data_contrib + relativedelta(years=1)
+            prox_data_aniversario = data_aniversario + relativedelta(years=1)
+            if prox_data_contrib < prox_data_aniversario:
+                data = prox_data_contrib
+                data_contrib += relativedelta(years=1)
+            else:
+                data = prox_data_aniversario
+                data_aniversario += relativedelta(years=1)

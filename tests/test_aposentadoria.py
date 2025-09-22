@@ -1,6 +1,7 @@
 from datetime import date
 
 from src.aposentadoria import (
+    AposentadoriaAntes98,
     AposentadoriaIntegral,
     DadosPrevidenciarios,
     Sexo,
@@ -8,7 +9,7 @@ from src.aposentadoria import (
 )
 
 
-class TestAposentadoria:
+class TestAposentadoriaAtual:
     def test_aposentadoria_por_tempo_contribuicao(self):
         servidor = DadosPrevidenciarios(
             data_nascimento=date(1992, 4, 4),
@@ -93,6 +94,8 @@ class TestAposentadoria:
         assert aposentadoria.data_aposentadoria == date(2022, 1, 1)
         assert aposentadoria.compulsoria
 
+
+class TestAposentadoriaIntegral:
     def test_aposentadoria_integral_sem_tempo_anterior(self):
         servidor = DadosPrevidenciarios(
             data_nascimento=date(1974, 5, 8),
@@ -119,4 +122,79 @@ class TestAposentadoria:
         aposentadoria = AposentadoriaIntegral(servidor)
 
         assert aposentadoria.data_aposentadoria == date(2033, 5, 12)
+        assert not aposentadoria.compulsoria
+
+
+class TestAposentadoriaAntes98:
+    def test_regra_transicao_qdo_completa_aniversario(self):
+        servidor = DadosPrevidenciarios(
+            data_nascimento=date(1968, 5, 30),
+            sexo=Sexo.MASCULINO,
+            data_admissao=date(1990, 8, 13),
+            tempo_INSS=0,
+            tempo_sevico_publico=0,
+        )
+        # 13/08/2025 - 35 anos contribuição e 57 anos idade -> total 92 pontos
+        # 30/05/2026 - 35 anos contribuição e 58 anos idade -> total 93 pontos
+        # 13/08/2026 - 36 anos contribuição e 58 anos idade -> total 94 pontos
+        # 30/05/2027 - 36 anos contribuição e 59 anos idade -> total 95 pontos
+
+        aposentadoria = AposentadoriaAntes98(servidor)
+
+        assert aposentadoria.data_aposentadoria == date(2027, 5, 30)
+        assert not aposentadoria.compulsoria
+
+    def test_regra_transicao_qdo_completa_contribuicao(self):
+        servidor = DadosPrevidenciarios(
+            data_nascimento=date(1969, 8, 18),
+            sexo=Sexo.FEMININO,
+            data_admissao=date(1990, 5, 30),
+            tempo_INSS=0,
+            tempo_sevico_publico=0,
+        )
+        # 30/05/2020 - 30 anos contribuição e 50 anos idade -> total 80 pontos
+        # 18/08/2020 - 30 anos contribuição e 51 anos idade -> total 81 pontos
+        # 30/05/2021 - 31 anos contribuição e 51 anos idade -> total 82 pontos
+        # 18/08/2021 - 31 anos contribuição e 52 anos idade -> total 83 pontos
+        # 30/05/2022 - 32 anos contribuição e 52 anos idade -> total 84 pontos
+        # 18/08/2022 - 32 anos contribuição e 53 anos idade -> total 85 pontos
+
+        aposentadoria = AposentadoriaAntes98(servidor)
+
+        assert aposentadoria.data_aposentadoria == date(2022, 8, 18)
+        assert not aposentadoria.compulsoria
+
+    def test_regra_transicao_com_mesmo_dia_admissao_e_aniversario(self):
+        servidor = DadosPrevidenciarios(
+            data_nascimento=date(1972, 1, 1),
+            sexo=Sexo.FEMININO,
+            data_admissao=date(1995, 1, 1),
+            tempo_INSS=0,
+            tempo_sevico_publico=0,
+        )
+        # 01/01/2025 - 30 anos contribuição e 53 anos idade -> total 83 pontos
+        # 01/01/2026 - 31 anos contribuição e 54 anos idade -> total 85 pontos
+
+        aposentadoria = AposentadoriaAntes98(servidor)
+
+        assert aposentadoria.data_aposentadoria == date(2026, 1, 1)
+        assert not aposentadoria.compulsoria
+
+    def test_aposentadoria_integral_mais_vantajosa(self):
+        servidor = DadosPrevidenciarios(
+            data_nascimento=date(1969, 12, 5),
+            sexo=Sexo.FEMININO,
+            data_admissao=date(2010, 2, 10),
+            tempo_INSS=0,
+            tempo_sevico_publico=7300 # 20 anos
+        )
+        # 05/12/2022 - 32 anos de contribuição e 53 anos de idade -> total 85 pontos
+        # precisa ter 15 anos de CMBH, tem 13, então aposentaria por essa regra só em 10/02/2025
+
+        # Pela regra integral, completa a idade minima em 05/12/2024, com 14 anos de CMBH
+        # e 35 anos de contribuição
+
+        aposentadoria = AposentadoriaAntes98(servidor)
+
+        assert aposentadoria.data_aposentadoria == date(2024, 12, 5)
         assert not aposentadoria.compulsoria
