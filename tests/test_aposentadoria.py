@@ -6,6 +6,7 @@ from src.aposentadoria import (
     DadosPrevidenciarios,
     Sexo,
     AposentadoriaAtual,
+    atribui_aposentadoria,
 )
 
 
@@ -186,7 +187,7 @@ class TestAposentadoriaAntes98:
             sexo=Sexo.FEMININO,
             data_admissao=date(2010, 2, 10),
             tempo_INSS=0,
-            tempo_sevico_publico=7300 # 20 anos
+            tempo_sevico_publico=7300,  # 20 anos
         )
         # 05/12/2022 - 32 anos de contribuição e 53 anos de idade -> total 85 pontos
         # precisa ter 15 anos de CMBH, tem 13, então aposentaria por essa regra só em 10/02/2025
@@ -198,3 +199,53 @@ class TestAposentadoriaAntes98:
 
         assert aposentadoria.data_aposentadoria == date(2024, 12, 5)
         assert not aposentadoria.compulsoria
+
+
+class TesytAtribuiAposentadoria:
+    def test_atribui_aposentadoria_antes_98(self):
+        servidor = DadosPrevidenciarios(
+            data_nascimento=date(1960, 1, 1),
+            sexo=Sexo.MASCULINO,
+            data_admissao=date(1980, 1, 1),
+            tempo_INSS=0,
+            tempo_sevico_publico=0,
+        )
+        cls = atribui_aposentadoria(servidor)
+        assert cls is AposentadoriaAntes98
+
+    def test_atribui_aposentadoria_integral():
+        servidor = DadosPrevidenciarios(
+            data_nascimento=date(1970, 1, 1),
+            sexo=Sexo.FEMININO,
+            data_admissao=date(2000, 1, 1),
+            tempo_INSS=0,
+            tempo_sevico_publico=0,
+        )
+
+        cls = atribui_aposentadoria(servidor)
+        assert cls is AposentadoriaIntegral
+
+    def test_atribui_aposentadoria_atual():
+        servidor = DadosPrevidenciarios(
+            data_nascimento=date(1980, 1, 1),
+            sexo=Sexo.FEMININO,
+            data_admissao=date(2010, 1, 1),
+            tempo_INSS=1200,
+            tempo_sevico_publico=0,
+        )
+
+        cls = atribui_aposentadoria(servidor)
+        assert cls is AposentadoriaAtual
+
+    def test_atribui_aposentadoria_integral_with_tempo_servico_publico():
+        # Admissao: 2005-01-01, tempo_sevico_publico: 2000 dias (~5.48 anos)
+        # Ingresso no serviço público: 2005-01-01 - 2000 dias = 1999-06-15
+        servidor = DadosPrevidenciarios(
+            data_nascimento=date(1975, 1, 1),
+            sexo=Sexo.FEMININO,
+            data_admissao=date(2005, 1, 1),
+            tempo_INSS=0,
+            tempo_sevico_publico=2000,
+        )
+        cls = atribui_aposentadoria(servidor)
+        assert cls is AposentadoriaIntegral

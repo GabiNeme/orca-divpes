@@ -166,3 +166,15 @@ class AposentadoriaAntes98(Aposentadoria):
             else:
                 data = prox_data_aniversario
                 data_aniversario += relativedelta(years=1)
+
+
+def atribui_aposentadoria(funcionario: DadosPrevidenciarios) -> Aposentadoria:
+    """Atribui o tipo de aposentadoria ao funcionário, baseado na data de admissão."""
+    data_ingresso_serv_publ = funcionario.data_admissao - relativedelta(days=funcionario.tempo_sevico_publico)
+    
+    if data_ingresso_serv_publ < date(1998, 7, 16):
+        return AposentadoriaAntes98
+    elif data_ingresso_serv_publ < date(2003, 12, 31):
+        return AposentadoriaIntegral
+    else:
+        return AposentadoriaAtual
