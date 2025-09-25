@@ -8,7 +8,6 @@ def main(
     ano_fim,
     diretorio_resultado,
     recalcula_projecao=False,
-    exporta_progressoes=False,
 ):
 
     cmbh: CMBH = CMBH.from_excel(
@@ -16,7 +15,6 @@ def main(
     )
     if recalcula_projecao:
         cmbh.calcula_projecao(ano_inicio, ano_fim)
-    if exporta_progressoes:
         cmbh.exporta_progressoes(diretorio_resultado)
 
     cmbh.exporta(diretorio_resultado, ano_inicio, ano_fim)
@@ -30,7 +28,7 @@ if __name__ == "__main__":
     if len(sys.argv) < 5:
         print(
             f"Uso: python main.py <caminho_projecao_excel> <ano_inicio> <ano_fim> "
-            f"<diretorio_resultado> [--recalcula-projecao] [--exporta-progressoes]"
+            f"<diretorio_resultado> [--recalcula-projecao]"
         )
         sys.exit(1)
     caminho_projecao_excel = sys.argv[1]
@@ -43,12 +41,10 @@ if __name__ == "__main__":
         sys.exit(1)
 
     recalcula_projecao = "--recalcula-projecao" in sys.argv
-    exporta_progressoes = "--exporta-progressoes" in sys.argv
     main(
         caminho_projecao_excel,
         ano_inicio,
         ano_fim,
         diretorio_resultado,
         recalcula_projecao,
-        exporta_progressoes,
     )
