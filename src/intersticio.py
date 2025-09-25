@@ -8,7 +8,7 @@ class Intersticio:
             return 9
         if numero_nivel <= 28:
             return 12
-        if numero_nivel <= 47:
+        if numero_nivel <= 37:
             return 15
         return 24
 
