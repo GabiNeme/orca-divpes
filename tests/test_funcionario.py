@@ -9,7 +9,7 @@ from dateutil.relativedelta import relativedelta
 
 class DummyCarreira(Carreira):
     # Implementação para testes
-    def progride_verticalmente_e_horizontalmente(self, ultima_progressao):
+    def progride_verticalmente_e_horizontalmente(self, ultima_progressao, letra_maxima=None):
         progs_horizontais = 1
         if ultima_progressao.nivel.numero >= 5:
             progs_horizontais = 0

@@ -64,17 +64,21 @@ class Carreira(ABC):
         )
 
     def progride_verticalmente_e_horizontalmente(
-        self, ultima_progressao: Progressao
+        self, ultima_progressao: Progressao, letra_maxima: str = None
     ) -> Optional[Progressao]:
         """Calcula uma progressão vertical (2 interstícios), podendo ser especial ou
-        não, e concede todas as letras permitidas pelo nível final."""
+        não, e concede todas as letras permitidas pelo nível final se letra máxima for
+        None. Caso contrário concede todas as letras permitidas até letra_maxima."""
 
         progressao = self.progride_verticalmente(ultima_progressao)
 
         if not progressao:
             return None
 
-        nivel_com_letras = self.concede_letras_ate_limite(progressao.nivel)
+        if letra_maxima:
+            nivel_com_letras = self.progride_ate_letra(progressao.nivel, letra_maxima)
+        else:
+            nivel_com_letras = self.concede_letras_ate_limite(progressao.nivel)
         return Progressao(
             progressao.data, nivel_com_letras, progressao.progs_sem_especial
         )
@@ -87,6 +91,25 @@ class Carreira(ABC):
 
         letra_maxima = self._letra_maxima_para_nivel(nivel_origem.numero)
         return Nivel(nivel_origem.numero, letra_maxima)
+
+    def progride_ate_letra(self, nivel_origem: Nivel, letra: str) -> Nivel:
+        """Concede progressões horizontais até no máximo letra informada."""
+        letra_solicitada_count: int = Nivel(
+            nivel_origem.numero, letra
+        ).numero_progressoes_horizontais
+
+        # Não retrocede nível se a letra solicitada for menor que nível origem
+        if nivel_origem.numero_progressoes_horizontais > letra_solicitada_count:
+            return nivel_origem
+
+        letra_maxima:str = self._letra_maxima_para_nivel(nivel_origem.numero)
+        letra_maxima_count : int = Nivel(
+            nivel_origem.numero, letra_maxima
+        ).numero_progressoes_horizontais
+        if letra_solicitada_count > letra_maxima_count:
+            return Nivel(nivel_origem.numero, letra_maxima)
+
+        return Nivel(nivel_origem.numero, letra)
 
     def _limite(self) -> int:
         """Limite da carreira enquanto não completar condição de aposentadoria."""
@@ -128,6 +151,7 @@ class Carreira(ABC):
             if transicao_para_letra[i][0] <= numero_nivel:
                 return transicao_para_letra[i][1]
 
+
 class CarreiraConcurso2008(Carreira):
     """Carreira do concurso de 2008."""
 
@@ -135,12 +159,14 @@ class CarreiraConcurso2008(Carreira):
         """Limite da carreira enquanto não completar condição de aposentadoria."""
         return 35
 
+
 class CarreiraConcurso2004(Carreira):
     """Carreira do concurso de 2004."""
 
     def _limite(self) -> int:
         """Limite da carreira enquanto não completar condição de aposentadoria."""
         return 37
+
 
 class CarreiraAtual(Carreira):
 
@@ -159,10 +185,24 @@ class CarreiraAtual(Carreira):
             if transicao_para_letra[i][0] <= numero_nivel:
                 return transicao_para_letra[i][1]
 
+    def _limite(self) -> int:
+        """Limite da carreira enquanto não completar condição de aposentadoria."""
+        return 48
+
+
+class CarreiraPassaDoTetoAtual(Carreira):
+    """Carreira do concurso de 2004 que passa do teto atual."""
+
+    def _limite(self) -> int:
+        """Limite da carreira enquanto não completar condição de aposentadoria."""
+        return 41
+
 
 def atribui_carreira(cm: int) -> Carreira:
     """Atribui a nova carreira ao funcionário com base no concurso."""
-    if cm <= 336:
+    if cm < 330:
+        return CarreiraPassaDoTetoAtual()
+    elif cm < 412:
         return CarreiraConcurso2004()
     elif cm <= 545:
         return CarreiraConcurso2008()

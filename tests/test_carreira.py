@@ -114,6 +114,20 @@ class TestCarreira:
         with pytest.raises(ValueError):
             _ = Carreira().progride_verticalmente_e_horizontalmente(progressao)
 
+    def test_progride_vert_e_hor_nao_ultrapassa_letra_maxima(self):
+        ultima_progressao = Progressao(
+            date.today(), Nivel(8, "B"), progs_sem_especial=1
+        )
+        letra_maxima = "D"
+        progressao_esperada = Progressao(
+            date.today(), Nivel(11, "D"), progs_sem_especial=0
+        )  # No nivel 11 poderia ir até E
+
+        progressao = Carreira().progride_verticalmente_e_horizontalmente(
+            ultima_progressao, letra_maxima
+        )
+        assert progressao.nivel == progressao_esperada.nivel
+
     def test_concede_letra_verifica_nivel_invalido(self):
         nivel = Nivel(2, "E")
         with pytest.raises(ValueError):
@@ -146,6 +160,27 @@ class TestCarreira:
     def test_progressao_e_none_se_ja_esta_no_fim_da_carreira(self, prog_antes):
         carreira = Carreira()
         assert carreira.progride_verticalmente(prog_antes) is None
+
+    def test_progride_ate_letra_respeita_letra_maxima(self):
+        carreira = Carreira()
+        nivel_origem = Nivel(5, "A")
+        letra = "B"
+        nivel_destino = Nivel(5, "B")  # No 5, letra C é o máximo
+        assert carreira.progride_ate_letra(nivel_origem, letra) == nivel_destino
+
+    def test_progride_ate_letra_vai_ate_maximo_se_limite_e_maior(self):
+        carreira = Carreira()
+        nivel_origem = Nivel(3, "A")
+        letra = "C"
+        nivel_destino = Nivel(3, "B")  # No 3, letra B é o máximo
+        assert carreira.progride_ate_letra(nivel_origem, letra) == nivel_destino
+
+    def test_progride_ate_letra_vai_nao_volta_nivel(self):
+        carreira = Carreira()
+        nivel_origem = Nivel(5, "B")
+        letra = "A"
+        nivel_destino = Nivel(5, "B")  # No 5, letra C é o máximo
+        assert carreira.progride_ate_letra(nivel_origem, letra) == nivel_destino
 
 
 class TestCarreiraConcurso2008:

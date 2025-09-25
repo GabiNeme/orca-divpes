@@ -39,6 +39,7 @@ class Funcionario:
         aposentadoria: Aposentadoria,
         ultima_progressao: Progressao,
         carreira: Carreira,
+        letra_maxima: str = None,
     ):
         self.cm = cm
         self.data_admissao = data_admissao
@@ -46,37 +47,17 @@ class Funcionario:
         self.aposentadoria = aposentadoria
         self.progressoes = [ultima_progressao]
         self.carreira = carreira
-
-    def _concede_letras(self) -> bool:
-        """Concede todas as letras se a pessoa tiver na letra máxima do nível,
-        mas não concede nenhuma caso contrário."""
-
-        nivel_atual = self.progressoes[0].nivel
-        nivel_letra_maxima = CarreiraAtual().concede_letras_ate_limite(nivel_atual)
-
-        if (
-            nivel_letra_maxima.numero_progressoes_horizontais
-            - nivel_atual.numero_progressoes_horizontais
-            > 0
-        ):
-            return False
-        return True
+        self.letra_maxima = letra_maxima
 
     def _calcula_progressoes_ate(self, data: date):
         ultima_progressao = self.progressoes[-1]
 
-        concede_letras = self._concede_letras()
         while ultima_progressao and data > ultima_progressao.data:
-            if concede_letras:
-                ultima_progressao = (
-                    self.carreira.progride_verticalmente_e_horizontalmente(
-                        ultima_progressao
-                    )
-                )
-            else:
-                ultima_progressao = self.carreira.progride_verticalmente(
-                    ultima_progressao
-                )
+            # Sempre progride verticalmente e horizontalmente respeitando a letra máxima.
+            # Quando a letra máxima for None, progride até o máximo permitido.
+            ultima_progressao = self.carreira.progride_verticalmente_e_horizontalmente(
+                ultima_progressao, letra_maxima=self.letra_maxima
+            )
 
             if ultima_progressao:
                 self.progressoes.append(ultima_progressao)
@@ -115,3 +96,15 @@ class Funcionario:
             "Num Art 98 Data Aposentadoria": self.aposentadoria.num_art_98_data_aposentadoria,
             "Aderiu PIA": self.aposentadoria.aderiu_pia,
         }
+
+
+def concede_letras(nivel_atual: Nivel) -> bool:
+    nivel_letra_maxima = CarreiraAtual().concede_letras_ate_limite(nivel_atual)
+
+    if (
+        nivel_letra_maxima.numero_progressoes_horizontais
+        - nivel_atual.numero_progressoes_horizontais
+        > 0
+    ):
+        return False
+    return True

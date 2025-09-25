@@ -20,6 +20,7 @@ class FuncionarioFactory:
         ultima_progressao: Progressao,
         carreira: Carreira,
         grupo_de_controle: int,
+        letra_maxima: str = None,
     ) -> Funcionario:
 
         if grupo_de_controle == 1:
@@ -48,4 +49,5 @@ class FuncionarioFactory:
             aposentadoria=aposentadoria,
             ultima_progressao=ultima_progressao,
             carreira=carreira,
+            letra_maxima=letra_maxima,
         )

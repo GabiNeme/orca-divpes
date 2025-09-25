@@ -1,6 +1,6 @@
 from datetime import date
 import pytest
-from src.carreira import CarreiraConcurso2004
+from src.carreira import CarreiraPassaDoTetoAtual
 from src.classe import Classe
 from src.cmbh import CMBH, ImportadorProjecaoExcel
 from src.funcionario import TipoPrevidencia
@@ -67,11 +67,19 @@ class TestImportadorProjecaoExcel:
 
     def test_tipo_carreira(self, cmbh_fixture: CMBH):
         funcionario = cmbh_fixture.funcionarios.get(1)
-        assert isinstance(funcionario.carreira, CarreiraConcurso2004)
+        assert isinstance(funcionario.carreira, CarreiraPassaDoTetoAtual)
 
     def test_nao_aderiu_pia(self, cmbh_fixture: CMBH):
         funcionario = cmbh_fixture.funcionarios.get(1)
         assert not funcionario.aposentadoria.aderiu_pia
+
+    def test_salva_letra_maxima_se_nao_esta_no_topo(self, cmbh_fixture: CMBH):
+        funcionario = cmbh_fixture.funcionarios.get(1)
+        assert funcionario.letra_maxima == "C"
+
+    def test_nao_salva_letra_maxima_se_esta_no_topo(self, cmbh_fixture: CMBH):
+        funcionario = cmbh_fixture.funcionarios.get(2)
+        assert funcionario.letra_maxima is None
 
     def test_folha(self, cmbh_fixture: CMBH):
         competencia = date(2025, 11, 1)
