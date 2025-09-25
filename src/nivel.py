@@ -1,5 +1,5 @@
-
 LETRAS = ["0", "A", "B", "C", "D", "E"]
+
 
 class Nivel:
     def __init__(self, numero: int, letra: str) -> None:
@@ -39,7 +39,10 @@ class Nivel:
     @letra.setter
     def letra(self, value: int) -> None:
         if value not in LETRAS:
-            raise ValueError("As letras devem ser : " + ", ".join(LETRAS))
+            raise ValueError(
+                f"Letra: {value} não reconhecido. As letras devem ser : "
+                + ", ".join(LETRAS)
+            )
         self._letra = value
 
     @property
@@ -49,16 +52,12 @@ class Nivel:
 
     def anterior(self, passos_verticais: int, passos_horizontais: int):
         prox_numero = self.numero - passos_verticais
-        prox_letra = LETRAS[
-            self.numero_progressoes_horizontais - passos_horizontais
-        ]
+        prox_letra = LETRAS[self.numero_progressoes_horizontais - passos_horizontais]
         return Nivel(prox_numero, prox_letra)
 
     def proximo(self, passos_verticais: int, passos_horizontais: int):
         prox_numero = self.numero + passos_verticais
-        prox_letra = LETRAS[
-            self.numero_progressoes_horizontais + passos_horizontais
-        ]
+        prox_letra = LETRAS[self.numero_progressoes_horizontais + passos_horizontais]
         return Nivel(prox_numero, prox_letra)
 
     def __str__(self) -> str:
