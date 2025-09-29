@@ -4,7 +4,6 @@ from src.folha import Folha
 from src.folhas_efetivos import FolhasEfetivos, GastoMensalEfetivos
 from src.nivel import Nivel
 from src.tabela_salario import Tabela
-from datetime import date
 
 
 class DummyFolha(Folha):
@@ -175,3 +174,35 @@ class TestFolhasEfetivos:
         assert df.shape[0] == 3
         assert df.iloc[2]["Competência"] == "2024-03"
         assert df.iloc[2]["Total"] == 0
+
+    def test_calcula_metricas(self):
+        folhas = FolhasEfetivos(Tabela(), DummyCalculaFolha)
+        inicio = date(2024, 1, 1)
+        fim = date(2024, 3, 1)
+        competencias = folhas.gerar_periodos(inicio, fim)
+
+        funcionario1 = DummyFuncionario("001", {c: "nivel1" for c in competencias})
+        funcionario2 = DummyFuncionario("002", {c: "nivel2" for c in competencias})
+        funcionarios = [funcionario1, funcionario2]
+
+        folhas.calcula_folhas(funcionarios, inicio, fim)
+        df = folhas.calcula_metricas(inicio, fim)
+
+        assert isinstance(df, pd.DataFrame)
+        assert set(df.columns) == {
+            "CM",
+            "Valor Inicial",
+            "Valor Final",
+            "Média",
+            "VPL (0,5%)",
+            "Soma Total",
+        }
+        # Deve ter uma linha para cada funcionário
+        assert df.shape[0] == 2
+        # Checa valores esperados para DummyFolha (total sempre 100)
+        for _, row in df.iterrows():
+            assert row["Valor Inicial"] == 100
+            assert row["Valor Final"] == 100
+            assert row["Média"] == 100
+            assert round(row["VPL (0,5%)"], 2) == round(100 / (1 + 0.005) ** 0 + 100 / (1 + 0.005) ** 1 + 100 / (1 + 0.005) ** 2, 2)
+            assert row["Soma Total"] == 300

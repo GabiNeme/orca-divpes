@@ -87,6 +87,14 @@ class CMBH:
         df = pd.DataFrame(dados)
         df.to_excel(writer, sheet_name="Efetivos", index=False)
 
+    def exporta_metricas(self, ano_inicio: int, ano_fim: int, writer: pd.ExcelWriter) -> None:
+        """Exporta as métricas das folhas para uma planilha do Excel."""
+        comp_inicio = date(ano_inicio, 1, 1)
+        comp_fim = date(ano_fim, 12, 1)
+
+        df_metricas_efetivos = self.folhas_efetivos.calcula_metricas(comp_inicio, comp_fim)
+        df_metricas_efetivos.to_excel(writer, sheet_name="Métricas", index=False)
+
     def exporta(
         self,
         diretorio_resultado: str,
@@ -102,6 +110,9 @@ class CMBH:
             arquivo_servidores = os.path.join(diretorio_resultado, "servidores.xlsx")
             with pd.ExcelWriter(arquivo_servidores, engine="openpyxl") as writer:
                 self.exporta_servidores(writer=writer)
+                self.exporta_metricas(
+                    ano_inicio=ano_inicio, ano_fim=ano_fim, writer=writer
+                )
                 self.exporta_folhas_servidores_efetivos(
                     ano_inicio=ano_inicio, ano_fim=ano_fim, writer=writer
                 )

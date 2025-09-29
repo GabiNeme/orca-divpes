@@ -7,6 +7,7 @@ from src.folhas import Folhas
 from src.funcionario import Funcionario
 from src.tabela_salario import Tabela
 
+TAXA_DESCONTO = 0.005  # 0,5% ao mês
 
 @dataclass
 class GastoMensalEfetivos:
@@ -21,12 +22,14 @@ class FolhasEfetivos(Folhas):
         self, tabela: Tabela = Tabela, calcula_folha: CalculaFolha = CalculaFolha
     ):
         """Inicializa a classe as folhas."""
+        self.servidores = set()  # Conjunto para armazenar CMs únicos
         self.folhas = {}  # {competencia: {cm: Folha}}
         self.tabela = tabela
         self.calcula_folha = calcula_folha
 
     def adiciona_folha(self, competencia: date, cm: int, folha: Folha):
         """Adiciona uma folha de pagamento para um funcionário em uma competência específica."""
+        self.servidores.add(cm)
         if competencia not in self.folhas:
             self.folhas[competencia] = {}
         self.folhas[competencia][cm] = folha
@@ -48,6 +51,7 @@ class FolhasEfetivos(Folhas):
     def calcula_folhas(self, funcionarios: list[Funcionario], inicio: date, fim: date):
         """Calcula as folhas de pagamento para uma lista de funcionários."""
         for funcionario in funcionarios:
+            self.servidores.add(funcionario.cm)
             self._calcula_folhas_funcionario(funcionario, inicio, fim)
 
     def total_por_competencia(self, competencia: date) -> GastoMensalEfetivos:
@@ -126,8 +130,7 @@ class FolhasEfetivos(Folhas):
     def exporta_folhas_do_funcionario(
         self, cm: int, inicio: date, fim: date
     ) -> pd.DataFrame:
-        """Exporta as folhas de um funcionário específico para um arquivo Excel."""
-
+        """Exporta as folhas de um funcionário específico para um dataframe."""
         dados = []
         for competencia in self.gerar_periodos(inicio, fim):
             if competencia in self.folhas and cm in self.folhas[competencia]:
@@ -145,3 +148,66 @@ class FolhasEfetivos(Folhas):
                 )
 
         return pd.DataFrame(dados)
+    
+    def calcula_metricas(self, inicio: date, fim: date) -> pd.DataFrame:
+        """Calcula métricas adicionais para as folhas de pagamento no intervalo especificado."""
+        # Exemplo de métrica: total anual por funcionário
+        metricas = []
+        for cm in sorted(self.servidores):
+            dados = {
+                "CM": cm,
+                "Valor Inicial": self._calcula_valor_inicial(cm, inicio, fim),
+                "Valor Final": self._calcula_valor_final(cm, inicio, fim),
+                "Média": self._calcula_media(cm, inicio, fim),
+                "VPL (0,5%)": self._calcula_vpl(cm, inicio, fim),
+                "Soma Total": self._calcula_soma(cm, inicio, fim),
+            }
+            metricas.append(dados)
+        return pd.DataFrame(metricas)
+
+    def _calcula_valor_inicial(self, cm: int, inicio: date, fim: date) -> float:
+        """Calcula o valor inicial para um funcionário na primeira competência que ele/a aparece."""
+        for competencia in self.gerar_periodos(inicio, fim):
+            if competencia in self.folhas and cm in self.folhas[competencia]:
+                folha = self.folhas[competencia][cm]
+                return folha.total
+        return 0.0
+    
+    def _calcula_valor_final(self, cm: int, inicio: date, fim: date) -> float:
+        """Calcula o valor final para um funcionário na última competência que ele/a aparece."""
+        for competencia in reversed(list(self.gerar_periodos(inicio, fim))):
+            if competencia in self.folhas and cm in self.folhas[competencia]:
+                folha = self.folhas[competencia][cm]
+                return folha.total
+        return 0.0
+
+    def _calcula_media(self, cm: int, inicio: date, fim: date) -> float:
+        """Calcula a média para um funcionário no intervalo especificado."""
+        total = 0.0
+        count = 0
+        for competencia in self.gerar_periodos(inicio, fim):
+            if competencia in self.folhas and cm in self.folhas[competencia]:
+                folha = self.folhas[competencia][cm]
+                total += folha.total
+                count += 1
+        return round(total / count, 2) if count > 0 else 0.0
+    
+    def _calcula_vpl(self, cm: int, inicio: date, fim: date) -> float:
+        """Calcula o Valor Presente Líquido (VPL) para um funcionário no intervalo especificado."""
+        vpl = 0.0
+        meses = 0
+        for competencia in self.gerar_periodos(inicio, fim):
+            if competencia in self.folhas and cm in self.folhas[competencia]:
+                folha = self.folhas[competencia][cm]
+                vpl += folha.total / ((1 + TAXA_DESCONTO) ** meses)
+            meses += 1
+        return round(vpl, 2)
+
+    def _calcula_soma(self, cm: int, inicio: date, fim: date) -> float:
+        """Calcula a soma total para um funcionário no intervalo especificado."""
+        total = 0.0
+        for competencia in self.gerar_periodos(inicio, fim):
+            if competencia in self.folhas and cm in self.folhas[competencia]:
+                folha = self.folhas[competencia][cm]
+                total += folha.total
+        return total
