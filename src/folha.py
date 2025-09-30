@@ -5,13 +5,7 @@ from src.anuenio import Anuenio
 from src.funcionario import DadosFolha, TipoPrevidencia
 from src.nivel import Nivel
 from src.tabela_salario import Tabela
-
-LIMITE_PREFEITO = 34604.05
-LIMITE_PROCURADORES = 41845.49
-
-FATOR_PATRONAL = 0.22
-FATOR_PATRONAL_COMPLEMENTAR = 0.085
-TETO_INSS = 8157.41
+from src.parametros import parametros as p
 
 
 @dataclass
@@ -82,9 +76,9 @@ class CalculaFolha:
     def _calcula_total(self, nivel: Nivel, competencia: date) -> float:
         """Calcula o total do funcionário."""
         if self.funcionario.procurador:
-            limite = LIMITE_PROCURADORES
+            limite = p.TETO_PROCURADORES
         else:
-            limite = LIMITE_PREFEITO
+            limite = p.TETO_PREFEITO
 
         total_antes_limite_prefeito = self._calcula_total_antes_limite_prefeito(
             nivel, competencia
@@ -97,19 +91,22 @@ class CalculaFolha:
         """Calcula a previdência patronal do funcionário."""
         if self.funcionario.tipo_previdencia != TipoPrevidencia.Fufin:
             return 0
-        return round(self._calcula_total(nivel, competencia) * FATOR_PATRONAL, 2)
+        return round(self._calcula_total(nivel, competencia) * p.ALIQUOTA_PATRONAL, 2)
 
     def _calcula_bhprev_patronal(self, nivel: Nivel, competencia: date) -> float:
         """Calcula a previdência patronal do BHPrev do funcionário."""
         if self.funcionario.tipo_previdencia == TipoPrevidencia.Fufin:
             return 0
         elif self.funcionario.tipo_previdencia == TipoPrevidencia.BHPrev:
-            return round(self._calcula_total(nivel, competencia) * FATOR_PATRONAL, 2)
+            return round(
+                self._calcula_total(nivel, competencia) * p.ALIQUOTA_PATRONAL,
+                2,
+            )
         elif self.funcionario.tipo_previdencia == TipoPrevidencia.BHPrevComplementar:
             total = self._calcula_total(nivel, competencia)
-            if total > TETO_INSS:
-                return round(TETO_INSS * FATOR_PATRONAL, 2)
-            return round(total * FATOR_PATRONAL, 2)
+            if total > p.TETO_INSS:
+                return round(p.TETO_INSS * p.ALIQUOTA_PATRONAL, 2)
+            return round(total * p.ALIQUOTA_PATRONAL, 2)
 
     def _calcula_bhprev_complementar_patronal(
         self, nivel: Nivel, competencia: date
@@ -118,9 +115,9 @@ class CalculaFolha:
         if self.funcionario.tipo_previdencia != TipoPrevidencia.BHPrevComplementar:
             return 0
         total = self._calcula_total(nivel, competencia)
-        if total <= TETO_INSS:
+        if total <= p.TETO_INSS:
             return 0
-        return round((total - TETO_INSS) * FATOR_PATRONAL_COMPLEMENTAR, 2)
+        return round((total - p.TETO_INSS) * p.ALIQUOTA_PATRONAL_COMPLEMENTAR, 2)
 
     def calcula(self, nivel: Nivel, competencia: date) -> Folha:
         return Folha(

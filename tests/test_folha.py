@@ -4,6 +4,7 @@ from src.funcionario import TipoPrevidencia
 from src.nivel import Nivel
 from src.folha import *
 from src.tabela_salario import Tabela
+from src.parametros import parametros as p
 
 
 class DummyTabela(Tabela):
@@ -13,9 +14,9 @@ class DummyTabela(Tabela):
         if nivel == Nivel(25, "B") and classe == Classe.E2:
             return 2000
         if nivel == Nivel(30, "C") and classe == Classe.E2:
-            return LIMITE_PREFEITO
+            return p.TETO_PREFEITO
         if nivel == Nivel(36, "D") and classe == Classe.E3:
-            return LIMITE_PROCURADORES
+            return p.TETO_PROCURADORES
         return 0.0
 
 
@@ -120,11 +121,11 @@ class TestCalculoFolha:
                 tipo_previdencia=TipoPrevidencia.BHPrev,
             ),
         )
-        nivel = Nivel(30, "C")  # Valor: LIMITE_PREFEITO
+        nivel = Nivel(30, "C")  # Valor: TETO_PREFEITO
         competencia = date(
             2008, 2, 1
         )  # 8 anos = 80 reais de anuênio -> passa do limite
-        assert calculadora.calcula(nivel, competencia).total == LIMITE_PREFEITO
+        assert calculadora.calcula(nivel, competencia).total == p.TETO_PREFEITO
 
     def test_total_respeita_limite_do_procurador(self):
         calculadora = CalculaFolha(
@@ -137,11 +138,11 @@ class TestCalculoFolha:
                 tipo_previdencia=TipoPrevidencia.BHPrev,
             ),
         )
-        nivel = Nivel(36, "D")  # Valor: LIMITE_PROCURADORES
+        nivel = Nivel(36, "D")  # Valor: TETO_PROCURADORES
         competencia = date(
             2008, 2, 1
         )  # 8 anos = 80 reais de anuênio -> passa do limite
-        assert calculadora.calcula(nivel, competencia).total == LIMITE_PROCURADORES
+        assert calculadora.calcula(nivel, competencia).total == p.TETO_PROCURADORES
 
     def test_fufin_eh_zero_se_bh_prev(self):
         calculadora = CalculaFolha(
@@ -184,7 +185,7 @@ class TestCalculoFolha:
         nivel = Nivel(1, "0")  # Valor: 1.000
         assert (
             calculadora.calcula(nivel, competencia).fufin_patronal
-            == 1000 * FATOR_PATRONAL
+            == 1000 * p.ALIQUOTA_PATRONAL
         )
 
     def test_bhprev_patronal_passa_teto_inss_se_bhprev(self):
@@ -199,9 +200,9 @@ class TestCalculoFolha:
                 tipo_previdencia=TipoPrevidencia.BHPrev,
             ),
         )
-        nivel = Nivel(30, "C")  # Valor: LIMITE_PREFEITO
+        nivel = Nivel(30, "C")  # Valor: TETO_PREFEITO
         assert calculadora.calcula(nivel, competencia).bhprev_patronal == round(
-            LIMITE_PREFEITO * FATOR_PATRONAL, 2
+            p.TETO_PREFEITO * p.ALIQUOTA_PATRONAL, 2
         )
 
     def test_bhprev_patronal_limitado_ao_inss_se_bhprev_complementar(self):
@@ -216,9 +217,9 @@ class TestCalculoFolha:
                 tipo_previdencia=TipoPrevidencia.BHPrevComplementar,
             ),
         )
-        nivel = Nivel(30, "C")  # Valor: LIMITE_PREFEITO
+        nivel = Nivel(30, "C")  # Valor: TETO_PREFEITO
         assert calculadora.calcula(nivel, competencia).bhprev_patronal == round(
-            TETO_INSS * FATOR_PATRONAL, 2
+            p.TETO_INSS * p.ALIQUOTA_PATRONAL, 2
         )
 
     def test_bhprev_complementar_zerada_se_fufin(self):
@@ -282,5 +283,5 @@ class TestCalculoFolha:
         assert calculadora.calcula(
             nivel, competencia
         ).bhprev_complementar_patronal == round(
-            (LIMITE_PREFEITO - TETO_INSS) * FATOR_PATRONAL_COMPLEMENTAR, 2
+            (p.TETO_PREFEITO - p.TETO_INSS) * p.ALIQUOTA_PATRONAL_COMPLEMENTAR, 2
         )
