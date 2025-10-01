@@ -1,5 +1,7 @@
 import sys
 from src.cmbh import CMBH
+from src.parametros import Parametros, parametros
+from src.banco_de_dados import BancoDeDados
 
 
 def main(
@@ -9,6 +11,9 @@ def main(
     diretorio_resultado,
     recalcula_projecao=False,
 ):
+    # Necessário para garantir que o módulo use os parâmetros carregados do banco de dados
+    global parametros 
+    parametros = Parametros.from_aeros(BancoDeDados())
 
     cmbh: CMBH = CMBH.from_excel(
         caminho_projecao_excel, importa_folhas=not recalcula_projecao

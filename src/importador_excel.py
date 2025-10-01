@@ -12,10 +12,7 @@ from src.regra_transicao import RegraTransicao
 
 def obtem_tempos_licencas() -> dict[int, int]:
     """Obtém os tempos de licenças que interrompem contagem de progressão dos funcionários."""
-    with open("sql/tempo_licencas.sql", "r", encoding="utf-8") as f:
-        sql_query = f.read()
-    df_licencas = BancoDeDados().realiza_consulta(sql_query)
-    # Cria o dicionário indexado por cm
+    df_licencas = BancoDeDados().realiza_consulta_arquivo("tempo_licencas.sql")
     return dict(zip(df_licencas["cm"].astype(int), df_licencas["qtde_dias_licenca"]))
 
 
