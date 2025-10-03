@@ -36,11 +36,11 @@ class TestParametros:
         """Testa carregamento bem-sucedido do Aeros."""
         dummy_df = pd.DataFrame(
             {
-                "VALOR_BASE_E2": [6000.0],
-                "VALOR_BASE_E3": [11000.0],
-                "TETO_PREFEITO": [35000.0],
-                "TETO_PROCURADORES": [42000.0],
-                "TETO_INSS": [8500.0],
+                "valor_base_e2": [6000.0],
+                "valor_base_e3": [11000.0],
+                "teto_prefeito": [35000.0],
+                "teto_procuradores": [42000.0],
+                "teto_inss": [8500.0],
             }
         )
         dummy_aeros = DummyBancoDeDados(return_data=dummy_df)
@@ -56,13 +56,13 @@ class TestParametros:
 
     def test_from_aeros_lanca_erro_se_coluna_ausente(self):
         """Testa se erro é levantado quando coluna está ausente no DataFrame."""
-        # DataFrame sem a coluna VALOR_BASE_E2
+        # DataFrame sem a coluna valor_base_e2
         dummy_df = pd.DataFrame(
-            {"VALOR_BASE_E3": [11000.0], "TETO_PREFEITO": [35000.0]}
+            {"valor_base_e3": [11000.0], "teto_prefeito": [35000.0]}
         )
         dummy_aeros = DummyBancoDeDados(return_data=dummy_df)
 
-        with pytest.raises(KeyError, match="VALOR_BASE_E2"):
+        with pytest.raises(KeyError, match="valor_base_e2"):
             Parametros.from_aeros(dummy_aeros)
 
     def test_from_aeros_lanca_erro_se_dataframe_vazio(self):
@@ -76,11 +76,11 @@ class TestParametros:
         """Testa se valores nulos no DataFrame levantam erro."""
         dummy_df = pd.DataFrame(
             {
-                "VALOR_BASE_E2": [None],  # Valor nulo
-                "VALOR_BASE_E3": [11000.0],
-                "TETO_PREFEITO": [35000.0],
-                "TETO_PROCURADORES": [42000.0],
-                "TETO_INSS": [8500.0],
+                "valor_base_e2": [None],  # Valor nulo
+                "valor_base_e3": [11000.0],
+                "teto_prefeito": [35000.0],
+                "teto_procuradores": [42000.0],
+                "teto_inss": [8500.0],
             }
         )
         dummy_aeros = DummyBancoDeDados(return_data=dummy_df)
