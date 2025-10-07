@@ -1,7 +1,7 @@
-import pytest
 import pandas as pd
-from unittest.mock import patch, mock_open
-from src.parametros import Parametros
+import pytest
+
+import config
 
 
 class DummyBancoDeDados:
@@ -19,18 +19,18 @@ class DummyBancoDeDados:
 class TestParametros:
     def test_parametros_valores_padrao(self):
         """Testa se os valores padrão são carregados corretamente."""
-        p = Parametros()
-        assert p.VALOR_BASE_E2 == 5758.83
-        assert p.VALOR_BASE_E3 == 10047.80
+        p = config.Parametros()
+        assert p.VALOR_BASE_E2 == None
+        assert p.VALOR_BASE_E3 == None
         assert p.INDICE_PROGRESSAO_VERTICAL == 0.0391
         assert p.INDICE_PROGRESSAO_HORIZONTAL == 0.0797
         assert p.REAJUSTE_ANUAL == 0.1
         assert p.DATA_BASE_REAJUSTE == 5
-        assert p.TETO_PREFEITO == 34604.05
-        assert p.TETO_PROCURADORES == 41845.49
+        assert p.TETO_PREFEITO == None
+        assert p.TETO_PROCURADORES == None
         assert p.ALIQUOTA_PATRONAL == 0.22
         assert p.ALIQUOTA_PATRONAL_COMPLEMENTAR == 0.085
-        assert p.TETO_INSS == 8157.41
+        assert p.TETO_INSS == None
 
     def test_from_aeros_carregamento_bem_sucedido(self):
         """Testa carregamento bem-sucedido do Aeros."""
@@ -45,7 +45,7 @@ class TestParametros:
         )
         dummy_aeros = DummyBancoDeDados(return_data=dummy_df)
 
-        p = Parametros.from_aeros(dummy_aeros)
+        p = config.Parametros.from_aeros(dummy_aeros)
 
         assert p.VALOR_BASE_E2 == 6000.0
         assert p.VALOR_BASE_E3 == 11000.0
@@ -63,14 +63,14 @@ class TestParametros:
         dummy_aeros = DummyBancoDeDados(return_data=dummy_df)
 
         with pytest.raises(KeyError, match="valor_base_e2"):
-            Parametros.from_aeros(dummy_aeros)
+            config.Parametros.from_aeros(dummy_aeros)
 
     def test_from_aeros_lanca_erro_se_dataframe_vazio(self):
         """Testa se erro é levantado quando DataFrame está vazio."""
         dummy_aeros = DummyBancoDeDados(return_data=pd.DataFrame())
 
         with pytest.raises(ValueError):
-            Parametros.from_aeros(dummy_aeros)
+            config.Parametros.from_aeros(dummy_aeros)
 
     def test_from_aeros_lanca_erro_se_valores_nulos(self):
         """Testa se valores nulos no DataFrame levantam erro."""
@@ -86,6 +86,6 @@ class TestParametros:
         dummy_aeros = DummyBancoDeDados(return_data=dummy_df)
 
         with pytest.raises(ValueError):
-            p = Parametros.from_aeros(dummy_aeros)
+            p = config.Parametros.from_aeros(dummy_aeros)
             # Força o uso do valor None para verificar se causa erro
             assert p.VALOR_BASE_E2 is not None

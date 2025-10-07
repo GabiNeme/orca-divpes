@@ -6,20 +6,20 @@ from src.banco_de_dados import BancoDeDados
 @dataclass
 class Parametros:
     # Tabela de salários
-    VALOR_BASE_E2: float = 5758.83  # Importado do Aeros
-    VALOR_BASE_E3: float = 10047.80  # Importado do Aeros
+    VALOR_BASE_E2: float = None  # Importado do Aeros
+    VALOR_BASE_E3: float = None  # Importado do Aeros
     INDICE_PROGRESSAO_VERTICAL: float = 0.0391
     INDICE_PROGRESSAO_HORIZONTAL: float = 0.0797
     # Reajustes
     REAJUSTE_ANUAL: float = 0.1
     DATA_BASE_REAJUSTE: int = 5  # Maio
     # Tetos
-    TETO_PREFEITO: float = 34604.05  # Importado do Aeros
-    TETO_PROCURADORES: float = 41845.49  # Importado do Aeros
+    TETO_PREFEITO: float = None  # Importado do Aeros
+    TETO_PROCURADORES: float = None  # Importado do Aeros
     # Previdência
     ALIQUOTA_PATRONAL: float = 0.22
     ALIQUOTA_PATRONAL_COMPLEMENTAR: float = 0.085
-    TETO_INSS: float = 8157.41  # Importado do Aeros
+    TETO_INSS: float = None  # Importado do Aeros
 
     @classmethod
     def from_aeros(cls, aeros: BancoDeDados):
@@ -57,4 +57,4 @@ class Parametros:
         )
 
 
-parametros = Parametros()
+param = Parametros()

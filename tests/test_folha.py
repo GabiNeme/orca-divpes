@@ -1,10 +1,20 @@
 from datetime import date
+
+import config
 from src.classe import Classe
+from src.folha import CalculaFolha, DadosFolha
 from src.funcionario import TipoPrevidencia
 from src.nivel import Nivel
-from src.folha import *
 from src.tabela_salario import Tabela
-from src.parametros import parametros as p
+
+# Definindo parâmetros para os testes
+config.param.VALOR_BASE_E2 = 5758.83
+config.param.VALOR_BASE_E3 = 10047.80
+config.param.TETO_PREFEITO = 34604.05
+config.param.TETO_PROCURADORES = 41845.49
+config.param.TETO_INSS = 8157.41
+
+p = config.param
 
 
 class DummyTabela(Tabela):
