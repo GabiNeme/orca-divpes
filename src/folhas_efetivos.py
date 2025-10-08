@@ -28,8 +28,10 @@ class FolhasEfetivos(Folhas):
         self.tabela = tabela
         self.calcula_folha = calcula_folha
 
-    def adiciona_folha(self, competencia: date, cm: int, folha: Folha):
+    def adiciona_folha(self, competencia: date, cm: int, folha: Folha | None):
         """Adiciona uma folha de pagamento para um funcionário em uma competência específica."""
+        if not folha:
+            return
         self.servidores.add(cm)
         if competencia not in self.folhas:
             self.folhas[competencia] = {}
