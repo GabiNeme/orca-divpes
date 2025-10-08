@@ -3,7 +3,7 @@ from datetime import date
 
 import config
 from src.anuenio import Anuenio
-from src.funcionario import DadosFolha, TipoPrevidencia
+from src.funcionario import DadosFolha, Funcionario, TipoPrevidencia
 from src.nivel import Nivel
 from src.tabela_salario import Tabela
 
@@ -37,110 +37,115 @@ class Folha:
 
 
 class CalculaFolha:
-    def __init__(self, funcionario: DadosFolha, tabela: Tabela):
-        self.funcionario = funcionario
+    def __init__(self, tabela: Tabela):
         self.tabela = tabela
 
-    def _calcula_salario(self, nivel: Nivel) -> float:
+    def calcula(self, funcionario: Funcionario, competencia: date) -> Folha | None:
+        nivel = funcionario.obtem_nivel_para(competencia)
+        if not nivel:  # Funcionário não admitido ou exonerado
+            return None
+        dados_folha = funcionario.dados_folha
+        return Folha(
+            nivel=nivel,
+            salario=self._calcula_salario(dados_folha, nivel),
+            anuenio=self._calcula_anuenio(dados_folha, competencia),
+            ats=self._calcula_ats(dados_folha, nivel),
+            total_antes_limite_prefeito=self._calcula_total_antes_limite_prefeito(
+                dados_folha, nivel, competencia
+            ),
+            total=self._calcula_total(dados_folha, nivel, competencia),
+            fufin_patronal=self._calcula_fufin_patronal(dados_folha, nivel, competencia),
+            bhprev_patronal=self._calcula_bhprev_patronal(dados_folha, nivel, competencia),
+            bhprev_complementar_patronal=self._calcula_bhprev_complementar_patronal(
+                dados_folha, nivel, competencia
+            ),
+        )
+
+    def _calcula_salario(self, funcionario: DadosFolha, nivel: Nivel) -> float:
         """Calcula o salário base do funcionário."""
 
         return self.tabela.valor_do_nivel_para_classe(
-            nivel=nivel, classe=self.funcionario.classe
+            nivel=nivel, classe=funcionario.classe
         )
 
-    def _calcula_anuenio(self, competencia: date) -> float:
+    def _calcula_anuenio(self, funcionario: DadosFolha, competencia: date) -> float:
         """Calcula o anuenio do funcionário."""
 
-        anuenio = Anuenio(self.funcionario.data_anuenio)
+        anuenio = Anuenio(funcionario.data_anuenio)
         qtde_anuenios = anuenio.obtem_numero_anuenios_para(competencia)
 
         valor_por_anuenio = 0.01 * self.tabela.valor_do_nivel_para_classe(
-            nivel=Nivel(1, "0"), classe=self.funcionario.classe
+            nivel=Nivel(1, "0"), classe=funcionario.classe
         )
         return round(valor_por_anuenio * qtde_anuenios, 2)
 
-    def _calcula_ats(self, nivel: Nivel) -> float:
+    def _calcula_ats(self, funcionario: DadosFolha, nivel: Nivel) -> float:
         """Calcula o ATS do funcionário."""
 
-        salario = self._calcula_salario(nivel)
-        return round(self.funcionario.num_ats * salario * 0.01, 2)
+        salario = self._calcula_salario(funcionario, nivel)
+        return round(funcionario.num_ats * salario * 0.01, 2)
 
     def _calcula_total_antes_limite_prefeito(
-        self, nivel: Nivel, competencia: date
+        self, funcionario: DadosFolha, nivel: Nivel, competencia: date
     ) -> float:
         """Calcula o total antes do limite preferencial."""
-        salario = self._calcula_salario(nivel)
-        anuenio = self._calcula_anuenio(competencia)
-        ats = self._calcula_ats(nivel)
+        salario = self._calcula_salario(funcionario, nivel)
+        anuenio = self._calcula_anuenio(funcionario, competencia)
+        ats = self._calcula_ats(funcionario, nivel)
         return round(salario + anuenio + ats, 2)
 
-    def _calcula_total(self, nivel: Nivel, competencia: date) -> float:
+    def _calcula_total(
+        self, funcionario: DadosFolha, nivel: Nivel, competencia: date
+    ) -> float:
         """Calcula o total do funcionário."""
-        if self.funcionario.procurador:
+        if funcionario.procurador:
             limite = config.param.TETO_PROCURADORES
         else:
             limite = config.param.TETO_PREFEITO
 
         total_antes_limite_prefeito = self._calcula_total_antes_limite_prefeito(
-            nivel, competencia
+            funcionario, nivel, competencia
         )
         if total_antes_limite_prefeito > limite:
             return limite
         return total_antes_limite_prefeito
 
-    def _calcula_fufin_patronal(self, nivel: Nivel, competencia: date) -> float:
+    def _calcula_fufin_patronal(self, funcionario: DadosFolha, nivel: Nivel, competencia: date) -> float:
         """Calcula a previdência patronal do funcionário."""
-        if self.funcionario.tipo_previdencia != TipoPrevidencia.Fufin:
+        if funcionario.tipo_previdencia != TipoPrevidencia.Fufin:
             return 0
         return round(
-            self._calcula_total(nivel, competencia) * config.param.ALIQUOTA_PATRONAL,
+            self._calcula_total(funcionario, nivel, competencia) * config.param.ALIQUOTA_PATRONAL,
             2,
         )
 
-    def _calcula_bhprev_patronal(self, nivel: Nivel, competencia: date) -> float:
+    def _calcula_bhprev_patronal(self, funcionario: DadosFolha, nivel: Nivel, competencia: date) -> float:
         """Calcula a previdência patronal do BHPrev do funcionário."""
-        if self.funcionario.tipo_previdencia == TipoPrevidencia.Fufin:
+        if funcionario.tipo_previdencia == TipoPrevidencia.Fufin:
             return 0
-        elif self.funcionario.tipo_previdencia == TipoPrevidencia.BHPrev:
+        elif funcionario.tipo_previdencia == TipoPrevidencia.BHPrev:
             return round(
-                self._calcula_total(nivel, competencia)
+                self._calcula_total(funcionario, nivel, competencia)
                 * config.param.ALIQUOTA_PATRONAL,
                 2,
             )
-        elif self.funcionario.tipo_previdencia == TipoPrevidencia.BHPrevComplementar:
-            total = self._calcula_total(nivel, competencia)
+        elif funcionario.tipo_previdencia == TipoPrevidencia.BHPrevComplementar:
+            total = self._calcula_total(funcionario, nivel, competencia)
             if total > config.param.TETO_INSS:
                 return round(config.param.TETO_INSS * config.param.ALIQUOTA_PATRONAL, 2)
             return round(total * config.param.ALIQUOTA_PATRONAL, 2)
 
     def _calcula_bhprev_complementar_patronal(
-        self, nivel: Nivel, competencia: date
+        self, funcionario: DadosFolha, nivel: Nivel, competencia: date
     ) -> float:
         """Calcula a previdência patronal complementar do funcionário."""
-        if self.funcionario.tipo_previdencia != TipoPrevidencia.BHPrevComplementar:
+        if funcionario.tipo_previdencia != TipoPrevidencia.BHPrevComplementar:
             return 0
-        total = self._calcula_total(nivel, competencia)
+        total = self._calcula_total(funcionario, nivel, competencia)
         if total <= config.param.TETO_INSS:
             return 0
         return round(
             (total - config.param.TETO_INSS)
             * config.param.ALIQUOTA_PATRONAL_COMPLEMENTAR,
             2,
-        )
-
-    def calcula(self, nivel: Nivel, competencia: date) -> Folha:
-        return Folha(
-            nivel=nivel,
-            salario=self._calcula_salario(nivel),
-            anuenio=self._calcula_anuenio(competencia),
-            ats=self._calcula_ats(nivel),
-            total_antes_limite_prefeito=self._calcula_total_antes_limite_prefeito(
-                nivel, competencia
-            ),
-            total=self._calcula_total(nivel, competencia),
-            fufin_patronal=self._calcula_fufin_patronal(nivel, competencia),
-            bhprev_patronal=self._calcula_bhprev_patronal(nivel, competencia),
-            bhprev_complementar_patronal=self._calcula_bhprev_complementar_patronal(
-                nivel, competencia
-            ),
         )

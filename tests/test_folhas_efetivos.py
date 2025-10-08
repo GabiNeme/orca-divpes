@@ -31,7 +31,7 @@ class DummyFuncionario:
 
 
 class DummyCalculaFolha:
-    def __init__(self, dados_folha, tabela):
+    def __init__(self, tabela):
         pass
 
     def calcula(self, nivel, competencia):

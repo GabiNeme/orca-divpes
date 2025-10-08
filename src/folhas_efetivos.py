@@ -9,6 +9,7 @@ from src.tabela_salario import Tabela
 
 TAXA_DESCONTO = 0.005  # 0,5% ao mês
 
+
 @dataclass
 class GastoMensalEfetivos:
     total_efetivos: float
@@ -36,16 +37,13 @@ class FolhasEfetivos(Folhas):
 
     def _calcula_folhas_funcionario(
         self, funcionario: Funcionario, inicio: date, fim: date
-    ) -> Folha | None:
+    ):
         """Calcula a folha de pagamento para um funcionário específico."""
         cm = funcionario.cm
-        calculadora_folha = self.calcula_folha(funcionario.dados_folha, self.tabela)
+        calculadora_folha = self.calcula_folha(self.tabela)
 
         for competencia in self.gerar_periodos(inicio, fim):
-            nivel = funcionario.obtem_nivel_para(competencia)
-            if not nivel:  # Funcionário não admitido ou exonerado
-                continue
-            folha = calculadora_folha.calcula(nivel, competencia)
+            folha = calculadora_folha.calcula(funcionario, competencia)
             self.adiciona_folha(competencia, cm, folha)
 
     def calcula_folhas(self, funcionarios: list[Funcionario], inicio: date, fim: date):
@@ -148,7 +146,7 @@ class FolhasEfetivos(Folhas):
                 )
 
         return pd.DataFrame(dados)
-    
+
     def calcula_metricas(self, inicio: date, fim: date) -> pd.DataFrame:
         """Calcula métricas adicionais para as folhas de pagamento no intervalo especificado."""
         # Exemplo de métrica: total anual por funcionário
@@ -172,7 +170,7 @@ class FolhasEfetivos(Folhas):
                 folha = self.folhas[competencia][cm]
                 return folha.total
         return 0.0
-    
+
     def _calcula_valor_final(self, cm: int, inicio: date, fim: date) -> float:
         """Calcula o valor final para um funcionário na última competência que ele/a aparece."""
         for competencia in reversed(list(self.gerar_periodos(inicio, fim))):
@@ -191,7 +189,7 @@ class FolhasEfetivos(Folhas):
                 total += folha.total
                 count += 1
         return round(total / count, 2) if count > 0 else 0.0
-    
+
     def _calcula_vpl(self, cm: int, inicio: date, fim: date) -> float:
         """Calcula o Valor Presente Líquido (VPL) para um funcionário no intervalo especificado."""
         vpl = 0.0
