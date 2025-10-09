@@ -32,7 +32,7 @@ class CMBH:
         self.folhas_efetivos.calcula_folhas(funcionarios, comp_inicio, comp_fim)
         self.folhas_pia.calcula_pias(funcionarios)
 
-    def exporta_totais_mensais(
+    def escreve_totais_mensais(
         self, ano_inicio: int, ano_fim: int, writer: pd.ExcelWriter
     ) -> None:
         """Exporta os totais das folhas para uma única planilha do Excel, juntando por competência."""
@@ -46,7 +46,7 @@ class CMBH:
 
         df_total.to_excel(writer, sheet_name="Totais Mensais", index=False)
 
-    def exporta_totais_anuais(
+    def escreve_totais_anuais(
         self, ano_inicio: int, ano_fim: int, writer: pd.ExcelWriter
     ) -> None:
         """Exporta os totais anuais das folhas para uma única planilha do Excel, juntando por ano."""
@@ -58,7 +58,7 @@ class CMBH:
 
         df_total.to_excel(writer, sheet_name="Totais Anuais", index=True)
 
-    def exporta_folhas_servidores_efetivos(
+    def escreve_folhas_servidores_efetivos(
         self, ano_inicio: int, ano_fim: int, writer: pd.ExcelWriter
     ) -> None:
         """Exporta cada funcionário para uma planilha do Excel, contendo folhas do PIA e mensal."""
@@ -78,7 +78,7 @@ class CMBH:
             df_total = pd.merge(df_folhas, df_pia, on=["Competência"], how="outer")
             df_total.to_excel(writer, sheet_name=str(cm), index=False)
 
-    def exporta_servidores(self, writer: pd.ExcelWriter) -> None:
+    def escreve_servidores(self, writer: pd.ExcelWriter) -> None:
         """Exporta os dados dos servidores para uma planilha do Excel."""
         dados = []
         for funcionario in self.funcionarios.values():
@@ -87,7 +87,7 @@ class CMBH:
         df = pd.DataFrame(dados)
         df.to_excel(writer, sheet_name="Efetivos", index=False)
 
-    def exporta_metricas(self, ano_inicio: int, ano_fim: int, writer: pd.ExcelWriter) -> None:
+    def escreve_metricas(self, ano_inicio: int, ano_fim: int, writer: pd.ExcelWriter) -> None:
         """Exporta as métricas das folhas para uma planilha do Excel."""
         comp_inicio = date(ano_inicio, 1, 1)
         comp_fim = date(ano_fim, 12, 1)
@@ -109,11 +109,11 @@ class CMBH:
         if dados_servidores:
             arquivo_servidores = os.path.join(diretorio_resultado, "servidores.xlsx")
             with pd.ExcelWriter(arquivo_servidores, engine="openpyxl") as writer:
-                self.exporta_servidores(writer=writer)
-                self.exporta_metricas(
+                self.escreve_servidores(writer=writer)
+                self.escreve_metricas(
                     ano_inicio=ano_inicio, ano_fim=ano_fim, writer=writer
                 )
-                self.exporta_folhas_servidores_efetivos(
+                self.escreve_folhas_servidores_efetivos(
                     ano_inicio=ano_inicio, ano_fim=ano_fim, writer=writer
                 )
         if totalizadores:
@@ -121,10 +121,10 @@ class CMBH:
                 diretorio_resultado, "totalizadores.xlsx"
             )
             with pd.ExcelWriter(arquivo_totalizadores, engine="openpyxl") as writer:
-                self.exporta_totais_mensais(
+                self.escreve_totais_mensais(
                     ano_inicio=ano_inicio, ano_fim=ano_fim, writer=writer
                 )
-                self.exporta_totais_anuais(
+                self.escreve_totais_anuais(
                     ano_inicio=ano_inicio, ano_fim=ano_fim, writer=writer
                 )
 
