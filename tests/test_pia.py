@@ -6,8 +6,8 @@ from src.nivel import Nivel
 from src.classe import Classe
 
 
-class MockTabela:
-    def valor_do_nivel_para_classe(self, nivel, classe):
+class DummyTabela:
+    def valor_do_nivel_para_classe(self, nivel, classe, competencia):
         return 30000
 
 
@@ -45,7 +45,7 @@ class TestCalculaPIA:
         funcionario = funcionario_fixture(
             aderiu_pia=True, dias_pia=250, nivel=Nivel(1, "A")
         )
-        tabela = MockTabela()
+        tabela = DummyTabela()
         pia = CalculaPIA(funcionario, tabela).calcula()
         assert pia is not None
         assert pia == 250000.00
@@ -53,14 +53,14 @@ class TestCalculaPIA:
 
     def test_pia_nao_aderiu(self, funcionario_fixture):
         funcionario = funcionario_fixture(aderiu_pia=False)
-        tabela = MockTabela()
+        tabela = DummyTabela()
         pia = CalculaPIA(funcionario, tabela).calcula()
         assert pia is None
 
 
     def test_pia_nivel_none(self, funcionario_fixture):
         funcionario = funcionario_fixture(aderiu_pia=True)
-        tabela = MockTabela()
+        tabela = DummyTabela()
         funcionario.obtem_nivel_para = lambda data: None
         pia = CalculaPIA(funcionario, tabela).calcula()
         assert pia is None

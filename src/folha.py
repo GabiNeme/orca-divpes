@@ -47,9 +47,9 @@ class CalculaFolha:
         dados_folha = funcionario.dados_folha
         return Folha(
             nivel=nivel,
-            salario=self._calcula_salario(dados_folha, nivel),
+            salario=self._calcula_salario(dados_folha, nivel, competencia),
             anuenio=self._calcula_anuenio(dados_folha, competencia),
-            ats=self._calcula_ats(dados_folha, nivel),
+            ats=self._calcula_ats(dados_folha, nivel, competencia),
             total_antes_limite_prefeito=self._calcula_total_antes_limite_prefeito(
                 dados_folha, nivel, competencia
             ),
@@ -61,11 +61,11 @@ class CalculaFolha:
             ),
         )
 
-    def _calcula_salario(self, funcionario: DadosFolha, nivel: Nivel) -> float:
+    def _calcula_salario(self, funcionario: DadosFolha, nivel: Nivel, competencia: date) -> float:
         """Calcula o salário base do funcionário."""
 
         return self.tabela.valor_do_nivel_para_classe(
-            nivel=nivel, classe=funcionario.classe
+            nivel=nivel, classe=funcionario.classe, competencia=competencia
         )
 
     def _calcula_anuenio(self, funcionario: DadosFolha, competencia: date) -> float:
@@ -75,23 +75,23 @@ class CalculaFolha:
         qtde_anuenios = anuenio.obtem_numero_anuenios_para(competencia)
 
         valor_por_anuenio = 0.01 * self.tabela.valor_do_nivel_para_classe(
-            nivel=Nivel(1, "0"), classe=funcionario.classe
+            nivel=Nivel(1, "0"), classe=funcionario.classe, competencia=competencia
         )
         return round(valor_por_anuenio * qtde_anuenios, 2)
 
-    def _calcula_ats(self, funcionario: DadosFolha, nivel: Nivel) -> float:
+    def _calcula_ats(self, funcionario: DadosFolha, nivel: Nivel, competencia: date) -> float:
         """Calcula o ATS do funcionário."""
 
-        salario = self._calcula_salario(funcionario, nivel)
+        salario = self._calcula_salario(funcionario, nivel, competencia)
         return round(funcionario.num_ats * salario * 0.01, 2)
 
     def _calcula_total_antes_limite_prefeito(
         self, funcionario: DadosFolha, nivel: Nivel, competencia: date
     ) -> float:
         """Calcula o total antes do limite preferencial."""
-        salario = self._calcula_salario(funcionario, nivel)
+        salario = self._calcula_salario(funcionario, nivel, competencia)
         anuenio = self._calcula_anuenio(funcionario, competencia)
-        ats = self._calcula_ats(funcionario, nivel)
+        ats = self._calcula_ats(funcionario, nivel, competencia)
         return round(salario + anuenio + ats, 2)
 
     def _calcula_total(

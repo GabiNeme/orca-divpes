@@ -27,7 +27,7 @@ class DummyFuncionario(Funcionario):
 
 
 class DummyTabela(Tabela):
-    def valor_do_nivel_para_classe(self, nivel: Nivel, classe: Classe) -> float:
+    def valor_do_nivel_para_classe(self, nivel: Nivel, classe: Classe, competencia: date) -> float:
         if nivel == Nivel(1, "0") and classe == Classe.E2:
             return 1000
         if nivel == Nivel(25, "B") and classe == Classe.E2:

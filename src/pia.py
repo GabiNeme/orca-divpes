@@ -19,8 +19,11 @@ class CalculaPIA:
         if not nivel_aposentadoria:
             return None
 
+        competencia = self.funcionario.aposentadoria.data_aposentadoria
         valor_do_nivel = self.tabela.valor_do_nivel_para_classe(
-            nivel=nivel_aposentadoria, classe=self.funcionario.dados_folha.classe
+            nivel=nivel_aposentadoria,
+            classe=self.funcionario.dados_folha.classe,
+            competencia=competencia,
         )
 
         return dias_pia * valor_do_nivel / 30
