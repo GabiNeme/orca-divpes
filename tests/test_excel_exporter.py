@@ -259,3 +259,57 @@ class TestExcelExporter:
             assert worksheet[f"D{row}"].style != "number_format"  # Idade (int)
             assert worksheet[f"E{row}"].style != "number_format"  # Ativo (bool)
             assert worksheet[f"F{row}"].style == "number_format"  # Bonus (float)
+
+    def test_wrap_text_cabecalhos(self, arquivo_excel_temporario):
+        """Testa se wrap text é aplicado nos cabeçalhos."""
+        df = pd.DataFrame(
+            {
+                "Nome Completo do Funcionário": ["João", "Maria"],
+                "Salário Base Mensal": [1500.50, 2300.75],
+                "Data de Admissão": ["2020-01-01", "2019-05-15"],
+            }
+        )
+
+        exporter = ExcelExporter()
+
+        with pd.ExcelWriter(arquivo_excel_temporario, engine="openpyxl") as writer:
+            exporter.to_excel(df, writer, "WrapText", index=False)
+
+        workbook = load_workbook(arquivo_excel_temporario)
+        worksheet = workbook["WrapText"]
+
+        # Verifica se wrap_text está ativado nos cabeçalhos
+        assert worksheet["A1"].alignment.wrap_text == True
+        assert worksheet["B1"].alignment.wrap_text == True
+        assert worksheet["C1"].alignment.wrap_text == True
+
+        # Verifica alinhamento centralizado
+        assert worksheet["A1"].alignment.horizontal == "center"
+        assert worksheet["A1"].alignment.vertical == "center"
+
+    def test_auto_fit_colunas(self, arquivo_excel_temporario):
+        """Testa se as colunas são ajustadas automaticamente."""
+        df = pd.DataFrame(
+            {
+                "A": ["Pequeno", "Texto muito muito longo para testar auto-fit"],
+                "B": ["X", "Y"],
+                "C": [123.45, 6789.12],
+            }
+        )
+
+        exporter = ExcelExporter()
+
+        with pd.ExcelWriter(arquivo_excel_temporario, engine="openpyxl") as writer:
+            exporter.to_excel(df, writer, "AutoFit", index=False)
+
+        workbook = load_workbook(arquivo_excel_temporario)
+        worksheet = workbook["AutoFit"]
+
+        # Verifica se as larguras foram definidas
+        col_a_width = worksheet.column_dimensions["A"].width
+        col_b_width = worksheet.column_dimensions["B"].width
+        col_c_width = worksheet.column_dimensions["C"].width
+
+        # Coluna A deve ser a mais larga (texto longo)
+        assert col_a_width > col_b_width
+        assert col_a_width > col_c_width

@@ -1,5 +1,5 @@
 import pandas as pd
-from openpyxl.styles import NamedStyle
+from openpyxl.styles import Alignment, NamedStyle
 
 
 class ExcelExporter:
@@ -35,12 +35,17 @@ class ExcelExporter:
         df.to_excel(writer, sheet_name=sheet_name, index=index, **kwargs)
 
         # Depois aplica a formatação
-        self._format_worksheet(writer, sheet_name, df, index)
+        self._format_worksheet(writer, sheet_name, df, index, **kwargs)
 
     def _format_worksheet(
-        self, writer: pd.ExcelWriter, sheet_name: str, df: pd.DataFrame, index: bool
+        self,
+        writer: pd.ExcelWriter,
+        sheet_name: str,
+        df: pd.DataFrame,
+        index: bool,
+        **kwargs
     ) -> None:
-        """Aplica formatação de números na planilha."""
+        """Aplica formatação de números, quebra de linha automática e ajuste de colunas."""
         workbook = writer.book
         worksheet = writer.sheets[sheet_name]
 
@@ -52,7 +57,7 @@ class ExcelExporter:
         start_col = 2 if index else 1
         start_row = 2  # Linha após o cabeçalho
 
-        # Itera sobre as células e aplica formatação para números
+        # Aplica formatação para números float
         for row_idx in range(len(df)):
             for col_idx, _ in enumerate(df.columns):
                 cell = worksheet.cell(
@@ -62,6 +67,60 @@ class ExcelExporter:
                 # Verifica se o valor é um float
                 if self._is_float_value(df.iloc[row_idx, col_idx]):
                     cell.style = "number_format"
+
+        # Aplica wrap text na primeira linha (cabeçalhos)
+        self._apply_header_wrap_text(worksheet, df, index)
+
+        # Aplica auto-fit na altura das linhas
+        self._enhance_first_row_height(worksheet)
+
+        # Aplica auto-fit na largura das colunas
+        self._auto_fit_columns_width(worksheet, df, index)
+
+    def _apply_header_wrap_text(
+        self,
+        worksheet,
+        df: pd.DataFrame,
+        index: bool,
+    ) -> None:
+        """Aplica wrap text automático nos cabeçalhos."""
+        header_row = 1
+        start_col = 2 if index else 1
+
+        # Aplica wrap text nos cabeçalhos das colunas
+        for col_idx in range(len(df.columns)):
+            cell = worksheet.cell(row=header_row, column=start_col + col_idx)
+            cell.alignment = Alignment(
+                wrap_text=True, vertical="center", horizontal="center"
+            )
+
+    def _enhance_first_row_height(self, worksheet) -> None:
+        """Aplica auto-fit apenas na primeira linha."""
+
+        worksheet.row_dimensions[1].height = 45
+
+    def _auto_fit_columns_width(self, worksheet, df: pd.DataFrame, index: bool) -> None:
+        """Aplica auto-fit na largura das colunas."""
+        start_col = 2 if index else 1
+
+        for col_idx, col in enumerate(df.columns):
+            # Comprimento máximo dos dados
+            max_data_length = df[col].astype(str).map(len).max()
+
+            # Comprimento do cabeçalho com regra especial
+            header_length = len(str(col))
+            if header_length > 15:
+                header_constraint = 15
+            else:
+                header_constraint = header_length
+
+            # Largura final é o máximo entre dados e constraint do cabeçalho
+            max_length = max(max_data_length, header_constraint)
+
+            adjusted_width = (max_length + 2) * 1.1  # Ajuste para melhor visualização
+            worksheet.column_dimensions[chr(64 + start_col + col_idx)].width = (
+                adjusted_width
+            )
 
     def _is_float_value(self, value) -> bool:
         """Verifica se um valor é um número float."""
