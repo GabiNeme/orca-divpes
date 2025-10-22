@@ -5,8 +5,8 @@ from typing import Optional
 
 from dateutil.relativedelta import relativedelta
 
-from src.nivel import Nivel
 from src.intersticio import Intersticio
+from src.nivel import Nivel
 
 
 @dataclass
@@ -102,8 +102,8 @@ class Carreira(ABC):
         if nivel_origem.numero_progressoes_horizontais > letra_solicitada_count:
             return nivel_origem
 
-        letra_maxima:str = self._letra_maxima_para_nivel(nivel_origem.numero)
-        letra_maxima_count : int = Nivel(
+        letra_maxima: str = self._letra_maxima_para_nivel(nivel_origem.numero)
+        letra_maxima_count: int = Nivel(
             nivel_origem.numero, letra_maxima
         ).numero_progressoes_horizontais
         if letra_solicitada_count > letra_maxima_count:
@@ -113,7 +113,7 @@ class Carreira(ABC):
 
     def _limite(self) -> int:
         """Limite da carreira enquanto não completar condição de aposentadoria."""
-        return 33
+        return 32
 
     def checa_nivel_valido(self, nivel: Nivel):
         """Lança uma exceção se o nível informado for inválido."""
@@ -142,9 +142,9 @@ class Carreira(ABC):
         transicao_para_letra = [
             (1, "A"),
             (3, "B"),
-            (5, "C"),
-            (7, "D"),
-            (9, "E"),
+            (6, "C"),
+            (8, "D"),
+            (11, "E"),
         ]
 
         for i in reversed(range(len(transicao_para_letra))):
@@ -157,7 +157,7 @@ class CarreiraConcurso2008(Carreira):
 
     def _limite(self) -> int:
         """Limite da carreira enquanto não completar condição de aposentadoria."""
-        return 35
+        return 34
 
 
 class CarreiraConcurso2004(Carreira):
@@ -165,7 +165,7 @@ class CarreiraConcurso2004(Carreira):
 
     def _limite(self) -> int:
         """Limite da carreira enquanto não completar condição de aposentadoria."""
-        return 37
+        return 36
 
 
 class CarreiraAtual(Carreira):

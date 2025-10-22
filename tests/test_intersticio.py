@@ -1,7 +1,7 @@
 import pytest
 
-from src.nivel import Nivel
 from src.intersticio import Intersticio
+from src.nivel import Nivel
 
 
 class TestIntersticio:
@@ -14,8 +14,10 @@ class TestIntersticio:
             (Nivel(15, "C"), 2, 24),
             (Nivel(28, "D"), 2, 27),
             (Nivel(30, "E"), 2, 30),
-            (Nivel(37, "0"), 2, 39),
-            (Nivel(38, "0"), 2, 48),
+            (Nivel(34, "0"), 2, 30),
+            (Nivel(35, "0"), 2, 39),
+            (Nivel(36, "0"), 2, 48),
+            (Nivel(37, "0"), 2, 48),
         ],
     )
     def test_calcula_tempo_para_progredir(

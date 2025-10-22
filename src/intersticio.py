@@ -1,5 +1,6 @@
 from src.nivel import Nivel
 
+
 class Intersticio:
     @staticmethod
     def _intersticio(numero_nivel: int) -> int:
@@ -8,7 +9,7 @@ class Intersticio:
             return 9
         if numero_nivel <= 28:
             return 12
-        if numero_nivel <= 37:
+        if numero_nivel <= 35:
             return 15
         return 24
 

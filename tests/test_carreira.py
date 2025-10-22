@@ -1,13 +1,14 @@
 from datetime import date
+
 import pytest
 
-from src.nivel import Nivel
 from src.carreira import (
     Carreira,
     CarreiraConcurso2004,
     CarreiraConcurso2008,
     Progressao,
 )
+from src.nivel import Nivel
 
 
 class TestCarreira:
@@ -18,11 +19,13 @@ class TestCarreira:
             (Nivel(2, "0"), Nivel(2, "A")),
             (Nivel(3, "A"), Nivel(3, "B")),
             (Nivel(4, "0"), Nivel(4, "B")),
-            (Nivel(5, "0"), Nivel(5, "C")),
+            (Nivel(5, "0"), Nivel(5, "B")),
             (Nivel(6, "A"), Nivel(6, "C")),
-            (Nivel(7, "C"), Nivel(7, "D")),
+            (Nivel(7, "C"), Nivel(7, "C")),
             (Nivel(8, "A"), Nivel(8, "D")),
-            (Nivel(9, "0"), Nivel(9, "E")),
+            (Nivel(9, "0"), Nivel(9, "D")),
+            (Nivel(10, "0"), Nivel(10, "D")),
+            (Nivel(11, "0"), Nivel(11, "E")),
             (Nivel(20, "B"), Nivel(20, "E")),
         ],
     )
@@ -137,12 +140,12 @@ class TestCarreira:
         "prog_antes, prog_depois",
         [
             (
-                Progressao(date(2020, 1, 1), Nivel(31, "D"), progs_sem_especial=1),
-                Progressao(date(2022, 7, 1), Nivel(33, "D"), progs_sem_especial=0),
+                Progressao(date(2020, 1, 1), Nivel(30, "D"), progs_sem_especial=1),
+                Progressao(date(2022, 7, 1), Nivel(32, "D"), progs_sem_especial=0),
             ),
             (
-                Progressao(date(2020, 1, 1), Nivel(32, "E"), progs_sem_especial=0),
-                Progressao(date(2022, 7, 1), Nivel(33, "E"), progs_sem_especial=1),
+                Progressao(date(2020, 1, 1), Nivel(31, "E"), progs_sem_especial=0),
+                Progressao(date(2022, 7, 1), Nivel(32, "E"), progs_sem_especial=1),
             ),
         ],
     )
@@ -153,8 +156,8 @@ class TestCarreira:
     @pytest.mark.parametrize(
         "prog_antes",
         [
-            (Progressao(date(2020, 1, 1), Nivel(33, "0"), progs_sem_especial=0)),
-            (Progressao(date(2020, 1, 1), Nivel(33, "E"), progs_sem_especial=1)),
+            (Progressao(date(2020, 1, 1), Nivel(32, "0"), progs_sem_especial=0)),
+            (Progressao(date(2020, 1, 1), Nivel(32, "E"), progs_sem_especial=1)),
         ],
     )
     def test_progressao_e_none_se_ja_esta_no_fim_da_carreira(self, prog_antes):
@@ -186,14 +189,14 @@ class TestCarreira:
 class TestCarreiraConcurso2008:
     def test_nao_progride_alem_do_fim_da_carreira(self):
         carreira = CarreiraConcurso2008()
-        prog_antes = Progressao(date(2020, 1, 1), Nivel(33, "E"), progs_sem_especial=1)
-        prog_depois = Progressao(date(2022, 7, 1), Nivel(35, "E"), progs_sem_especial=0)
+        prog_antes = Progressao(date(2020, 1, 1), Nivel(32, "E"), progs_sem_especial=1)
+        prog_depois = Progressao(date(2022, 7, 1), Nivel(34, "E"), progs_sem_especial=0)
         assert carreira.progride_verticalmente(prog_antes) == prog_depois
 
 
 class TestCarreiraConcurso2004:
     def test_nao_progride_alem_do_fim_da_carreira(self):
         carreira = CarreiraConcurso2004()
-        prog_antes = Progressao(date(2020, 1, 1), Nivel(36, "E"), progs_sem_especial=0)
-        prog_depois = Progressao(date(2022, 7, 1), Nivel(37, "E"), progs_sem_especial=1)
+        prog_antes = Progressao(date(2020, 1, 1), Nivel(35, "E"), progs_sem_especial=0)
+        prog_depois = Progressao(date(2023, 4, 1), Nivel(36, "E"), progs_sem_especial=1)
         assert carreira.progride_verticalmente(prog_antes) == prog_depois

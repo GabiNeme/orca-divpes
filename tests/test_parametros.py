@@ -22,8 +22,8 @@ class TestParametros:
         p = config.Parametros()
         assert p.VALOR_BASE_E2 == None
         assert p.VALOR_BASE_E3 == None
-        assert p.INDICE_PROGRESSAO_VERTICAL == 0.0391
-        assert p.INDICE_PROGRESSAO_HORIZONTAL == 0.0797
+        assert p.INDICE_PROGRESSAO_VERTICAL == 0.04
+        assert p.INDICE_PROGRESSAO_HORIZONTAL == 0.0816
         assert p.REAJUSTE_ANUAL == 0.1
         assert p.DATA_BASE_REAJUSTE == 5
         assert p.TETO_PREFEITO == None
@@ -52,7 +52,7 @@ class TestParametros:
         assert p.TETO_PREFEITO == 35000.0
         assert p.TETO_PROCURADORES == 42000.0
         assert p.TETO_INSS == 8500.0
-        assert p.INDICE_PROGRESSAO_VERTICAL == 0.0391  # Default
+        assert p.INDICE_PROGRESSAO_VERTICAL == 0.04  # Default
 
     def test_from_aeros_lanca_erro_se_coluna_ausente(self):
         """Testa se erro é levantado quando coluna está ausente no DataFrame."""
