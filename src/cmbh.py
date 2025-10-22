@@ -3,7 +3,7 @@ from datetime import date
 
 import pandas as pd
 
-from src.excel_exporter import to_excel_formatted
+from src.exportador_excel import para_excel_formatado
 from src.folhas_efetivos import FolhasEfetivos
 from src.folhas_pia import FolhasPIA
 from src.importador_excel import ImportadorProjecaoExcel
@@ -46,7 +46,7 @@ class CMBH:
         # Merge usando a coluna 'competencia'
         df_total = pd.merge(df_efetivos, df_pia, on=["ano", "competencia"], how="outer")
 
-        to_excel_formatted(df_total, writer, sheet_name="Totais Mensais", index=False)
+        para_excel_formatado(df_total, writer, sheet_name="Totais Mensais", index=False)
 
     def escreve_totais_anuais(
         self, ano_inicio: int, ano_fim: int, writer: pd.ExcelWriter
@@ -58,7 +58,7 @@ class CMBH:
         # Merge usando a coluna 'competencia'
         df_total = pd.merge(df_efetivos, df_pia, on=["ano"], how="outer")
 
-        to_excel_formatted(df_total, writer, sheet_name="Totais Anuais", index=True)
+        para_excel_formatado(df_total, writer, sheet_name="Totais Anuais", index=True)
 
     def escreve_folhas_servidores_efetivos(
         self, ano_inicio: int, ano_fim: int, writer: pd.ExcelWriter
@@ -77,7 +77,7 @@ class CMBH:
             )
 
             df_total = pd.merge(df_folhas, df_pia, on=["Competência"], how="outer")
-            to_excel_formatted(df_total, writer, sheet_name=str(cm), index=False)
+            para_excel_formatado(df_total, writer, sheet_name=str(cm), index=False)
 
     def escreve_servidores(self, writer: pd.ExcelWriter) -> None:
         """Exporta os dados dos servidores para uma planilha do Excel."""
@@ -86,7 +86,7 @@ class CMBH:
             dados.append(funcionario.to_dict())
 
         df = pd.DataFrame(dados)
-        to_excel_formatted(df, writer, sheet_name="Efetivos", index=False)
+        para_excel_formatado(df, writer, sheet_name="Efetivos", index=False)
 
     def escreve_metricas(
         self, ano_inicio: int, ano_fim: int, writer: pd.ExcelWriter
@@ -98,7 +98,7 @@ class CMBH:
         df_metricas_efetivos = self.folhas_efetivos.calcula_metricas(
             comp_inicio, comp_fim
         )
-        to_excel_formatted(
+        para_excel_formatado(
             df_metricas_efetivos, writer, sheet_name="Métricas", index=False
         )
 
@@ -151,6 +151,6 @@ class CMBH:
                     )
 
                 df = pd.DataFrame(dados)
-                to_excel_formatted(
+                para_excel_formatado(
                     df, writer, sheet_name=str(funcionario.cm), index=False
                 )

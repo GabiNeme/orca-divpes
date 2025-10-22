@@ -5,7 +5,7 @@ import pandas as pd
 import pytest
 from openpyxl import load_workbook
 
-from src.excel_exporter import ExcelExporter, to_excel_formatted
+from src.exportador_excel import ExportadorExcel, para_excel_formatado
 
 
 class TestExcelExporter:
@@ -36,37 +36,37 @@ class TestExcelExporter:
 
     def test_inicializacao_exportador(self):
         """Testa se o exportador é inicializado corretamente."""
-        exporter = ExcelExporter()
-        assert exporter.number_style.name == "number_format"
-        assert exporter.number_style.number_format == "#,##0.00"
+        exporter = ExportadorExcel()
+        assert exporter.estilo_numerico.name == "formato_numerico"
+        assert exporter.estilo_numerico.number_format == "#,##0.00"
 
     def test_deteccao_valor_float(self):
         """Testa a detecção de valores float."""
-        exporter = ExcelExporter()
+        exporter = ExportadorExcel()
 
         # Valores que devem ser detectados como float
-        assert exporter._is_float_value(123.45) == True
-        assert exporter._is_float_value(-50.5) == True
-        assert exporter._is_float_value(0.0) == True
-        assert exporter._is_float_value(1500.50) == True
+        assert exporter._eh_float(123.45) == True
+        assert exporter._eh_float(-50.5) == True
+        assert exporter._eh_float(0.0) == True
+        assert exporter._eh_float(1500.50) == True
 
         # Valores que NÃO devem ser detectados como float
-        assert exporter._is_float_value(123) == False  # int
-        assert exporter._is_float_value(0) == False  # int
-        assert exporter._is_float_value("123.45") == False  # string
-        assert exporter._is_float_value("texto") == False
-        assert exporter._is_float_value(None) == False
-        assert exporter._is_float_value(pd.NA) == False
-        assert exporter._is_float_value(True) == False  # bool
+        assert exporter._eh_float(123) == False  # int
+        assert exporter._eh_float(0) == False  # int
+        assert exporter._eh_float("123.45") == False  # string
+        assert exporter._eh_float("texto") == False
+        assert exporter._eh_float(None) == False
+        assert exporter._eh_float(pd.NA) == False
+        assert exporter._eh_float(True) == False  # bool
 
     def test_funcionalidade_basica_to_excel(
         self, exemplo_dataframe, arquivo_excel_temporario
     ):
         """Testa a funcionalidade básica de exportação."""
-        exporter = ExcelExporter()
+        exporter = ExportadorExcel()
 
         with pd.ExcelWriter(arquivo_excel_temporario, engine="openpyxl") as writer:
-            exporter.to_excel(exemplo_dataframe, writer, "Teste", index=False)
+            exporter.para_excel(exemplo_dataframe, writer, "Teste", index=False)
 
         # Verifica se o arquivo foi criado
         assert os.path.exists(arquivo_excel_temporario)
@@ -87,43 +87,43 @@ class TestExcelExporter:
             }
         )
 
-        exporter = ExcelExporter()
+        exporter = ExportadorExcel()
 
         with pd.ExcelWriter(arquivo_excel_temporario, engine="openpyxl") as writer:
-            exporter.to_excel(df, writer, "Formatação", index=False)
+            exporter.para_excel(df, writer, "Formatação", index=False)
 
         # Carrega o workbook diretamente para verificar a formatação
         workbook = load_workbook(arquivo_excel_temporario)
         worksheet = workbook["Formatação"]
 
         # Verifica se o estilo de número foi adicionado
-        assert "number_format" in workbook.named_styles
+        assert "formato_numerico" in workbook.named_styles
 
         # Apenas as células float devem ter formatação
         # Células B2, B3, B4 (coluna Float)
-        assert worksheet["B2"].style == "number_format"
-        assert worksheet["B3"].style == "number_format"
-        assert worksheet["B4"].style == "number_format"
+        assert worksheet["B2"].style == "formato_numerico"
+        assert worksheet["B3"].style == "formato_numerico"
+        assert worksheet["B4"].style == "formato_numerico"
 
         # Células de outros tipos não devem ter formatação especial
-        assert worksheet["A2"].style != "number_format"  # Texto
-        assert worksheet["A3"].style != "number_format"
-        assert worksheet["A4"].style != "number_format"
+        assert worksheet["A2"].style != "formato_numerico"  # Texto
+        assert worksheet["A3"].style != "formato_numerico"
+        assert worksheet["A4"].style != "formato_numerico"
 
-        assert worksheet["C2"].style != "number_format"  # Inteiro
-        assert worksheet["C3"].style != "number_format"
-        assert worksheet["C4"].style != "number_format"
+        assert worksheet["C2"].style != "formato_numerico"  # Inteiro
+        assert worksheet["C3"].style != "formato_numerico"
+        assert worksheet["C4"].style != "formato_numerico"
 
-        assert worksheet["D2"].style != "number_format"  # Boolean
-        assert worksheet["D3"].style != "number_format"
-        assert worksheet["D4"].style != "number_format"
+        assert worksheet["D2"].style != "formato_numerico"  # Boolean
+        assert worksheet["D3"].style != "formato_numerico"
+        assert worksheet["D4"].style != "formato_numerico"
 
     def test_to_excel_com_indice(self, exemplo_dataframe, arquivo_excel_temporario):
         """Testa exportação com índice incluído."""
-        exporter = ExcelExporter()
+        exporter = ExportadorExcel()
 
         with pd.ExcelWriter(arquivo_excel_temporario, engine="openpyxl") as writer:
-            exporter.to_excel(exemplo_dataframe, writer, "ComIndice", index=True)
+            exporter.para_excel(exemplo_dataframe, writer, "ComIndice", index=True)
 
         # Carrega e verifica
         df_carregado = pd.read_excel(
@@ -135,7 +135,7 @@ class TestExcelExporter:
     def test_funcao_conveniencia(self, exemplo_dataframe, arquivo_excel_temporario):
         """Testa a função de conveniência to_excel_formatted."""
         with pd.ExcelWriter(arquivo_excel_temporario, engine="openpyxl") as writer:
-            to_excel_formatted(exemplo_dataframe, writer, "Conveniência", index=False)
+            para_excel_formatado(exemplo_dataframe, writer, "Conveniência", index=False)
 
         # Verifica se funcionou corretamente
         assert os.path.exists(arquivo_excel_temporario)
@@ -149,11 +149,11 @@ class TestExcelExporter:
         df1 = pd.DataFrame({"A": [1, 2], "B": [10.5, 20.5]})
         df2 = pd.DataFrame({"C": [3, 4], "D": [30.5, 40.5]})
 
-        exporter = ExcelExporter()
+        exporter = ExportadorExcel()
 
         with pd.ExcelWriter(arquivo_excel_temporario, engine="openpyxl") as writer:
-            exporter.to_excel(df1, writer, "Planilha1", index=False)
-            exporter.to_excel(df2, writer, "Planilha2", index=False)
+            exporter.para_excel(df1, writer, "Planilha1", index=False)
+            exporter.para_excel(df2, writer, "Planilha2", index=False)
 
         # Verifica se ambas as planilhas existem
         workbook = load_workbook(arquivo_excel_temporario)
@@ -165,18 +165,18 @@ class TestExcelExporter:
         ws2 = workbook["Planilha2"]
 
         # Apenas floats devem ter formatação
-        assert ws1["A2"].style != "number_format"  # int
-        assert ws1["B2"].style == "number_format"  # float
-        assert ws2["A3"].style != "number_format"  # int
-        assert ws2["B3"].style == "number_format"  # float
+        assert ws1["A2"].style != "formato_numerico"  # int
+        assert ws1["B2"].style == "formato_numerico"  # float
+        assert ws2["A3"].style != "formato_numerico"  # int
+        assert ws2["B3"].style == "formato_numerico"  # float
 
     def test_dataframe_vazio(self, arquivo_excel_temporario):
         """Testa comportamento com DataFrame vazio."""
         df_vazio = pd.DataFrame()
-        exporter = ExcelExporter()
+        exporter = ExportadorExcel()
 
         with pd.ExcelWriter(arquivo_excel_temporario, engine="openpyxl") as writer:
-            exporter.to_excel(df_vazio, writer, "Vazio", index=False)
+            exporter.para_excel(df_vazio, writer, "Vazio", index=False)
 
         # Deve funcionar sem erros
         assert os.path.exists(arquivo_excel_temporario)
@@ -189,31 +189,31 @@ class TestExcelExporter:
         """Testa comportamento com valores NaN."""
         df_nan = pd.DataFrame({"Floats": [1.5, None, 3.5], "Texto": ["A", "B", None]})
 
-        exporter = ExcelExporter()
+        exporter = ExportadorExcel()
 
         with pd.ExcelWriter(arquivo_excel_temporario, engine="openpyxl") as writer:
-            exporter.to_excel(df_nan, writer, "ComNaN", index=False)
+            exporter.para_excel(df_nan, writer, "ComNaN", index=False)
 
         # Carrega o workbook para verificar formatação
         workbook = load_workbook(arquivo_excel_temporario)
         worksheet = workbook["ComNaN"]
 
         # Apenas valores float válidos devem ter formatação
-        assert worksheet["A2"].style == "number_format"  # 1.5
-        assert worksheet["A3"].style != "number_format"  # None
-        assert worksheet["A4"].style == "number_format"  # 3.5
+        assert worksheet["A2"].style == "formato_numerico"  # 1.5
+        assert worksheet["A3"].style != "formato_numerico"  # None
+        assert worksheet["A4"].style == "formato_numerico"  # 3.5
 
         # Células de texto não devem ter formatação
-        assert worksheet["B2"].style != "number_format"  # 'A'
-        assert worksheet["B3"].style != "number_format"  # 'B'
-        assert worksheet["B4"].style != "number_format"  # None
+        assert worksheet["B2"].style != "formato_numerico"  # 'A'
+        assert worksheet["B3"].style != "formato_numerico"  # 'B'
+        assert worksheet["B4"].style != "formato_numerico"  # None
 
     def test_kwargs_adicionais(self, exemplo_dataframe, arquivo_excel_temporario):
         """Testa se kwargs adicionais são passados corretamente."""
-        exporter = ExcelExporter()
+        exporter = ExportadorExcel()
 
         with pd.ExcelWriter(arquivo_excel_temporario, engine="openpyxl") as writer:
-            exporter.to_excel(
+            exporter.para_excel(
                 exemplo_dataframe,
                 writer,
                 "ComKwargs",
@@ -243,22 +243,22 @@ class TestExcelExporter:
             }
         )
 
-        exporter = ExcelExporter()
+        exporter = ExportadorExcel()
 
         with pd.ExcelWriter(arquivo_excel_temporario, engine="openpyxl") as writer:
-            exporter.to_excel(df, writer, "Exemplo", index=False)
+            exporter.para_excel(df, writer, "Exemplo", index=False)
 
         workbook = load_workbook(arquivo_excel_temporario)
         worksheet = workbook["Exemplo"]
 
         # Apenas as colunas de float devem ter formatação
         for row in range(2, 5):  # Linhas 2-4 (dados)
-            assert worksheet[f"A{row}"].style != "number_format"  # CM (int)
-            assert worksheet[f"B{row}"].style != "number_format"  # Nome (string)
-            assert worksheet[f"C{row}"].style == "number_format"  # Salário (float)
-            assert worksheet[f"D{row}"].style != "number_format"  # Idade (int)
-            assert worksheet[f"E{row}"].style != "number_format"  # Ativo (bool)
-            assert worksheet[f"F{row}"].style == "number_format"  # Bonus (float)
+            assert worksheet[f"A{row}"].style != "formato_numerico"  # CM (int)
+            assert worksheet[f"B{row}"].style != "formato_numerico"  # Nome (string)
+            assert worksheet[f"C{row}"].style == "formato_numerico"  # Salário (float)
+            assert worksheet[f"D{row}"].style != "formato_numerico"  # Idade (int)
+            assert worksheet[f"E{row}"].style != "formato_numerico"  # Ativo (bool)
+            assert worksheet[f"F{row}"].style == "formato_numerico"  # Bonus (float)
 
     def test_wrap_text_cabecalhos(self, arquivo_excel_temporario):
         """Testa se wrap text é aplicado nos cabeçalhos."""
@@ -270,10 +270,10 @@ class TestExcelExporter:
             }
         )
 
-        exporter = ExcelExporter()
+        exporter = ExportadorExcel()
 
         with pd.ExcelWriter(arquivo_excel_temporario, engine="openpyxl") as writer:
-            exporter.to_excel(df, writer, "WrapText", index=False)
+            exporter.para_excel(df, writer, "WrapText", index=False)
 
         workbook = load_workbook(arquivo_excel_temporario)
         worksheet = workbook["WrapText"]
@@ -297,10 +297,10 @@ class TestExcelExporter:
             }
         )
 
-        exporter = ExcelExporter()
+        exporter = ExportadorExcel()
 
         with pd.ExcelWriter(arquivo_excel_temporario, engine="openpyxl") as writer:
-            exporter.to_excel(df, writer, "AutoFit", index=False)
+            exporter.para_excel(df, writer, "AutoFit", index=False)
 
         workbook = load_workbook(arquivo_excel_temporario)
         worksheet = workbook["AutoFit"]
