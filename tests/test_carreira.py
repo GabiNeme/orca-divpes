@@ -3,15 +3,18 @@ from datetime import date
 import pytest
 
 from src.carreira import (
-    Carreira,
-    CarreiraConcurso2004,
-    CarreiraConcurso2008,
+    CarreiraE2,
+    CarreiraE2Concurso2004,
+    CarreiraE2Concurso2008,
+    CarreiraE3,
+    CarreiraE3Concurso2004,
+    CarreiraE3Concurso2008,
     Progressao,
 )
 from src.nivel import Nivel
 
 
-class TestCarreira:
+class TestCarreiraE2:
     @pytest.mark.parametrize(
         "nivel_origem, nivel_destino",
         [
@@ -30,7 +33,7 @@ class TestCarreira:
         ],
     )
     def test_concede_letras_ate_limite(self, nivel_origem, nivel_destino):
-        assert Carreira().concede_letras_ate_limite(nivel_origem) == nivel_destino
+        assert CarreiraE2().concede_letras_ate_limite(nivel_origem) == nivel_destino
 
     @pytest.mark.parametrize(
         "prog_antes, prog_depois",
@@ -52,7 +55,7 @@ class TestCarreira:
     def test_progressao_vertical_nao_especia_progride_2_niveis(
         self, prog_antes, prog_depois
     ):
-        carreira = Carreira()
+        carreira = CarreiraE2()
         assert carreira.progride_verticalmente(prog_antes) == prog_depois
 
     @pytest.mark.parametrize(
@@ -71,7 +74,7 @@ class TestCarreira:
     def test_progressao_vertical_com_especial_progride_3_niveis(
         self, prog_antes, prog_depois
     ):
-        carreira = Carreira()
+        carreira = CarreiraE2()
         assert carreira.progride_verticalmente(prog_antes) == prog_depois
 
     @pytest.mark.parametrize(
@@ -88,7 +91,7 @@ class TestCarreira:
         ],
     )
     def test_progressao_vertical_e_horizontal(self, prog_antes, prog_depois):
-        carreira = Carreira()
+        carreira = CarreiraE2()
         assert (
             carreira.progride_verticalmente_e_horizontalmente(prog_antes) == prog_depois
         )
@@ -100,22 +103,22 @@ class TestCarreira:
             (Nivel(4, "C")),
             (Nivel(6, "D")),
             (Nivel(8, "E")),
-            (Nivel(34, "0")),
+            (Nivel(33, "0")),
         ],
     )
     def test_checa_nivel_valido_lanca_excecao_se_invalido(self, nivel):
         with pytest.raises(ValueError):
-            _ = Carreira().checa_nivel_valido(nivel)
+            _ = CarreiraE2().checa_nivel_valido(nivel)
 
     def test_progride_verticalmente_verifica_nivel_invalido(self):
         progressao = Progressao(date.today(), Nivel(2, "E"), progs_sem_especial=0)
         with pytest.raises(ValueError):
-            _ = Carreira().progride_verticalmente(progressao)
+            _ = CarreiraE2().progride_verticalmente(progressao)
 
     def test_progride_verticalmente_e_horizontalmente_verifica_nivel_invalido(self):
         progressao = Progressao(date.today(), Nivel(2, "E"), progs_sem_especial=0)
         with pytest.raises(ValueError):
-            _ = Carreira().progride_verticalmente_e_horizontalmente(progressao)
+            _ = CarreiraE2().progride_verticalmente_e_horizontalmente(progressao)
 
     def test_progride_vert_e_hor_nao_ultrapassa_letra_maxima(self):
         ultima_progressao = Progressao(
@@ -126,7 +129,7 @@ class TestCarreira:
             date.today(), Nivel(11, "D"), progs_sem_especial=0
         )  # No nivel 11 poderia ir até E
 
-        progressao = Carreira().progride_verticalmente_e_horizontalmente(
+        progressao = CarreiraE2().progride_verticalmente_e_horizontalmente(
             ultima_progressao, letra_maxima
         )
         assert progressao.nivel == progressao_esperada.nivel
@@ -134,7 +137,7 @@ class TestCarreira:
     def test_concede_letra_verifica_nivel_invalido(self):
         nivel = Nivel(2, "E")
         with pytest.raises(ValueError):
-            _ = Carreira().concede_letras_ate_limite(nivel)
+            _ = CarreiraE2().concede_letras_ate_limite(nivel)
 
     @pytest.mark.parametrize(
         "prog_antes, prog_depois",
@@ -150,7 +153,7 @@ class TestCarreira:
         ],
     )
     def test_nao_progride_alem_do_fim_da_carreira(self, prog_antes, prog_depois):
-        carreira = Carreira()
+        carreira = CarreiraE2()
         assert carreira.progride_verticalmente(prog_antes) == prog_depois
 
     @pytest.mark.parametrize(
@@ -161,25 +164,25 @@ class TestCarreira:
         ],
     )
     def test_progressao_e_none_se_ja_esta_no_fim_da_carreira(self, prog_antes):
-        carreira = Carreira()
+        carreira = CarreiraE2()
         assert carreira.progride_verticalmente(prog_antes) is None
 
     def test_progride_ate_letra_respeita_letra_maxima(self):
-        carreira = Carreira()
+        carreira = CarreiraE2()
         nivel_origem = Nivel(5, "A")
         letra = "B"
         nivel_destino = Nivel(5, "B")  # No 5, letra C é o máximo
         assert carreira.progride_ate_letra(nivel_origem, letra) == nivel_destino
 
     def test_progride_ate_letra_vai_ate_maximo_se_limite_e_maior(self):
-        carreira = Carreira()
+        carreira = CarreiraE2()
         nivel_origem = Nivel(3, "A")
         letra = "C"
         nivel_destino = Nivel(3, "B")  # No 3, letra B é o máximo
         assert carreira.progride_ate_letra(nivel_origem, letra) == nivel_destino
 
     def test_progride_ate_letra_vai_nao_volta_nivel(self):
-        carreira = Carreira()
+        carreira = CarreiraE2()
         nivel_origem = Nivel(5, "B")
         letra = "A"
         nivel_destino = Nivel(5, "B")  # No 5, letra C é o máximo
@@ -188,7 +191,7 @@ class TestCarreira:
 
 class TestCarreiraConcurso2008:
     def test_nao_progride_alem_do_fim_da_carreira(self):
-        carreira = CarreiraConcurso2008()
+        carreira = CarreiraE2Concurso2008()
         prog_antes = Progressao(date(2020, 1, 1), Nivel(32, "E"), progs_sem_especial=1)
         prog_depois = Progressao(date(2022, 7, 1), Nivel(34, "E"), progs_sem_especial=0)
         assert carreira.progride_verticalmente(prog_antes) == prog_depois
@@ -196,7 +199,31 @@ class TestCarreiraConcurso2008:
 
 class TestCarreiraConcurso2004:
     def test_nao_progride_alem_do_fim_da_carreira(self):
-        carreira = CarreiraConcurso2004()
+        carreira = CarreiraE2Concurso2004()
         prog_antes = Progressao(date(2020, 1, 1), Nivel(35, "E"), progs_sem_especial=0)
         prog_depois = Progressao(date(2023, 4, 1), Nivel(36, "E"), progs_sem_especial=1)
+        assert carreira.progride_verticalmente(prog_antes) == prog_depois
+
+
+class TestCarreiraE3:
+    def test_nao_progride_alem_do_fim_da_carreira(self):
+        carreira = CarreiraE3()
+        prog_antes = Progressao(date(2020, 1, 1), Nivel(30, "E"), progs_sem_especial=1)
+        prog_depois = Progressao(date(2022, 7, 1), Nivel(31, "E"), progs_sem_especial=0)
+        assert carreira.progride_verticalmente(prog_antes) == prog_depois
+
+
+class TestCarreiraE3Concurso2008:
+    def test_nao_progride_alem_do_fim_da_carreira(self):
+        carreira = CarreiraE3Concurso2008()
+        prog_antes = Progressao(date(2020, 1, 1), Nivel(31, "E"), progs_sem_especial=1)
+        prog_depois = Progressao(date(2022, 7, 1), Nivel(33, "E"), progs_sem_especial=0)
+        assert carreira.progride_verticalmente(prog_antes) == prog_depois
+
+
+class TestCarreiraE3Concurso2004:
+    def test_nao_progride_alem_do_fim_da_carreira(self):
+        carreira = CarreiraE3Concurso2004()
+        prog_antes = Progressao(date(2020, 1, 1), Nivel(34, "E"), progs_sem_especial=1)
+        prog_depois = Progressao(date(2023, 4, 1), Nivel(35, "E"), progs_sem_especial=0)
         assert carreira.progride_verticalmente(prog_antes) == prog_depois

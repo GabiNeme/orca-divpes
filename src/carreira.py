@@ -5,7 +5,8 @@ from typing import Optional
 
 from dateutil.relativedelta import relativedelta
 
-from src.intersticio import Intersticio
+from src.classe import Classe
+from src.intersticio import Intersticio, IntersticioE2, IntersticioE3
 from src.nivel import Nivel
 
 
@@ -17,8 +18,8 @@ class Progressao:
 
 
 class Carreira(ABC):
-    def __init__(self) -> None:
-        return
+    def __init__(self, intersticio: Intersticio = None) -> None:
+        self.intersticio = intersticio
 
     def incrementa(self, progs_sem_especial: int) -> int:
         """Incrementa a progressão especial (concede 1 a cada 2 progressões)."""
@@ -36,7 +37,7 @@ class Carreira(ABC):
         if ultima_progressao.nivel.numero >= limite:
             return None
 
-        intersticio = Intersticio.tempo_para_progredir(ultima_progressao.nivel, 2)
+        intersticio = self.intersticio.tempo_para_progredir(ultima_progressao.nivel, 2)
         dt_prox_prog = ultima_progressao.data + relativedelta(months=intersticio)
 
         if numero_niveis + ultima_progressao.nivel.numero > limite:
@@ -113,7 +114,7 @@ class Carreira(ABC):
 
     def _limite(self) -> int:
         """Limite da carreira enquanto não completar condição de aposentadoria."""
-        return 32
+        return NotImplementedError("Método deve ser implementado em subclasses.")
 
     def checa_nivel_valido(self, nivel: Nivel):
         """Lança uma exceção se o nível informado for inválido."""
@@ -152,7 +153,20 @@ class Carreira(ABC):
                 return transicao_para_letra[i][1]
 
 
-class CarreiraConcurso2008(Carreira):
+# Carreiras E2
+
+
+class CarreiraE2(Carreira):
+    """Carreira da classe E2."""
+
+    def __init__(self) -> None:
+        super().__init__(IntersticioE2())
+
+    def _limite(self):
+        return 32
+
+
+class CarreiraE2Concurso2008(CarreiraE2):
     """Carreira do concurso de 2008."""
 
     def _limite(self) -> int:
@@ -160,12 +174,57 @@ class CarreiraConcurso2008(Carreira):
         return 34
 
 
-class CarreiraConcurso2004(Carreira):
+class CarreiraE2Concurso2004(CarreiraE2):
     """Carreira do concurso de 2004."""
 
     def _limite(self) -> int:
         """Limite da carreira enquanto não completar condição de aposentadoria."""
         return 36
+
+
+class CarreiraE2PassaDoTetoAtual(CarreiraE2):
+    """Carreira do concurso de 2004 que passa do teto atual."""
+
+    def _limite(self) -> int:
+        """Limite da carreira enquanto não completar condição de aposentadoria."""
+        return 40
+
+
+# Carreiras E3
+
+
+class CarreiraE3(Carreira):
+    """Carreira da classe E3."""
+
+    def __init__(self) -> None:
+        super().__init__(IntersticioE3())
+
+    def _limite(self):
+        return 31
+
+
+class CarreiraE3Concurso2008(CarreiraE3):
+    """Carreira do concurso de 2008."""
+
+    def _limite(self) -> int:
+        """Limite da carreira enquanto não completar condição de aposentadoria."""
+        return 33
+
+
+class CarreiraE3Concurso2004(CarreiraE3):
+    """Carreira do concurso de 2004."""
+
+    def _limite(self) -> int:
+        """Limite da carreira enquanto não completar condição de aposentadoria."""
+        return 35
+
+
+class CarreiraE3PassaDoTetoAtual(CarreiraE3):
+    """Carreira do concurso de 2004 que passa do teto atual."""
+
+    def _limite(self) -> int:
+        """Limite da carreira enquanto não completar condição de aposentadoria."""
+        return 39
 
 
 class CarreiraAtual(Carreira):
@@ -190,20 +249,22 @@ class CarreiraAtual(Carreira):
         return 48
 
 
-class CarreiraPassaDoTetoAtual(Carreira):
-    """Carreira do concurso de 2004 que passa do teto atual."""
-
-    def _limite(self) -> int:
-        """Limite da carreira enquanto não completar condição de aposentadoria."""
-        return 41
-
-
-def atribui_carreira(cm: int) -> Carreira:
+def atribui_carreira(cm: int, classe: Classe) -> Carreira:
     """Atribui a nova carreira ao funcionário com base no concurso."""
+    if classe == Classe.E3:
+        if cm < 330:
+            return CarreiraE3PassaDoTetoAtual()
+        elif cm < 412:
+            return CarreiraE3Concurso2004()
+        elif cm <= 545:
+            return CarreiraE3Concurso2008()
+        return CarreiraE3()
+
+    # E1 ou E2
     if cm < 330:
-        return CarreiraPassaDoTetoAtual()
+        return CarreiraE2PassaDoTetoAtual()
     elif cm < 412:
-        return CarreiraConcurso2004()
+        return CarreiraE2Concurso2004()
     elif cm <= 545:
-        return CarreiraConcurso2008()
-    return Carreira()
+        return CarreiraE2Concurso2008()
+    return CarreiraE2()

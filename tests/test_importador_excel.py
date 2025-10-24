@@ -1,6 +1,8 @@
 from datetime import date
+
 import pytest
-from src.carreira import CarreiraPassaDoTetoAtual
+
+from src.carreira import CarreiraE2PassaDoTetoAtual
 from src.classe import Classe
 from src.cmbh import CMBH, ImportadorProjecaoExcel
 from src.funcionario import TipoPrevidencia
@@ -67,7 +69,7 @@ class TestImportadorProjecaoExcel:
 
     def test_tipo_carreira(self, cmbh_fixture: CMBH):
         funcionario = cmbh_fixture.funcionarios.get(1)
-        assert isinstance(funcionario.carreira, CarreiraPassaDoTetoAtual)
+        assert isinstance(funcionario.carreira, CarreiraE2PassaDoTetoAtual)
 
     def test_nao_aderiu_pia(self, cmbh_fixture: CMBH):
         funcionario = cmbh_fixture.funcionarios.get(1)

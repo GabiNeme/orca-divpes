@@ -1,9 +1,11 @@
-import pandas as pd
 from datetime import date
+
+import pandas as pd
+
+from src.banco_de_dados import BancoDeDados
 from src.carreira import atribui_carreira
 from src.classe import Classe
 from src.folha import Folha
-from src.banco_de_dados import BancoDeDados
 from src.funcionario import Funcionario, concede_letras
 from src.funcionario_factory import FuncionarioFactory
 from src.nivel import Nivel
@@ -80,9 +82,9 @@ class ImportadorProjecaoExcel:
         ultima_progressao = RegraTransicao.primeira_progressao(
             data_admissao, procurador, self.licencas.get(cm, 0)
         )
-        carreira = atribui_carreira(cm)
+        carreira = atribui_carreira(cm, classe)
         grupo_de_controle = int(linha[1][15])
-        nivel_carreira_atual= Nivel.from_string(linha[1][3])
+        nivel_carreira_atual = Nivel.from_string(linha[1][3])
         if concede_letras(nivel_carreira_atual):
             letra_maxima = None
         else:
