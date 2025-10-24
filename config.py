@@ -11,7 +11,7 @@ class Parametros:
     INDICE_PROGRESSAO_VERTICAL: float = 0.04
     INDICE_PROGRESSAO_HORIZONTAL: float = 0.0816
     # Reajustes
-    REAJUSTE_ANUAL: float = 0.1
+    REAJUSTE_ANUAL: float = 0.0
     DATA_BASE_REAJUSTE: int = 5  # Maio
     # Tetos
     TETO_PREFEITO: float = None  # Importado do Aeros

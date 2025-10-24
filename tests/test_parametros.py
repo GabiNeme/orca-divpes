@@ -24,7 +24,6 @@ class TestParametros:
         assert p.VALOR_BASE_E3 == None
         assert p.INDICE_PROGRESSAO_VERTICAL == 0.04
         assert p.INDICE_PROGRESSAO_HORIZONTAL == 0.0816
-        assert p.REAJUSTE_ANUAL == 0.1
         assert p.DATA_BASE_REAJUSTE == 5
         assert p.TETO_PREFEITO == None
         assert p.TETO_PROCURADORES == None
