@@ -1,5 +1,7 @@
-import pandas as pd
 from datetime import date
+
+import pandas as pd
+
 from src.folha import Folha
 from src.folhas_efetivos import FolhasEfetivos, GastoMensalEfetivos
 from src.nivel import Nivel
@@ -14,6 +16,8 @@ class DummyFolha(Folha):
         bhprev_patronal=5,
         bhprev_complementar_patronal=2,
     ):
+        self.nivel = Nivel(1, "A")
+        self.salario = 1000
         self.total = total
         self.fufin_patronal = fufin_patronal
         self.bhprev_patronal = bhprev_patronal
@@ -141,14 +145,10 @@ class TestFolhasEfetivos:
         cm = "001"
         # Adiciona folhas manualmente
         folhas.adiciona_folha(
-            competencia1,
-            cm,
-            Folha(nivel=Nivel(1, "A"), salario=1000, total=100)
+            competencia1, cm, Folha(nivel=Nivel(1, "A"), salario=1000, total=100)
         )
         folhas.adiciona_folha(
-            competencia2,
-            cm,
-            Folha(nivel=Nivel(3, "B"), salario=200, total=300)
+            competencia2, cm, Folha(nivel=Nivel(3, "B"), salario=200, total=300)
         )
         # Exporta para DataFrame
         df = folhas.exporta_folhas_do_funcionario(cm, competencia1, competencia2)
@@ -191,8 +191,10 @@ class TestFolhasEfetivos:
         assert isinstance(df, pd.DataFrame)
         assert set(df.columns) == {
             "CM",
-            "Valor Inicial",
-            "Valor Final",
+            "Nível inicial",
+            "Salário Inicial",
+            "Valor Inicial lim. teto",
+            "Valor Final lim. teto",
             "Média",
             "VPL (0,5%)",
             "Soma Total",
@@ -201,8 +203,15 @@ class TestFolhasEfetivos:
         assert df.shape[0] == 2
         # Checa valores esperados para DummyFolha (total sempre 100)
         for _, row in df.iterrows():
-            assert row["Valor Inicial"] == 100
-            assert row["Valor Final"] == 100
+            assert row["Nível inicial"] == Nivel(1, "A")
+            assert row["Salário Inicial"] == 1000
+            assert row["Valor Inicial lim. teto"] == 100
+            assert row["Valor Final lim. teto"] == 100
             assert row["Média"] == 100
-            assert round(row["VPL (0,5%)"], 2) == round(100 / (1 + 0.005) ** 0 + 100 / (1 + 0.005) ** 1 + 100 / (1 + 0.005) ** 2, 2)
+            assert round(row["VPL (0,5%)"], 2) == round(
+                100 / (1 + 0.005) ** 0
+                + 100 / (1 + 0.005) ** 1
+                + 100 / (1 + 0.005) ** 2,
+                2,
+            )
             assert row["Soma Total"] == 300

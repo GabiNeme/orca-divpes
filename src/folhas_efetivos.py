@@ -1,7 +1,8 @@
-import pandas as pd
-
 from dataclasses import dataclass
 from datetime import date
+
+import pandas as pd
+
 from src.folha import CalculaFolha, Folha
 from src.folhas import Folhas
 from src.funcionario import Funcionario
@@ -156,8 +157,10 @@ class FolhasEfetivos(Folhas):
         for cm in sorted(self.servidores):
             dados = {
                 "CM": cm,
-                "Valor Inicial": self._calcula_valor_inicial(cm, inicio, fim),
-                "Valor Final": self._calcula_valor_final(cm, inicio, fim),
+                "Nível inicial": self._calcula_nivel_inicial(cm, inicio, fim),
+                "Salário Inicial": self._calcula_salario_inicial(cm, inicio, fim),
+                "Valor Inicial lim. teto": self._calcula_valor_inicial(cm, inicio, fim),
+                "Valor Final lim. teto": self._calcula_valor_final(cm, inicio, fim),
                 "Média": self._calcula_media(cm, inicio, fim),
                 "VPL (0,5%)": self._calcula_vpl(cm, inicio, fim),
                 "Soma Total": self._calcula_soma(cm, inicio, fim),
@@ -165,11 +168,27 @@ class FolhasEfetivos(Folhas):
             metricas.append(dados)
         return pd.DataFrame(metricas)
 
+    def _calcula_nivel_inicial(self, cm: int, inicio: date, fim: date) -> float | None:
+        """Calcula o nível inicial para um funcionário na primeira competência que ele/a aparece."""
+        for competencia in self.gerar_periodos(inicio, fim):
+            if competencia in self.folhas and cm in self.folhas[competencia]:
+                folha: Folha = self.folhas[competencia][cm]
+                return folha.nivel
+        return None
+
+    def _calcula_salario_inicial(self, cm: int, inicio: date, fim: date) -> float:
+        """Calcula o salario inicial para um funcionário na primeira competência que ele/a aparece."""
+        for competencia in self.gerar_periodos(inicio, fim):
+            if competencia in self.folhas and cm in self.folhas[competencia]:
+                folha: Folha = self.folhas[competencia][cm]
+                return folha.salario
+        return 0.0
+
     def _calcula_valor_inicial(self, cm: int, inicio: date, fim: date) -> float:
         """Calcula o valor inicial para um funcionário na primeira competência que ele/a aparece."""
         for competencia in self.gerar_periodos(inicio, fim):
             if competencia in self.folhas and cm in self.folhas[competencia]:
-                folha = self.folhas[competencia][cm]
+                folha: Folha = self.folhas[competencia][cm]
                 return folha.total
         return 0.0
 
@@ -177,7 +196,7 @@ class FolhasEfetivos(Folhas):
         """Calcula o valor final para um funcionário na última competência que ele/a aparece."""
         for competencia in reversed(list(self.gerar_periodos(inicio, fim))):
             if competencia in self.folhas and cm in self.folhas[competencia]:
-                folha = self.folhas[competencia][cm]
+                folha: Folha = self.folhas[competencia][cm]
                 return folha.total
         return 0.0
 
@@ -187,7 +206,7 @@ class FolhasEfetivos(Folhas):
         count = 0
         for competencia in self.gerar_periodos(inicio, fim):
             if competencia in self.folhas and cm in self.folhas[competencia]:
-                folha = self.folhas[competencia][cm]
+                folha: Folha = self.folhas[competencia][cm]
                 total += folha.total
                 count += 1
         return round(total / count, 2) if count > 0 else 0.0
@@ -198,7 +217,7 @@ class FolhasEfetivos(Folhas):
         meses = 0
         for competencia in self.gerar_periodos(inicio, fim):
             if competencia in self.folhas and cm in self.folhas[competencia]:
-                folha = self.folhas[competencia][cm]
+                folha: Folha = self.folhas[competencia][cm]
                 vpl += folha.total / ((1 + TAXA_DESCONTO) ** meses)
             meses += 1
         return round(vpl, 2)
@@ -208,6 +227,6 @@ class FolhasEfetivos(Folhas):
         total = 0.0
         for competencia in self.gerar_periodos(inicio, fim):
             if competencia in self.folhas and cm in self.folhas[competencia]:
-                folha = self.folhas[competencia][cm]
+                folha: Folha = self.folhas[competencia][cm]
                 total += folha.total
         return total
