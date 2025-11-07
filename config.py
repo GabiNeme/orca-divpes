@@ -56,5 +56,27 @@ class Parametros:
             TETO_INSS=valores["teto_inss"],
         )
 
+    @classmethod
+    def from_json(cls, json_data: dict):
+        return cls(
+            VALOR_BASE_E2=json_data.get("VALOR_BASE_E2", None),
+            VALOR_BASE_E3=json_data.get("VALOR_BASE_E3", None),
+            INDICE_PROGRESSAO_VERTICAL=json_data.get(
+                "INDICE_PROGRESSAO_VERTICAL", None
+            ),
+            INDICE_PROGRESSAO_HORIZONTAL=json_data.get(
+                "INDICE_PROGRESSAO_HORIZONTAL", None
+            ),
+            REAJUSTE_ANUAL=json_data.get("REAJUSTE_ANUAL", None),
+            DATA_BASE_REAJUSTE=json_data.get("DATA_BASE_REAJUSTE", None),
+            TETO_PREFEITO=json_data.get("TETO_PREFEITO", None),
+            TETO_PROCURADORES=json_data.get("TETO_PROCURADORES", None),
+            ALIQUOTA_PATRONAL=json_data.get("ALIQUOTA_PATRONAL", None),
+            ALIQUOTA_PATRONAL_COMPLEMENTAR=json_data.get(
+                "ALIQUOTA_PATRONAL_COMPLEMENTAR", None
+            ),
+            TETO_INSS=json_data.get("TETO_INSS", None),
+        )
+
 
 param = Parametros()
