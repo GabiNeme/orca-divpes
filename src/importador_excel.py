@@ -74,6 +74,7 @@ class ImportadorProjecaoExcel:
         data_anuenio = _parse_data(linha[1][6])
         num_ats = int(linha[1][7]) if not pd.isna(linha[1][7]) else 0
         procurador = linha[1][12] == "S"
+        data_condicao_aposentadoria = _parse_data(linha[1][16])
         data_aposentadoria = _parse_data(linha[1][17])
         num_art_98_data_aposentadoria = (
             int(linha[1][18]) if not pd.isna(linha[1][18]) else 0
@@ -97,6 +98,7 @@ class ImportadorProjecaoExcel:
             data_anuenio=data_anuenio,
             num_ats=num_ats,
             procurador=procurador,
+            data_condicao_aposentadoria=data_condicao_aposentadoria,
             data_aposentadoria=data_aposentadoria,
             num_art_98_data_aposentadoria=num_art_98_data_aposentadoria,
             aderiu_pia=aderiu_pia,

@@ -1,15 +1,17 @@
 from datetime import date
 
 import pandas as pd
+
 from src.folhas import Folhas
-from src.funcionario import Aposentadoria
 from src.folhas_pia import FolhasPIA
+from src.funcionario import Aposentadoria
 
 
 class DummyFuncionario:
     def __init__(self, cm, data_aposentadoria, valor_pia):
         self.cm = cm
         self.aposentadoria = Aposentadoria(
+            data_condicao_aposentadoria=data_aposentadoria,
             data_aposentadoria=data_aposentadoria,
             num_art_98_data_aposentadoria=0,  # não é usado
             aderiu_pia=True,
@@ -61,7 +63,6 @@ class TestFolhasPIA:
         # A competência deve ser armazenada como o primeiro dia do mês
         assert date(2030, 1, 1) in folhas_pia.pias
         assert folhas_pia.pias[date(2030, 1, 1)][1] == 1000
-
 
     def test_total_anual(self):
         ano = 2030
@@ -120,7 +121,9 @@ class TestFolhasPIA:
         competencia1 = date(ano, 1, 1)
         competencia2 = date(ano, 2, 1)
         competencia3 = date(ano, 3, 1)
-        funcionario = DummyFuncionario(cm=1, data_aposentadoria=competencia1, valor_pia=1000)
+        funcionario = DummyFuncionario(
+            cm=1, data_aposentadoria=competencia1, valor_pia=1000
+        )
 
         folhas_pia = FolhasPIA(calcula_pia=DummyCalculaPIA)
         folhas_pia.calcula_pias([funcionario])
@@ -132,9 +135,24 @@ class TestFolhasPIA:
         # Deve ter 3 linhas (jan, fev, mar)
         assert df.shape[0] == 3
         # Janeiro tem valor, os outros meses são zero
-        assert df.loc[df["Competência"] == Folhas.formata_data(competencia1), "PIA"].iloc[0] == 1000
-        assert df.loc[df["Competência"] == Folhas.formata_data(competencia2), "PIA"].iloc[0] == 0.0
-        assert df.loc[df["Competência"] == Folhas.formata_data(competencia3), "PIA"].iloc[0] == 0.0
+        assert (
+            df.loc[df["Competência"] == Folhas.formata_data(competencia1), "PIA"].iloc[
+                0
+            ]
+            == 1000
+        )
+        assert (
+            df.loc[df["Competência"] == Folhas.formata_data(competencia2), "PIA"].iloc[
+                0
+            ]
+            == 0.0
+        )
+        assert (
+            df.loc[df["Competência"] == Folhas.formata_data(competencia3), "PIA"].iloc[
+                0
+            ]
+            == 0.0
+        )
 
     def test_exporta_pia_do_funcionario_sem_pia(self):
         ano = 2030

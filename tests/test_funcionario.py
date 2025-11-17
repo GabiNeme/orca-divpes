@@ -1,15 +1,18 @@
 from datetime import date
 
-from src.classe import Classe
-from src.nivel import Nivel
-from src.carreira import Carreira, Progressao
-from src.funcionario import Funcionario, DadosFolha, Aposentadoria, TipoPrevidencia
 from dateutil.relativedelta import relativedelta
+
+from src.carreira import Carreira, Progressao
+from src.classe import Classe
+from src.funcionario import Aposentadoria, DadosFolha, Funcionario, TipoPrevidencia
+from src.nivel import Nivel
 
 
 class DummyCarreira(Carreira):
     # Implementação para testes
-    def progride_verticalmente_e_horizontalmente(self, ultima_progressao, letra_maxima=None):
+    def progride_verticalmente_e_horizontalmente(
+        self, ultima_progressao, letra_maxima=None
+    ):
         progs_horizontais = 1
         if ultima_progressao.nivel.numero >= 5:
             progs_horizontais = 0
@@ -41,6 +44,7 @@ class TesteFuncionario:
                 tipo_previdencia=TipoPrevidencia.Fufin,
             ),
             aposentadoria=Aposentadoria(
+                data_condicao_aposentadoria=date(2045, 10, 1),
                 data_aposentadoria=date(2045, 10, 20),
                 num_art_98_data_aposentadoria=0,
                 aderiu_pia=True,
@@ -79,7 +83,7 @@ class TesteFuncionario:
         funcionario = self.default_funcionario()
 
         assert funcionario.obtem_nivel_para(date(2045, 9, 30)) is not None
-    
+
     def retorna_nivel_correto_no_dia_da_aposentadoria(self):
         funcionario = self.default_funcionario()
 

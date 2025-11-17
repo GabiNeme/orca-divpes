@@ -1,8 +1,8 @@
 from datetime import date
+
 from src.carreira import Carreira, Progressao
 from src.classe import Classe
-from src.funcionario import Aposentadoria, Funcionario, DadosFolha, TipoPrevidencia
-from src.nivel import Nivel
+from src.funcionario import Aposentadoria, DadosFolha, Funcionario, TipoPrevidencia
 
 
 class FuncionarioFactory:
@@ -14,6 +14,7 @@ class FuncionarioFactory:
         data_anuenio: date,
         num_ats: int,
         procurador: bool,
+        data_condicao_aposentadoria: date,
         data_aposentadoria: date,
         num_art_98_data_aposentadoria: int,
         aderiu_pia: bool,
@@ -38,6 +39,7 @@ class FuncionarioFactory:
             tipo_previdencia=tipo_previdencia,
         )
         aposentadoria = Aposentadoria(
+            data_condicao_aposentadoria=data_condicao_aposentadoria,
             data_aposentadoria=data_aposentadoria,
             num_art_98_data_aposentadoria=num_art_98_data_aposentadoria,
             aderiu_pia=aderiu_pia,

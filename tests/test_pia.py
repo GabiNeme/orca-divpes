@@ -1,9 +1,11 @@
-import pytest
 from datetime import date
-from src.pia import CalculaPIA
-from src.funcionario import Funcionario, DadosFolha, Aposentadoria, TipoPrevidencia
-from src.nivel import Nivel
+
+import pytest
+
 from src.classe import Classe
+from src.funcionario import Aposentadoria, DadosFolha, Funcionario, TipoPrevidencia
+from src.nivel import Nivel
+from src.pia import CalculaPIA
 
 
 class DummyTabela:
@@ -22,6 +24,7 @@ def funcionario_fixture():
             tipo_previdencia=TipoPrevidencia.BHPrev,
         )
         aposentadoria = Aposentadoria(
+            data_condicao_aposentadoria=date(2029, 12, 1),
             data_aposentadoria=date(2030, 1, 1),
             num_art_98_data_aposentadoria=dias_pia,
             aderiu_pia=aderiu_pia,
@@ -50,13 +53,11 @@ class TestCalculaPIA:
         assert pia is not None
         assert pia == 250000.00
 
-
     def test_pia_nao_aderiu(self, funcionario_fixture):
         funcionario = funcionario_fixture(aderiu_pia=False)
         tabela = DummyTabela()
         pia = CalculaPIA(funcionario, tabela).calcula()
         assert pia is None
-
 
     def test_pia_nivel_none(self, funcionario_fixture):
         funcionario = funcionario_fixture(aderiu_pia=True)

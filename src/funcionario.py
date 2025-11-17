@@ -3,7 +3,7 @@ from datetime import date
 from enum import Enum
 from typing import Optional
 
-from src.carreira import Progressao, Carreira, CarreiraAtual
+from src.carreira import Carreira, CarreiraAtual, Progressao
 from src.classe import Classe
 from src.nivel import Nivel
 
@@ -25,6 +25,7 @@ class DadosFolha:
 
 @dataclass
 class Aposentadoria:
+    data_condicao_aposentadoria: date
     data_aposentadoria: date
     num_art_98_data_aposentadoria: int
     aderiu_pia: bool
@@ -92,6 +93,7 @@ class Funcionario:
             "Num ATS": self.dados_folha.num_ats,
             "Procurador": self.dados_folha.procurador,
             "Tipo Previdência": self.dados_folha.tipo_previdencia.value,
+            "Data Condição Aposentadoria": self.aposentadoria.data_condicao_aposentadoria,
             "Data Aposentadoria": self.aposentadoria.data_aposentadoria,
             "Num Art 98 Data Aposentadoria": self.aposentadoria.num_art_98_data_aposentadoria,
             "Aderiu PIA": self.aposentadoria.aderiu_pia,
