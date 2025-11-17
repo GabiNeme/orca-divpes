@@ -11,7 +11,7 @@ from src.nivel import Nivel
 class DummyCarreira(Carreira):
     # Implementação para testes
     def progride_verticalmente_e_horizontalmente(
-        self, ultima_progressao, letra_maxima=None
+        self, ultima_progressao, letra_maxima=None, data_condicao_aposentadoria=None
     ):
         progs_horizontais = 1
         if ultima_progressao.nivel.numero >= 5:

@@ -6,9 +6,11 @@ from src.carreira import (
     CarreiraE2,
     CarreiraE2Concurso2004,
     CarreiraE2Concurso2008,
+    CarreiraE2PassaDoTetoAtual,
     CarreiraE3,
     CarreiraE3Concurso2004,
     CarreiraE3Concurso2008,
+    CarreiraE3PassaDoTetoAtual,
     Progressao,
 )
 from src.nivel import Nivel
@@ -188,6 +190,21 @@ class TestCarreiraE2:
         nivel_destino = Nivel(5, "B")  # No 5, letra C é o máximo
         assert carreira.progride_ate_letra(nivel_origem, letra) == nivel_destino
 
+    def test_progride_mesmo_depois_de_completar_condicao_aposentadoria(self):
+        carreira = CarreiraE2()
+        prog_antes = Progressao(date(2020, 1, 1), Nivel(30, "E"), progs_sem_especial=0)
+        prog_depois_esperada = Progressao(
+            date(2022, 7, 1), Nivel(32, "E"), progs_sem_especial=1
+        )
+
+        prog_depois = carreira.progride_verticalmente(prog_antes, date(2020, 2, 1))
+        assert prog_depois == prog_depois_esperada
+
+        prog_depois = carreira.progride_verticalmente_e_horizontalmente(
+            prog_antes, None, date(2018, 1, 1)
+        )
+        assert prog_depois == prog_depois_esperada
+
 
 class TestCarreiraConcurso2008:
     def test_nao_progride_alem_do_fim_da_carreira(self):
@@ -203,6 +220,38 @@ class TestCarreiraConcurso2004:
         prog_antes = Progressao(date(2020, 1, 1), Nivel(35, "E"), progs_sem_especial=0)
         prog_depois = Progressao(date(2023, 4, 1), Nivel(36, "E"), progs_sem_especial=1)
         assert carreira.progride_verticalmente(prog_antes) == prog_depois
+
+
+class TestCarreiraE2PassaDoTetoAtual:
+    def test_nao_progride_alem_do_fim_da_carreira(self):
+        carreira = CarreiraE2PassaDoTetoAtual()
+        prog_antes = Progressao(date(2020, 1, 1), Nivel(40, "E"), progs_sem_especial=0)
+        assert carreira.progride_verticalmente(prog_antes) == None
+
+    def test_progride_ate_36_mesmo_depois_de_completar_condicao_aposentadoria(self):
+        carreira = CarreiraE2PassaDoTetoAtual()
+        prog_antes = Progressao(date(2020, 1, 1), Nivel(34, "E"), progs_sem_especial=0)
+        prog_depois_esperada = Progressao(
+            date(2022, 7, 1), Nivel(36, "E"), progs_sem_especial=1
+        )
+        prog_depois = carreira.progride_verticalmente(prog_antes, date(2018, 2, 1))
+        assert prog_depois == prog_depois_esperada
+
+    def test_nao_progride_apos_36_se_completou_condicao_aposentadoria(self):
+        carreira = CarreiraE2PassaDoTetoAtual()
+        prog_antes = Progressao(date(2020, 1, 1), Nivel(35, "E"), progs_sem_especial=1)
+        prog_depois_esperada = Progressao(
+            date(2023, 4, 1), Nivel(36, "E"), progs_sem_especial=0
+        )
+        prog_depois = carreira.progride_verticalmente(prog_antes, date(2018, 2, 1))
+        assert prog_depois == prog_depois_esperada
+        assert prog_depois == prog_depois_esperada
+
+    def test_nao_progride_mais_apos_completar_condicao_aposentadoria(self):
+        carreira = CarreiraE2PassaDoTetoAtual()
+        prog_antes = Progressao(date(2020, 1, 1), Nivel(38, "E"), progs_sem_especial=1)
+
+        assert carreira.progride_verticalmente(prog_antes, date(2021, 1, 1)) == None
 
 
 class TestCarreiraE3:
@@ -227,3 +276,35 @@ class TestCarreiraE3Concurso2004:
         prog_antes = Progressao(date(2020, 1, 1), Nivel(34, "E"), progs_sem_especial=1)
         prog_depois = Progressao(date(2023, 4, 1), Nivel(35, "E"), progs_sem_especial=0)
         assert carreira.progride_verticalmente(prog_antes) == prog_depois
+
+
+class TestCarreiraE3PassaDoTetoAtual:
+    def test_nao_progride_alem_do_fim_da_carreira(self):
+        carreira = CarreiraE3PassaDoTetoAtual()
+        prog_antes = Progressao(date(2020, 1, 1), Nivel(39, "E"), progs_sem_especial=0)
+        assert carreira.progride_verticalmente(prog_antes) == None
+
+    def test_progride_ate_35_mesmo_depois_de_completar_condicao_aposentadoria(self):
+        carreira = CarreiraE3PassaDoTetoAtual()
+        prog_antes = Progressao(date(2020, 1, 1), Nivel(32, "E"), progs_sem_especial=0)
+        prog_depois_esperada = Progressao(
+            date(2022, 7, 1), Nivel(34, "E"), progs_sem_especial=1
+        )
+        prog_depois = carreira.progride_verticalmente(prog_antes, date(2018, 2, 1))
+        assert prog_depois == prog_depois_esperada
+
+    def test_nao_progride_apos_35_se_completou_condicao_aposentadoria(self):
+        carreira = CarreiraE3PassaDoTetoAtual()
+        prog_antes = Progressao(date(2020, 1, 1), Nivel(34, "E"), progs_sem_especial=1)
+        prog_depois_esperada = Progressao(
+            date(2023, 4, 1), Nivel(35, "E"), progs_sem_especial=0
+        )
+        prog_depois = carreira.progride_verticalmente(prog_antes, date(2018, 2, 1))
+        assert prog_depois == prog_depois_esperada
+        assert prog_depois == prog_depois_esperada
+
+    def test_nao_progride_mais_apos_completar_condicao_aposentadoria(self):
+        carreira = CarreiraE3PassaDoTetoAtual()
+        prog_antes = Progressao(date(2020, 1, 1), Nivel(37, "E"), progs_sem_especial=1)
+
+        assert carreira.progride_verticalmente(prog_antes, date(2021, 1, 1)) == None

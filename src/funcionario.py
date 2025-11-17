@@ -57,7 +57,9 @@ class Funcionario:
             # Sempre progride verticalmente e horizontalmente respeitando a letra máxima.
             # Quando a letra máxima for None, progride até o máximo permitido.
             ultima_progressao = self.carreira.progride_verticalmente_e_horizontalmente(
-                ultima_progressao, letra_maxima=self.letra_maxima
+                ultima_progressao,
+                letra_maxima=self.letra_maxima,
+                data_condicao_aposentadoria=self.aposentadoria.data_condicao_aposentadoria,
             )
 
             if ultima_progressao:

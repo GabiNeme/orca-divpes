@@ -26,19 +26,26 @@ class Carreira(ABC):
         return (progs_sem_especial + 1) % 2
 
     def progride_verticalmente_por_quantidade_de_niveis(
-        self, ultima_progressao: Progressao, numero_niveis: int
+        self,
+        ultima_progressao: Progressao,
+        numero_niveis: int,
+        data_condicao_aposentadoria: date = None,
     ) -> Optional[Progressao]:
         """Calcula uma progressão vertical (2 interstícios), permitindo definir quantos
         níveis serão progredidos."""
 
         self.checa_nivel_valido(ultima_progressao.nivel)
-        limite = self._limite()
-
-        if ultima_progressao.nivel.numero >= limite:
-            return None
 
         intersticio = self.intersticio.tempo_para_progredir(ultima_progressao.nivel, 2)
         dt_prox_prog = ultima_progressao.data + relativedelta(months=intersticio)
+
+        limite = self._limite(
+            self._completou_condicao_aposentadoria(
+                dt_prox_prog, data_condicao_aposentadoria
+            )
+        )
+        if ultima_progressao.nivel.numero >= limite:
+            return None
 
         if numero_niveis + ultima_progressao.nivel.numero > limite:
             numero_niveis = limite - ultima_progressao.nivel.numero
@@ -50,7 +57,7 @@ class Carreira(ABC):
         )
 
     def progride_verticalmente(
-        self, ultima_progressao: Progressao
+        self, ultima_progressao: Progressao, data_condicao_aposentadoria: date = None
     ) -> Optional[Progressao]:
         """Calcula uma progressão vertical (2 interstícios), podendo ser especial
         ou não."""
@@ -61,17 +68,22 @@ class Carreira(ABC):
             niveis = 2
 
         return self.progride_verticalmente_por_quantidade_de_niveis(
-            ultima_progressao, niveis
+            ultima_progressao, niveis, data_condicao_aposentadoria
         )
 
     def progride_verticalmente_e_horizontalmente(
-        self, ultima_progressao: Progressao, letra_maxima: str = None
+        self,
+        ultima_progressao: Progressao,
+        letra_maxima: str = None,
+        data_condicao_aposentadoria: date = None,
     ) -> Optional[Progressao]:
         """Calcula uma progressão vertical (2 interstícios), podendo ser especial ou
         não, e concede todas as letras permitidas pelo nível final se letra máxima for
         None. Caso contrário concede todas as letras permitidas até letra_maxima."""
 
-        progressao = self.progride_verticalmente(ultima_progressao)
+        progressao = self.progride_verticalmente(
+            ultima_progressao, data_condicao_aposentadoria
+        )
 
         if not progressao:
             return None
@@ -85,7 +97,7 @@ class Carreira(ABC):
         )
 
     def concede_letras_ate_limite(self, nivel_origem: Nivel) -> Nivel:
-        """Concede progressões veriticais até o máximo permitido por aquele nível
+        """Concede progressões horizontais até o máximo permitido por aquele nível
         vertical."""
 
         self.checa_nivel_valido(nivel_origem)
@@ -112,7 +124,7 @@ class Carreira(ABC):
 
         return Nivel(nivel_origem.numero, letra)
 
-    def _limite(self) -> int:
+    def _limite(self, completou_condicao_aposentadoria: bool = False) -> int:
         """Limite da carreira enquanto não completar condição de aposentadoria."""
         return NotImplementedError("Método deve ser implementado em subclasses.")
 
@@ -152,6 +164,14 @@ class Carreira(ABC):
             if transicao_para_letra[i][0] <= numero_nivel:
                 return transicao_para_letra[i][1]
 
+    def _completou_condicao_aposentadoria(
+        self, data_atual: date, data_condicao_aposentadoria: date
+    ) -> bool:
+        """Verifica se a condição de aposentadoria foi completada na data atual."""
+        if data_condicao_aposentadoria and data_atual >= data_condicao_aposentadoria:
+            return True
+        return False
+
 
 # Carreiras E2
 
@@ -162,14 +182,14 @@ class CarreiraE2(Carreira):
     def __init__(self) -> None:
         super().__init__(IntersticioE2())
 
-    def _limite(self):
+    def _limite(self, completou_condicao_aposentadoria: bool = False):
         return 32
 
 
 class CarreiraE2Concurso2008(CarreiraE2):
     """Carreira do concurso de 2008."""
 
-    def _limite(self) -> int:
+    def _limite(self, completou_condicao_aposentadoria: bool = False) -> int:
         """Limite da carreira enquanto não completar condição de aposentadoria."""
         return 34
 
@@ -177,7 +197,7 @@ class CarreiraE2Concurso2008(CarreiraE2):
 class CarreiraE2Concurso2004(CarreiraE2):
     """Carreira do concurso de 2004."""
 
-    def _limite(self) -> int:
+    def _limite(self, completou_condicao_aposentadoria: bool = False) -> int:
         """Limite da carreira enquanto não completar condição de aposentadoria."""
         return 36
 
@@ -185,8 +205,10 @@ class CarreiraE2Concurso2004(CarreiraE2):
 class CarreiraE2PassaDoTetoAtual(CarreiraE2):
     """Carreira do concurso de 2004 que passa do teto atual."""
 
-    def _limite(self) -> int:
+    def _limite(self, completou_condicao_aposentadoria: bool = False) -> int:
         """Limite da carreira enquanto não completar condição de aposentadoria."""
+        if completou_condicao_aposentadoria:
+            return 36
         return 40
 
 
@@ -199,14 +221,14 @@ class CarreiraE3(Carreira):
     def __init__(self) -> None:
         super().__init__(IntersticioE3())
 
-    def _limite(self):
+    def _limite(self, completou_condicao_aposentadoria: bool = False):
         return 31
 
 
 class CarreiraE3Concurso2008(CarreiraE3):
     """Carreira do concurso de 2008."""
 
-    def _limite(self) -> int:
+    def _limite(self, completou_condicao_aposentadoria: bool = False) -> int:
         """Limite da carreira enquanto não completar condição de aposentadoria."""
         return 33
 
@@ -214,7 +236,7 @@ class CarreiraE3Concurso2008(CarreiraE3):
 class CarreiraE3Concurso2004(CarreiraE3):
     """Carreira do concurso de 2004."""
 
-    def _limite(self) -> int:
+    def _limite(self, completou_condicao_aposentadoria: bool = False) -> int:
         """Limite da carreira enquanto não completar condição de aposentadoria."""
         return 35
 
@@ -222,8 +244,10 @@ class CarreiraE3Concurso2004(CarreiraE3):
 class CarreiraE3PassaDoTetoAtual(CarreiraE3):
     """Carreira do concurso de 2004 que passa do teto atual."""
 
-    def _limite(self) -> int:
+    def _limite(self, completou_condicao_aposentadoria: bool = False) -> int:
         """Limite da carreira enquanto não completar condição de aposentadoria."""
+        if completou_condicao_aposentadoria:
+            return 35
         return 39
 
 
