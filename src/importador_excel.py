@@ -15,7 +15,11 @@ from src.regra_transicao import RegraTransicao
 def obtem_tempos_licencas() -> dict[int, int]:
     """Obtém os tempos de licenças que interrompem contagem de progressão dos funcionários."""
     df_licencas = BancoDeDados().realiza_consulta_arquivo("tempo_licencas.sql")
-    return dict(zip(df_licencas["cm"].astype(int), df_licencas["qtde_dias_licenca"]))
+    dic_licencas = dict(
+        zip(df_licencas["cm"].astype(int), df_licencas["qtde_dias_licenca"])
+    )
+    dic_licencas[545] = 680  # Aposentadoria por invalidez revertida
+    return dic_licencas
 
 
 class ImportadorProjecaoExcel:
