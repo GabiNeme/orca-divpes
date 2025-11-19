@@ -34,16 +34,12 @@ class TrajetoriaSimulada:
         funcionario: Funcionario,
         data_migracao: date,
         progressoes: list[ProgressaoSimulada],
-        nome: str,
-        tempo_licenca: int,
-        letra_maxima: str,
+        dados_faltantes_aeros: DadosFaltantesAeros,
     ):
-        self.funcionario = funcionario
-        self.data_migracao = data_migracao
-        self.progressoes = progressoes  # list[ProgressaoSimulada]
-        self.nome = nome
-        self.tempo_licenca = tempo_licenca
-        self.letra_maxima = letra_maxima
+        self.funcionario: Funcionario = funcionario
+        self.data_migracao: date = data_migracao
+        self.progressoes: list[ProgressaoSimulada] = progressoes
+        self.dados_faltantes_aeros: DadosFaltantesAeros = dados_faltantes_aeros
 
     def escreve(self, writer: pd.ExcelWriter) -> None:
         """Escreve esta trajetória simulada em uma planilha do Excel usando o
@@ -64,9 +60,9 @@ class TrajetoriaSimulada:
         # Write CM and tempo_licenca in the requested cells
         worksheet["E3"] = self.data_migracao
         worksheet["C5"] = self.funcionario.cm
-        worksheet["C6"] = self.nome
+        worksheet["C6"] = self.dados_faltantes_aeros.nome
         worksheet["C7"] = self.funcionario.data_admissao
-        worksheet["D8"] = self.tempo_licenca
+        worksheet["D8"] = self.dados_faltantes_aeros.qtde_dias_licenca
 
         # Escreve progressões
         start_row = 13
@@ -92,7 +88,7 @@ class TrajetoriaSimulada:
         """Compara as progs horizontais que servidor tem com o limite da sua carreira."""
         nivel = Nivel(
             self.progressoes[-1].nivel.numero,
-            self.letra_maxima,
+            self.dados_faltantes_aeros.letra_maxima,
         )
         while True:
             try:
@@ -130,20 +126,12 @@ class TrajetoriasSimuladas:
     def calcula(self) -> None:
         """Calcula as carreiras simuladas de todos os funcionários."""
         for cm, funcionario in self.funcionarios.items():
-            trajetoria_simulada = CalculadoraTrajetoriaFuncionario(
+            trajetoria_simulada = CalculaReenquadramento(
                 funcionario,
                 self.data_migracao,
                 self.avaliacoes.do_cm(cm),
-                self.dados_faltantes.get(
-                    cm, DadosFaltantesAeros("", 0, "")
-                ).qtde_dias_licenca,
+                self.dados_faltantes.get(cm, DadosFaltantesAeros("", 0, "")),
             ).calcula()
-
-            dados_faltantes_aeros = self.dados_faltantes.get(
-                cm, DadosFaltantesAeros("", 0, "")
-            )
-            trajetoria_simulada.nome = dados_faltantes_aeros.nome
-            trajetoria_simulada.letra_maxima = dados_faltantes_aeros.letra_maxima
 
             self.trajetorias_simuladas[cm] = trajetoria_simulada
 
@@ -185,25 +173,28 @@ class TrajetoriasSimuladas:
         template_wb.save(caminho_excel)
 
 
-class CalculadoraTrajetoriaFuncionario:
+class CalculaReenquadramento:
     def __init__(
         self,
         funcionario: Funcionario,
         data_migracao: date,
         avaliacoes: list[Avaliacao],
-        tempo_licenca: int,
+        dados_faltantes_aeros: DadosFaltantesAeros,
     ):
         self.funcionario = funcionario
         self.data_migracao = data_migracao
         self.avaliacoes = avaliacoes or []
-        self.tempo_licenca = tempo_licenca
+        self.dados_faltantes_aeros = dados_faltantes_aeros
         self.indx_avaliacao = 0
         self.num_progressoes = 0
 
     def calcula(self) -> TrajetoriaSimulada:
         """Calcula a carreira simulada de um funcionário."""
         trajetoria_simulada = TrajetoriaSimulada(
-            self.funcionario, self.data_migracao, [], "", self.tempo_licenca, ""
+            self.funcionario,
+            self.data_migracao,
+            [],
+            self.dados_faltantes_aeros,
         )
 
         data_condicao_aposentadoria = (
