@@ -1,16 +1,18 @@
 import argparse
 import sys
+from datetime import date, datetime
 
 from reenquadramento.trajetoria_simulada import TrajetoriasSimuladas
 
 
 def reenquadramento(
     caminho_projecao_excel: str,
+    data_migracao: date,
     caminho_saida_reenquadramento: str = "resultado_reenquadramento.xlsx",
 ):
     """Executa a lógica principal do reenquadramento."""
 
-    calculadora = TrajetoriasSimuladas.from_excel(caminho_projecao_excel)
+    calculadora = TrajetoriasSimuladas.from_excel(caminho_projecao_excel, data_migracao)
     print("Calculando trajetórias simuladas...")
     calculadora.calcula()
     calculadora.exporta_para_excel(caminho_excel=caminho_saida_reenquadramento)
@@ -29,6 +31,7 @@ def run_from_argv(argv=None):
     parser.add_argument(
         "caminho_projecao_excel", help="Caminho do arquivo de projeção (xlsx)"
     )
+    parser.add_argument("data_migracao", help="Data de migração (DD/MM/YYYY)")
     parser.add_argument(
         "caminho_saida_reenquadramento",
         help="Caminho e nome do arquivo que conterá os resultados de reenquadramento",
@@ -38,6 +41,7 @@ def run_from_argv(argv=None):
 
     reenquadramento(
         args.caminho_projecao_excel,
+        datetime.strptime(args.data_migracao, "%d/%m/%Y").date(),
         args.caminho_saida_reenquadramento,
     )
     return 0

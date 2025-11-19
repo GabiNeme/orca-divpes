@@ -32,12 +32,14 @@ class TrajetoriaSimulada:
     def __init__(
         self,
         funcionario: Funcionario,
+        data_migracao: date,
         progressoes: list[ProgressaoSimulada],
         nome: str,
         tempo_licenca: int,
         letra_maxima: str,
     ):
         self.funcionario = funcionario
+        self.data_migracao = data_migracao
         self.progressoes = progressoes  # list[ProgressaoSimulada]
         self.nome = nome
         self.tempo_licenca = tempo_licenca
@@ -60,13 +62,14 @@ class TrajetoriaSimulada:
         writer.sheets[sheet_name] = worksheet
 
         # Write CM and tempo_licenca in the requested cells
-        worksheet["C4"] = self.funcionario.cm
-        worksheet["C5"] = self.nome
-        worksheet["C6"] = self.funcionario.data_admissao
-        worksheet["D7"] = self.tempo_licenca
+        worksheet["E3"] = self.data_migracao
+        worksheet["C5"] = self.funcionario.cm
+        worksheet["C6"] = self.nome
+        worksheet["C7"] = self.funcionario.data_admissao
+        worksheet["D8"] = self.tempo_licenca
 
-        # Write progressoes starting at row 11
-        start_row = 11
+        # Escreve progressões
+        start_row = 13
         for i, prog in enumerate(self.progressoes):
             row = start_row + i
             worksheet.cell(row=row, column=2, value=prog.data)
@@ -75,15 +78,15 @@ class TrajetoriaSimulada:
             worksheet.cell(row=row, column=5, value=prog.especial_concedida)
             worksheet.cell(row=row, column=6, value=prog.nota_media_especial)
 
-        # Escreve reenquadramento
+        # Escreve resultado do reenquadramento
         if self.funcionario.dados_folha.classe == Classe.E1:
-            worksheet["C33"] = "E2"
+            worksheet["C34"] = "E2"
         else:
-            worksheet["C33"] = self.funcionario.dados_folha.classe.name
-        worksheet["C34"] = self.progressoes[-1].nivel.numero
-        worksheet["C35"] = self._calcula_letra_maxima()
-        worksheet["E36"] = self.progressoes[-1].data
-        worksheet["E37"] = self.progressoes[-1].especial_concedida
+            worksheet["C34"] = self.funcionario.dados_folha.classe.name
+        worksheet["C35"] = self.progressoes[-1].nivel.numero
+        worksheet["C36"] = self._calcula_letra_maxima()
+        worksheet["E37"] = self.progressoes[-1].data
+        worksheet["E38"] = self.progressoes[-1].especial_concedida
 
     def _calcula_letra_maxima(self) -> str:
         """Compara as progs horizontais que servidor tem com o limite da sua carreira."""
@@ -104,9 +107,11 @@ class TrajetoriasSimuladas:
     def __init__(
         self,
         funcionarios: Funcionario,
+        data_migracao: date,
         avaliacoes: Avaliacoes = Avaliacoes.from_excel(),
     ):
         self.funcionarios = funcionarios  # {cm: Funcionario}
+        self.data_migracao = data_migracao
         self.avaliacoes = avaliacoes  # Avaliacoes
         self.dados_faltantes = obtem_dados_faltantes_aeros()
 
@@ -114,19 +119,20 @@ class TrajetoriasSimuladas:
         self.trajetorias_simuladas = {}  # {cm: TrajetoriaSimulada}
 
     @classmethod
-    def from_excel(cls, caminho_excel: str):
+    def from_excel(cls, caminho_excel: str, data_migracao: date):
         """Cria uma instância de CMBH a partir de um arquivo Excel."""
 
         cmbh: CMBH = ImportadorProjecaoExcel().importa(
             caminho_excel, importa_folhas=False
         )
-        return cls(cmbh.funcionarios)
+        return cls(cmbh.funcionarios, data_migracao)
 
     def calcula(self) -> None:
         """Calcula as carreiras simuladas de todos os funcionários."""
         for cm, funcionario in self.funcionarios.items():
             trajetoria_simulada = CalculadoraTrajetoriaFuncionario(
                 funcionario,
+                self.data_migracao,
                 self.avaliacoes.do_cm(cm),
                 self.dados_faltantes.get(
                     cm, DadosFaltantesAeros("", 0, "")
@@ -183,10 +189,12 @@ class CalculadoraTrajetoriaFuncionario:
     def __init__(
         self,
         funcionario: Funcionario,
+        data_migracao: date,
         avaliacoes: list[Avaliacao],
         tempo_licenca: int,
     ):
         self.funcionario = funcionario
+        self.data_migracao = data_migracao
         self.avaliacoes = avaliacoes or []
         self.tempo_licenca = tempo_licenca
         self.indx_avaliacao = 0
@@ -195,7 +203,7 @@ class CalculadoraTrajetoriaFuncionario:
     def calcula(self) -> TrajetoriaSimulada:
         """Calcula a carreira simulada de um funcionário."""
         trajetoria_simulada = TrajetoriaSimulada(
-            self.funcionario, [], "", self.tempo_licenca, ""
+            self.funcionario, self.data_migracao, [], "", self.tempo_licenca, ""
         )
 
         data_condicao_aposentadoria = (
@@ -203,7 +211,7 @@ class CalculadoraTrajetoriaFuncionario:
         )
         progressao = self.funcionario.progressoes[-1]
 
-        while progressao and progressao.data < date(2026, 3, 1):
+        while progressao and progressao.data < self.data_migracao:
 
             prog_sim = self._converte_em_simulada(progressao)
 
