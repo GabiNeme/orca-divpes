@@ -133,3 +133,7 @@ db_config.json
 
 #VsCode
 .vscode/
+
+# Personal info
+efetivos.xlsx
+reenquadramento/notas.xlsx
