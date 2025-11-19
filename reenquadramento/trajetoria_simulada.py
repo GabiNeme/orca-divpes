@@ -49,20 +49,28 @@ class TrajetoriaSimulada:
         workbook = writer.book
         sheet_name = str(self.funcionario.cm)
 
-        # Reuse existing sheet if present, else create a new one
+        # Reaproveite planilha existente se encontrada, senão crie uma nova
         if sheet_name in workbook.sheetnames:
             worksheet = workbook[sheet_name]
         else:
             worksheet = workbook.create_sheet(title=sheet_name)
-        # Ensure writer knows about the sheet
+        # Assegure que o writer conheça a planilha
         writer.sheets[sheet_name] = worksheet
 
-        # Write CM and tempo_licenca in the requested cells
+        # Escreve dados de entrada
         worksheet["E3"] = self.data_migracao
         worksheet["C5"] = self.funcionario.cm
         worksheet["C6"] = self.dados_faltantes_aeros.nome
         worksheet["C7"] = self.funcionario.data_admissao
         worksheet["D8"] = self.dados_faltantes_aeros.qtde_dias_licenca
+
+        # Se completou condição de aposentadoria antes da data da migração, escreve
+        if (
+            self.funcionario.aposentadoria.data_condicao_aposentadoria
+            < self.data_migracao
+        ) and self.funcionario.cm < 330:  # Aposentadoria só influencia carreira de cm antes de 330
+            worksheet["B9"] = "Completou cond. de aposentadoria:"
+            worksheet["D9"] = self.funcionario.aposentadoria.data_condicao_aposentadoria
 
         # Escreve progressões
         start_row = 13
