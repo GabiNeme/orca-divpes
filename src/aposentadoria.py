@@ -50,6 +50,10 @@ class Aposentadoria:
             self._calcula_aposentadoria()
         return self._compulsoria
 
+    @property
+    def data_compulsoria(self) -> date:
+        return self._data_compulsoria()
+
     def _calcula_aposentadoria(self):
         data_completa_cond_aposentadoria = max(
             self._data_por_tempo_contribuicao(),
@@ -170,8 +174,10 @@ class AposentadoriaAntes98(Aposentadoria):
 
 def atribui_aposentadoria(funcionario: DadosPrevidenciarios) -> Aposentadoria:
     """Atribui o tipo de aposentadoria ao funcionário, baseado na data de admissão."""
-    data_ingresso_serv_publ = funcionario.data_admissao - relativedelta(days=funcionario.tempo_sevico_publico)
-    
+    data_ingresso_serv_publ = funcionario.data_admissao - relativedelta(
+        days=funcionario.tempo_sevico_publico
+    )
+
     if data_ingresso_serv_publ < date(1998, 7, 16):
         return AposentadoriaAntes98
     elif data_ingresso_serv_publ < date(2003, 12, 31):

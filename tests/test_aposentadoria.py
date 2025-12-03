@@ -2,10 +2,10 @@ from datetime import date
 
 from src.aposentadoria import (
     AposentadoriaAntes98,
+    AposentadoriaAtual,
     AposentadoriaIntegral,
     DadosPrevidenciarios,
     Sexo,
-    AposentadoriaAtual,
     atribui_aposentadoria,
 )
 
@@ -94,6 +94,17 @@ class TestAposentadoriaAtual:
 
         assert aposentadoria.data_aposentadoria == date(2022, 1, 1)
         assert aposentadoria.compulsoria
+
+    def test_data_compulsoria(self):
+        servidor = DadosPrevidenciarios(
+            data_nascimento=date(1980, 1, 1),
+            sexo=Sexo.MASCULINO,
+            data_admissao=date(2010, 1, 1),
+            tempo_INSS=0,
+            tempo_sevico_publico=0,
+        )
+        aposentadoria = AposentadoriaAtual(servidor)
+        assert aposentadoria.data_compulsoria == date(2055, 1, 1)
 
 
 class TestAposentadoriaIntegral:
