@@ -5,25 +5,25 @@ from dateutil.relativedelta import relativedelta
 
 class Art98:
     def __init__(
-        self, data_inicio: date, usufruto: int, media_usufruto_cmbh: int = None
+        self, data_inicio: date, usufruto: int, media_usufruto_cmbh: int = 0
     ) -> None:
         self.data_inicio = data_inicio
         self.usufruto = usufruto
         self._media_usufruto_cmbh = media_usufruto_cmbh
 
     def media_usufruto_por_ano(self) -> int:
-        """Calcula média de usufruto, caso não informado.
+        """Calcula média de usufruto, caso início do art 98 seja maior que a data atual.
 
-        Se for informada, na instanciação da classe, a média de usufruto da CMBH, essa
-        média será retornada por essa funçõa. Caso contrário, será calculada a média
-        anual de usufruto, sendo considerada como a divisão inteira entre o usufruto do
-        servidor pelo número de anos completos desde o início do art. 98 e a data de
-        execução dessa função.
+        Se a data de início for maior que a data atual, retorna o usufruto médio do CMBH.
+        Caso contrário, será calculada a média anual de usufruto, sendo considerada como
+        a divisão inteira entre o usufruto do servidor pelo número de anos completos.
         """
-        if self._media_usufruto_cmbh:
+        if self.data_inicio > date.today():
             return self._media_usufruto_cmbh
 
         anos = relativedelta(date.today(), self.data_inicio).years
+        if anos == 0:
+            return 0
         return self.usufruto // anos
 
     def obtem_num_art98_para(self, data: date) -> int:

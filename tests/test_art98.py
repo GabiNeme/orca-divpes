@@ -7,8 +7,9 @@ from src.art98 import Art98
 
 
 class TestArt98:
-    def test_media_usufruto_igual_media_cmbh(self):
-        art98 = Art98(date(2000, 1, 1), 20, media_usufruto_cmbh=4)
+    @freeze_time("2020-02-01")
+    def test_media_usufruto_igual_media_cmbh_se_admissao_maior_que_data_atual(self):
+        art98 = Art98(date(2021, 1, 1), 20, media_usufruto_cmbh=4)
         assert art98.media_usufruto_por_ano() == 4
 
     @pytest.mark.parametrize(
@@ -27,6 +28,12 @@ class TestArt98:
         art98 = Art98(data_inicio_art98, usufruto)
 
         assert art98.media_usufruto_por_ano() == media_usufruto
+
+    @freeze_time("2020-06-01")
+    def test_media_zero_se_menos_que_1_ano(self):
+        art98 = Art98(date(2020, 2, 1), 0)
+
+        assert art98.media_usufruto_por_ano() == 0
 
     @pytest.mark.parametrize(
         "data_inicio_art98, data, usufruto, num_art98",
@@ -74,7 +81,7 @@ class TestArt98:
 
         assert art98.obtem_num_art98_para(data) == num_art98
 
-    @freeze_time("2020-02-01")
+    @freeze_time("2020-01-01")  # Função irá usar a média informada
     def test_num_art98_nunca_menor_que_0(self):
         art98 = Art98(date(2020, 2, 1), 0, media_usufruto_cmbh=11)
 
