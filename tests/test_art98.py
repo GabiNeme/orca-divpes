@@ -3,7 +3,7 @@ from datetime import date
 import pytest
 from freezegun import freeze_time
 
-from src.art98 import Art98
+from src.art98 import Art98, DadosArt98
 
 
 class TestArt98:
@@ -90,3 +90,21 @@ class TestArt98:
         assert art98.obtem_num_art98_para(date(2022, 2, 1)) == 0
         assert art98.obtem_num_art98_para(date(2023, 2, 1)) == 7
         assert art98.obtem_num_art98_para(date(2024, 2, 1)) == 4
+
+    @freeze_time("2020-01-01")
+    def test_calcula_media_usufruto_art98_cmbh(self):
+        dados_art98 = [
+            DadosArt98(date(2010, 1, 1), 10),  # 1 por ano
+            DadosArt98(date(2010, 1, 1), 20),  # 2 por ano
+            DadosArt98(date(2015, 1, 1), 30),  # 6 por ano
+        ]
+
+        assert Art98.calcula_media_usufruto_art98_cmbh(dados_art98) == 3
+
+    def test_calcula_media_usufruto_art98_cmbh_sem_dados(self):
+        dados_art98 = []
+
+        assert Art98.calcula_media_usufruto_art98_cmbh(dados_art98) == 0
+
+    def test_calcula_media_usufruto_art98_cmbh_none(self):
+        assert Art98.calcula_media_usufruto_art98_cmbh(None) == 0
