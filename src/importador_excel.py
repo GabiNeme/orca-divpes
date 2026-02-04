@@ -6,7 +6,7 @@ from src.banco_de_dados import BancoDeDados
 from src.carreira import atribui_carreira
 from src.classe import Classe
 from src.folha import Folha
-from src.funcionario import Funcionario, concede_letras
+from src.funcionario import Funcionario
 from src.funcionario_factory import FuncionarioFactory
 from src.nivel import Nivel
 from src.regra_transicao import RegraTransicao
@@ -89,11 +89,6 @@ class ImportadorProjecaoExcel:
         )
         carreira = atribui_carreira(cm, classe)
         grupo_de_controle = int(linha[1][15])
-        nivel_carreira_atual = Nivel.from_string(linha[1][3])
-        if concede_letras(nivel_carreira_atual):
-            letra_maxima = None
-        else:
-            letra_maxima = Nivel.from_string(linha[1][3]).letra
 
         return FuncionarioFactory.cria_funcionario(
             cm=cm,
@@ -109,7 +104,6 @@ class ImportadorProjecaoExcel:
             ultima_progressao=ultima_progressao,
             carreira=carreira,
             grupo_de_controle=grupo_de_controle,
-            letra_maxima=letra_maxima,
         )
 
     def _adiciona_folha_da_linha(self, cm: int, linha) -> None:

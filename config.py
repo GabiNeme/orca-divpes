@@ -20,6 +20,8 @@ class Parametros:
     ALIQUOTA_PATRONAL: float = 0.22
     ALIQUOTA_PATRONAL_COMPLEMENTAR: float = 0.085
     TETO_INSS: float = None  # Importado do Aeros
+    # Parâmetros de cálculo
+    CONCEDE_NOVAS_LETRAS: bool = True
 
     @classmethod
     def from_aeros(cls, aeros: BancoDeDados):
@@ -76,6 +78,7 @@ class Parametros:
                 "ALIQUOTA_PATRONAL_COMPLEMENTAR", None
             ),
             TETO_INSS=json_data.get("TETO_INSS", None),
+            CONCEDE_NOVAS_LETRAS=json_data.get("CONCEDE_NOVAS_LETRAS", True),
         )
 
 

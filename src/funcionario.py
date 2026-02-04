@@ -3,9 +3,10 @@ from datetime import date
 from enum import Enum
 from typing import Optional
 
-from src.carreira import Carreira, CarreiraAtual, Progressao
+from src.carreira import Carreira, Progressao
 from src.classe import Classe
 from src.nivel import Nivel
+from src.progressoes_horizontais import progressoes_horizontais
 
 
 class TipoPrevidencia(Enum):
@@ -40,7 +41,6 @@ class Funcionario:
         aposentadoria: Aposentadoria,
         ultima_progressao: Progressao,
         carreira: Carreira,
-        letra_maxima: str = None,
     ):
         self.cm = cm
         self.data_admissao = data_admissao
@@ -48,7 +48,6 @@ class Funcionario:
         self.aposentadoria = aposentadoria
         self.progressoes = [ultima_progressao]
         self.carreira = carreira
-        self.letra_maxima = letra_maxima
 
     def _calcula_progressoes_ate(self, data: date):
         ultima_progressao = self.progressoes[-1]
@@ -58,7 +57,7 @@ class Funcionario:
             # Quando a letra máxima for None, progride até o máximo permitido.
             ultima_progressao = self.carreira.progride_verticalmente_e_horizontalmente(
                 ultima_progressao,
-                letra_maxima=self.letra_maxima,
+                letra_maxima=progressoes_horizontais.obtem_letra_maxima(self.cm),
                 data_condicao_aposentadoria=self.aposentadoria.data_condicao_aposentadoria,
             )
 
@@ -100,15 +99,3 @@ class Funcionario:
             "Num Art 98 Data Aposentadoria": self.aposentadoria.num_art_98_data_aposentadoria,
             "Aderiu PIA": self.aposentadoria.aderiu_pia,
         }
-
-
-def concede_letras(nivel_atual: Nivel) -> bool:
-    nivel_letra_maxima = CarreiraAtual().concede_letras_ate_limite(nivel_atual)
-
-    if (
-        nivel_letra_maxima.numero_progressoes_horizontais
-        - nivel_atual.numero_progressoes_horizontais
-        > 0
-    ):
-        return False
-    return True

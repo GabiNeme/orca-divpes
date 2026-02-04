@@ -75,14 +75,6 @@ class TestImportadorProjecaoExcel:
         funcionario = cmbh_fixture.funcionarios.get(1)
         assert not funcionario.aposentadoria.aderiu_pia
 
-    def test_salva_letra_maxima_se_nao_esta_no_topo(self, cmbh_fixture: CMBH):
-        funcionario = cmbh_fixture.funcionarios.get(1)
-        assert funcionario.letra_maxima == "C"
-
-    def test_nao_salva_letra_maxima_se_esta_no_topo(self, cmbh_fixture: CMBH):
-        funcionario = cmbh_fixture.funcionarios.get(2)
-        assert funcionario.letra_maxima is None
-
     def test_folha(self, cmbh_fixture: CMBH):
         competencia = date(2025, 11, 1)
         folha = cmbh_fixture.folhas_efetivos.folhas[competencia][1]

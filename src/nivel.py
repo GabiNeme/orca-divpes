@@ -68,3 +68,7 @@ class Nivel:
 
     def __hash__(self) -> int:
         return self.numero * (self.numero_progressoes_horizontais + 1000)
+
+    @staticmethod
+    def nivel_horizontal_para_numero(letra: str) -> int:
+        return LETRAS.index(letra)
