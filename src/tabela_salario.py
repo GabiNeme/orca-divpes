@@ -1,5 +1,6 @@
 from datetime import date
 from functools import lru_cache
+
 from dateutil.relativedelta import relativedelta
 
 import config
@@ -41,22 +42,20 @@ class Tabela:
     def calcula_indice_reajuste(
         competencia: date, data_calculo: date = date.today()
     ) -> float:
-        """Calcula o índice de reajuste para a competência informada."""
+        """Calcula o índice de reajuste para a competência informada.
+        O índice de reajuste é aplicado somente no primeiro ano."""
 
         # Se a projeção for executada no mês ou após o mês da data base, não conta o
         # ano corrente, e a primeira data base será no ano seguinte
         if data_calculo.month >= config.param.DATA_BASE_REAJUSTE:
             data_base_inicial = date(
-                data_calculo.year, config.param.DATA_BASE_REAJUSTE, 1
+                data_calculo.year + 1, config.param.DATA_BASE_REAJUSTE, 1
             )
         else:
             data_base_inicial = date(
-                data_calculo.year - 1, config.param.DATA_BASE_REAJUSTE, 1
+                data_calculo.year, config.param.DATA_BASE_REAJUSTE, 1
             )
 
-        quantidade_anos = relativedelta(competencia, data_base_inicial).years
-
-        # Não permite índices negativos (competências anteriores à data base)
-        quantidade_anos = max(0, quantidade_anos)
-
-        return round((1 + config.param.REAJUSTE_ANUAL) ** quantidade_anos, 6)
+        if competencia < data_base_inicial:
+            return 1.0
+        return 1 + config.param.REAJUSTE_ANUAL

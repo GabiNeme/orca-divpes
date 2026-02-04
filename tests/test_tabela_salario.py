@@ -1,4 +1,5 @@
 from datetime import date
+
 import pytest
 
 import config
@@ -112,11 +113,11 @@ class TestTabela:
             Tabela.calcula_indice_reajuste(
                 competencia=date(2024, 5, 1), data_calculo=date(2023, 1, 1)
             )
-            == 1.21
+            == 1.1
         )
         assert (
             Tabela.calcula_indice_reajuste(
                 competencia=date(2025, 5, 1), data_calculo=date(2023, 1, 1)
             )
-            == 1.331
+            == 1.1
         )
