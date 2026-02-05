@@ -72,3 +72,10 @@ class Nivel:
     @staticmethod
     def nivel_horizontal_para_numero(letra: str) -> int:
         return LETRAS.index(letra)
+
+    @staticmethod
+    def proxima_letra(letra: str) -> str:
+        """Retorna a letra que segue a letra informada."""
+        if letra == LETRAS[-1]:
+            return letra  # Já é a última letra
+        return LETRAS[LETRAS.index(letra) + 1]

@@ -1,6 +1,13 @@
 from dataclasses import dataclass
+from enum import Enum
 
 from src.banco_de_dados import BancoDeDados
+
+
+class ConcessaoLetras(Enum):
+    NAO_CONCEDE = "NAO_CONCEDE"
+    CONCEDE_UMA = "CONCEDE_UMA"
+    CONCEDE_TODAS = "CONCEDE_TODAS"
 
 
 @dataclass
@@ -21,7 +28,7 @@ class Parametros:
     ALIQUOTA_PATRONAL_COMPLEMENTAR: float = 0.085
     TETO_INSS: float = None  # Importado do Aeros
     # Parâmetros de cálculo
-    CONCEDE_NOVAS_LETRAS: bool = True
+    CONCESSAO_LETRAS: ConcessaoLetras = ConcessaoLetras.CONCEDE_TODAS
 
     @classmethod
     def from_aeros(cls, aeros: BancoDeDados):
@@ -60,6 +67,19 @@ class Parametros:
 
     @classmethod
     def from_json(cls, json_data: dict):
+        # Lê o parâmetro CONCESSAO_LETRAS como enum
+        concessao_letras_bruto = json_data.get("CONCESSAO_LETRAS", None)
+        if concessao_letras_bruto is None:
+            concessao_letras = ConcessaoLetras.CONCEDE_TODAS
+        if isinstance(concessao_letras_bruto, str):
+            try:
+                concessao_letras = ConcessaoLetras(concessao_letras_bruto)
+            except ValueError:
+                # Se não for um valor válido do enum, usa o padrão CONCEDE_TODAS
+                concessao_letras = ConcessaoLetras.CONCEDE_TODAS
+        else:
+            concessao_letras = ConcessaoLetras.CONCEDE_TODAS
+
         return cls(
             VALOR_BASE_E2=json_data.get("VALOR_BASE_E2", None),
             VALOR_BASE_E3=json_data.get("VALOR_BASE_E3", None),
@@ -78,7 +98,7 @@ class Parametros:
                 "ALIQUOTA_PATRONAL_COMPLEMENTAR", None
             ),
             TETO_INSS=json_data.get("TETO_INSS", None),
-            CONCEDE_NOVAS_LETRAS=json_data.get("CONCEDE_NOVAS_LETRAS", True),
+            CONCESSAO_LETRAS=concessao_letras,
         )
 
 

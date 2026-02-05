@@ -33,24 +33,31 @@ class ProgressoesHorizontais:
             self.nivel_atual[cm] = nivel_atual
 
     def obtem_letra_maxima(self, cm: int) -> str | None:
-        """Caso deva ser respeitada uma letra máxima para o funcionário, retorna essa letra.
-        Caso possa ter todas as progressões, retorna None."""
-        if cm not in self.letras_adquiridas:
-            return None  # Pode ter todas as letras
-        if self._concede_letras(cm):
-            return None  # Pode ter todas as letras
-        return self.letras_adquiridas.get(cm, None)  # limita às letras adquiridas
+        """Respeita a configuração geral de concessão de letras.
+        No entanto, caso o funcionário não possua todas as letras permitidas
+        para o seu nível atual, ele não receberá novas letras independente da configuração geral.
 
-    def _concede_letras(self, cm: int) -> bool:
+        Retorna None se o funcionário pode ter todas as letras.
+        Retorna a letra máxima que o funcionário pode ter caso contrário."""
 
-        if config.param.CONCEDE_NOVAS_LETRAS:
-            return self._possui_todas_as_letras_permitidas(cm)
-        return False  # Limita a letra à atual adquirida
+        possui_todas_letras_permitidas = self._possui_todas_as_letras_permitidas(cm)
+
+        # Se o servidor não possui todas as letras permitidas, ele não irá ganhar
+        # letras novas independente da configuração geral
+        if not possui_todas_letras_permitidas:
+            return self.letras_adquiridas.get(cm, None)
+
+        if config.param.CONCESSAO_LETRAS == config.ConcessaoLetras.NAO_CONCEDE:
+            return self.letras_adquiridas.get(cm, "0")  # limita às letras adquiridas
+        elif config.param.CONCESSAO_LETRAS == config.ConcessaoLetras.CONCEDE_UMA:
+            letra_atual = self.letras_adquiridas.get(cm, "0")
+            return Nivel.proxima_letra(letra_atual)
+        elif config.param.CONCESSAO_LETRAS == config.ConcessaoLetras.CONCEDE_TODAS:
+            return None  # pode ter todas as letras
 
     def _possui_todas_as_letras_permitidas(self, cm: int) -> bool:
-        """Permite que o funcionário tenha novas letras se possuir todas as letras permitidas pelo
-        nível atual. Caso contrário, não permite novas letras."""
-        nivel_atual = self.nivel_atual.get(cm, 0)
+        """Descobre se o funcionário já possui todas as letras permitidas para o seu nível atual."""
+        nivel_atual = self.nivel_atual.get(cm, 1)
         letra_maxima_do_nivel_atual = CarreiraAtual().concede_letras_ate_limite(
             Nivel(nivel_atual, "0")
         )

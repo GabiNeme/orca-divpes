@@ -6,6 +6,7 @@ from src.carreira import Carreira, Progressao
 from src.classe import Classe
 from src.funcionario import Aposentadoria, DadosFolha, Funcionario, TipoPrevidencia
 from src.nivel import Nivel
+from src.progressoes_horizontais import progressoes_horizontais
 
 
 class DummyCarreira(Carreira):
@@ -33,7 +34,7 @@ class DummyCarreira(Carreira):
 class TesteFuncionario:
 
     def default_funcionario(self, nivel_inicial: Nivel = Nivel(1, "A")) -> Funcionario:
-        return Funcionario(
+        funcionario = Funcionario(
             cm=12345,
             data_admissao=date(2020, 1, 1),
             dados_folha=DadosFolha(
@@ -54,6 +55,13 @@ class TesteFuncionario:
             ),
             carreira=DummyCarreira(),
         )
+
+        # Ensure progressoes_horizontais has data for this CM so obtem_letra_maxima
+        # and subsequent logic do not crash when the tests run.
+        progressoes_horizontais.letras_adquiridas[funcionario.cm] = nivel_inicial.letra
+        progressoes_horizontais.nivel_atual[funcionario.cm] = nivel_inicial.numero
+
+        return funcionario
 
     def test_retorna_nivel_correto_se_concede_todas_as_letras(self):
         funcionario = self.default_funcionario()

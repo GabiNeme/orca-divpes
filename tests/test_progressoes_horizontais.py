@@ -1,8 +1,10 @@
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
 import pandas as pd
 import pytest
 
+import config
+from config import ConcessaoLetras
 from src.progressoes_horizontais import ProgressoesHorizontais
 
 
@@ -40,39 +42,48 @@ class TestProgressoesHorizontais:
             3: 1,  # None convertido para 1
         }
 
-    @patch("config.param.CONCEDE_NOVAS_LETRAS", True)
-    def test_obtem_letra_maxima_concede_novas_letras_no_maximo(
-        self, progressoes_horizontais
-    ):
-        """Testa obtem_letra_maxima quando CONCEDE_NOVAS_LETRAS=True e está no máximo."""
-        # Para cm=1, nivel_atual=5, letras_adquiridas='A'
-        # CarreiraAtual().concede_letras_ate_limite(Nivel(5, "0")) retorna Nivel(5, "A") que tem numero_progressoes_horizontais=1
-        # Nivel.nivel_horizontal_para_numero('A') = 1
-        # 1 >= 1, então concede novas letras
-        result = progressoes_horizontais.obtem_letra_maxima(1)
-        assert result is None  # Pode ter todas as letras
+    def test_obtem_letra_maxima_concede_todas(self, progressoes_horizontais):
+        """Testa obtem_letra_maxima quando modo é CONCEDE_TODAS e está no máximo."""
+        original = config.param.CONCESSAO_LETRAS
+        config.param.CONCESSAO_LETRAS = ConcessaoLetras.CONCEDE_TODAS
+        try:
+            result = progressoes_horizontais.obtem_letra_maxima(1)
+            assert result is None  # Pode ter todas as letras
+        finally:
+            config.param.CONCESSAO_LETRAS = original
 
-    @patch("config.param.CONCEDE_NOVAS_LETRAS", True)
-    def test_obtem_letra_maxima_nao_concede_novas_letras_abaixo_maximo(
-        self, progressoes_horizontais
-    ):
-        """Testa obtem_letra_maxima quando CONCEDE_NOVAS_LETRAS=True mas não está no máximo."""
-        # Para cm=2, nivel_atual=1, letras_adquiridas='0'
-        # CarreiraAtual().concede_letras_ate_limite(Nivel(1, "0")) retorna Nivel(1, "A") que tem numero_progressoes_horizontais=1
-        # Nivel.nivel_horizontal_para_numero('0') = 0
-        # 0 >= 1? Não, então limita às adquiridas
-        result = progressoes_horizontais.obtem_letra_maxima(2)
-        assert result == "0"
+    def test_obtem_letra_maxima_nao_alcancou_maximo(self, progressoes_horizontais):
+        """Testa obtem_letra_maxima quando servidor não possui todas as letras permitidas."""
+        original = config.param.CONCESSAO_LETRAS
+        config.param.CONCESSAO_LETRAS = ConcessaoLetras.CONCEDE_TODAS
+        try:
+            result = progressoes_horizontais.obtem_letra_maxima(2)
+            assert result == "0"
+        finally:
+            config.param.CONCESSAO_LETRAS = original
 
-    @patch("config.param.CONCEDE_NOVAS_LETRAS", False)
-    def test_obtem_letra_maxima_nao_concede_novas_letras_config_false(
-        self, progressoes_horizontais
-    ):
-        """Testa obtem_letra_maxima quando CONCEDE_NOVAS_LETRAS=False."""
-        result = progressoes_horizontais.obtem_letra_maxima(1)
-        assert result == "A"  # Limita à adquirida
+    def test_obtem_letra_maxima_nao_concede(self, progressoes_horizontais):
+        """Testa obtem_letra_maxima quando modo é NAO_CONCEDE."""
+        original = config.param.CONCESSAO_LETRAS
+        config.param.CONCESSAO_LETRAS = ConcessaoLetras.NAO_CONCEDE
+        try:
+            result = progressoes_horizontais.obtem_letra_maxima(1)
+            assert result == "A"  # Limita à adquirida
+        finally:
+            config.param.CONCESSAO_LETRAS = original
 
-    def test_obtem_letra_maxima_cm_nao_encontrado(self, progressoes_horizontais):
-        """Testa obtem_letra_maxima para cm não encontrado."""
-        result = progressoes_horizontais.obtem_letra_maxima(999)
-        assert result is None
+    def test_obtem_letra_maxima_concede_uma(self, progressoes_horizontais):
+        """Testa obtem_letra_maxima quando modo é CONCEDE_UMA (uma letra a mais)."""
+        original = config.param.CONCESSAO_LETRAS
+        config.param.CONCESSAO_LETRAS = ConcessaoLetras.CONCEDE_UMA
+        try:
+            # Para cm=1, adquirida 'A' -> permite 'B'
+            result = progressoes_horizontais.obtem_letra_maxima(1)
+            assert result == "B"
+        finally:
+            config.param.CONCESSAO_LETRAS = original
+
+    def test_obtem_letra_maxima_cm_nao_encontrado_raises(self, progressoes_horizontais):
+        """Testa obtem_letra_maxima para cm não encontrado: agora espera-se erro de validação."""
+        with pytest.raises(ValueError):
+            progressoes_horizontais.obtem_letra_maxima(999)
