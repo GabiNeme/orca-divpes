@@ -21,10 +21,12 @@ select
             FPC228 as progs
             left join FPC060 ON FPC060.FPC060_COD = progs.FPC060_COD
         WHERE
-            progs.C093_COD = fw.C093_COD
+            progs.C093_COD = fw.C093_COD and
+            FPC255_COD in (2, 3, 5, 14) -- prog hor, chefia, lanç futuro e hor esp
         ORDER BY
             C093_COD,
-            FPC060.FPC060_COD DESC -- maior letra
+            FPC228_DATA  DESC, -- mais recente
+            FPC060.FPC060_DESCR DESC -- seleciona maior se a data for a mesma
     ) as letras_adquiridas
     
 from VW_FUNCIONARIOS_WEB fw
