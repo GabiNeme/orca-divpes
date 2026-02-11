@@ -64,14 +64,6 @@ class TrajetoriaSimulada:
         worksheet["C7"] = self.funcionario.data_admissao
         worksheet["D8"] = self.dados_faltantes_aeros.qtde_dias_licenca
 
-        # Se completou condição de aposentadoria antes da data da migração, escreve
-        if (
-            self.funcionario.aposentadoria.data_condicao_aposentadoria
-            < self.data_migracao
-        ) and self.funcionario.cm < 330:  # Aposentadoria só influencia carreira de cm antes de 330
-            worksheet["B9"] = "Completou cond. de aposentadoria:"
-            worksheet["D9"] = self.funcionario.aposentadoria.data_condicao_aposentadoria
-
         # Escreve progressões
         start_row = 13
         for i, prog in enumerate(self.progressoes):
@@ -205,9 +197,6 @@ class CalculaReenquadramento:
             self.dados_faltantes_aeros,
         )
 
-        data_condicao_aposentadoria = (
-            self.funcionario.aposentadoria.data_condicao_aposentadoria
-        )
         progressao = self.funcionario.progressoes[-1]
 
         while progressao and progressao.data < self.data_migracao:
@@ -230,7 +219,7 @@ class CalculaReenquadramento:
 
             # Avança a progressão de acordo com qtde_progressoes calculada
             progressao = self.funcionario.carreira.progride_verticalmente_por_quantidade_de_niveis(
-                progressao, qtde_progressoes, data_condicao_aposentadoria
+                progressao, qtde_progressoes
             )
             self.num_progressoes += 1
 
