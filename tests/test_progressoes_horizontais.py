@@ -83,7 +83,15 @@ class TestProgressoesHorizontais:
         finally:
             config.param.CONCESSAO_LETRAS = original
 
-    def test_obtem_letra_maxima_cm_nao_encontrado_raises(self, progressoes_horizontais):
-        """Testa obtem_letra_maxima para cm não encontrado: agora espera-se erro de validação."""
-        with pytest.raises(ValueError):
-            progressoes_horizontais.obtem_letra_maxima(999)
+    def test_obtem_letra_maxima_cm_nao_encontrado_verdadeiro(
+        self, progressoes_horizontais
+    ):
+        """Testa obtem_letra_maxima para cm não encontrado: espera que seja retornado màximo 0."""
+        original = config.param.CONCESSAO_LETRAS
+        config.param.CONCESSAO_LETRAS = ConcessaoLetras.CONCEDE_UMA
+        try:
+            # cm=999 não existe nos dados de teste, deve retornar None
+            result = progressoes_horizontais.obtem_letra_maxima(999)
+            assert result == "0"
+        finally:
+            config.param.CONCESSAO_LETRAS = original

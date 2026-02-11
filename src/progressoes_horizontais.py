@@ -45,7 +45,7 @@ class ProgressoesHorizontais:
         # Se o servidor não possui todas as letras permitidas, ele não irá ganhar
         # letras novas independente da configuração geral
         if not possui_todas_letras_permitidas:
-            return self.letras_adquiridas.get(cm, None)
+            return self.letras_adquiridas.get(cm, "0")
 
         if config.param.CONCESSAO_LETRAS == config.ConcessaoLetras.NAO_CONCEDE:
             return self.letras_adquiridas.get(cm, "0")  # limita às letras adquiridas
