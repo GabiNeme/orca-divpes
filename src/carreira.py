@@ -187,8 +187,11 @@ class CarreiraE2Concurso2004(CarreiraE2):
         return 36
 
 
-class CarreiraE2PassaDoTetoAtual(CarreiraE2):
-    """Carreira do concurso de 2004 que passa do teto atual."""
+class CarreiraE2Concurso1998eAnterior(CarreiraE2):
+    """Carreira do concurso de 1998 e anterior.
+
+    Esse grupo abrange pessoas que sempre puderam passar do teto da carreira de 2004, e agora
+    também inclui pessoas que antes não podiam, mas agora podem (CMs 330 a 336)."""
 
     def _limite(self) -> int:
         """Limite da carreira."""
@@ -224,8 +227,11 @@ class CarreiraE3Concurso2004(CarreiraE3):
         return 35
 
 
-class CarreiraE3PassaDoTetoAtual(CarreiraE3):
-    """Carreira do concurso de 2004 que passa do teto atual."""
+class CarreiraE3Concurso1998eAnterior(CarreiraE3):
+    """Carreira do concurso de 1998 e anterior.
+
+    Esse grupo abrange pessoas que sempre puderam passar do teto da carreira de 2004, e agora
+    também inclui pessoas que antes não podiam, mas agora podem (CMs 330 a 336)."""
 
     def _limite(self) -> int:
         """Limite da carreira."""
@@ -257,8 +263,8 @@ class CarreiraAtual(Carreira):
 def atribui_carreira(cm: int, classe: Classe) -> Carreira:
     """Atribui a nova carreira ao funcionário com base no concurso."""
     if classe == Classe.E3:
-        if cm < 330:
-            return CarreiraE3PassaDoTetoAtual()
+        if cm < 338:
+            return CarreiraE3Concurso1998eAnterior()
         elif cm < 412:
             return CarreiraE3Concurso2004()
         elif cm <= 545:
@@ -266,8 +272,8 @@ def atribui_carreira(cm: int, classe: Classe) -> Carreira:
         return CarreiraE3()
 
     # E1 ou E2
-    if cm < 330:
-        return CarreiraE2PassaDoTetoAtual()
+    if cm < 338:
+        return CarreiraE2Concurso1998eAnterior()
     elif cm < 412:
         return CarreiraE2Concurso2004()
     elif cm <= 545:

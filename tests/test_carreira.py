@@ -4,13 +4,13 @@ import pytest
 
 from src.carreira import (
     CarreiraE2,
+    CarreiraE2Concurso1998eAnterior,
     CarreiraE2Concurso2004,
     CarreiraE2Concurso2008,
-    CarreiraE2PassaDoTetoAtual,
     CarreiraE3,
+    CarreiraE3Concurso1998eAnterior,
     CarreiraE3Concurso2004,
     CarreiraE3Concurso2008,
-    CarreiraE3PassaDoTetoAtual,
     Progressao,
 )
 from src.nivel import Nivel
@@ -209,7 +209,7 @@ class TestCarreiraConcurso2004:
 
 class TestCarreiraE2PassaDoTetoAtual:
     def test_nao_progride_alem_do_fim_da_carreira(self):
-        carreira = CarreiraE2PassaDoTetoAtual()
+        carreira = CarreiraE2Concurso1998eAnterior()
         prog_antes = Progressao(date(2020, 1, 1), Nivel(40, "E"), progs_sem_especial=0)
         assert carreira.progride_verticalmente(prog_antes) == None
 
@@ -240,6 +240,6 @@ class TestCarreiraE3Concurso2004:
 
 class TestCarreiraE3PassaDoTetoAtual:
     def test_nao_progride_alem_do_fim_da_carreira(self):
-        carreira = CarreiraE3PassaDoTetoAtual()
+        carreira = CarreiraE3Concurso1998eAnterior()
         prog_antes = Progressao(date(2020, 1, 1), Nivel(39, "E"), progs_sem_especial=0)
         assert carreira.progride_verticalmente(prog_antes) == None
